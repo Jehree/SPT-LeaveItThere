@@ -16,6 +16,7 @@ using EFT.InventoryLogic;
 using PersistentCaches.Components;
 using static RootMotion.FinalIK.InteractionTrigger.Range;
 using System.ComponentModel;
+using PersistentCaches.Common;
 
 namespace PersistentCaches.Patches
 {
@@ -24,7 +25,6 @@ namespace PersistentCaches.Patches
         private static MethodInfo _getLootItemActions;
         private static FieldInfo _staticLootIdField;
         private const string CRATE_ID = "5811ce772459770e9e5f9532";
-        private static GamePlayerOwner _owner;
 
         protected override MethodBase GetTargetMethod()
         {
@@ -39,11 +39,7 @@ namespace PersistentCaches.Patches
         {
             var player = Singleton<GameWorld>.Instance.MainPlayer;
             var owner = __args[0] as GamePlayerOwner;
-            var interactive = __args[1]; // as GInterface139 as of SPT 3.10
-            if (_owner == null)
-            {
-                _owner = owner;
-            }
+            var interactive = __args[1]; // as GInterface139 as of SPT 3.10 
 
             if (!WeCareAboutInteractive(interactive)) return true;
 
@@ -64,10 +60,24 @@ namespace PersistentCaches.Patches
         private static ActionsReturnClass HandleLootItemInteractive(object interactive, GamePlayerOwner owner)
         {
             var lootItem = interactive as LootItem;
+            var session = PersistentCachesSession.GetSession();
+            bool allowed = session.CachePlacementIsAllowed();
 
-            var action = new CustomInteractionAction("Place Cache", false, () =>
+            var action = new CustomInteractionAction(
+            "Place Cache",
+            !allowed,
+            () =>
             {
-                PlaceCache(lootItem as ObservedLootItem);
+                if (allowed)
+                {
+                    CacheController.PlaceCache(lootItem as ObservedLootItem);
+                    session.PlacedChachesCount++;
+                }
+                else
+                {
+                    NotificationManagerClass.DisplayWarningNotification("Maximum cache count for this map already met!");
+                    InteractionHelper.RefreshPrompt();
+                }
             });
 
             List<ActionsTypesClass> actions = new List<ActionsTypesClass>();
@@ -82,61 +92,6 @@ namespace PersistentCaches.Patches
             if (interactive is LootItem) return true;
             if (interactive is RemoteInteractableComponent) return true;
             return false;
-        }
-
-        public static void PlaceCache(ObservedLootItem lootItem)
-        {
-            Vector3 cachePosition = lootItem.gameObject.transform.position;
-            lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
-
-            RemoteInteractableComponent remoteInteractableComponent = CreateRemoteCacheAccessObject(cachePosition, lootItem.gameObject);
-
-            var session = PersistentCachesSession.GetSession();
-            session.AddPair(lootItem, remoteInteractableComponent, cachePosition);
-        }
-
-        public static RemoteInteractableComponent CreateRemoteCacheAccessObject(Vector3 position, GameObject lootItemObject)
-        {
-            GameObject remoteAccessObj = GameObject.Instantiate(lootItemObject);
-            ObservedLootItem lootItem = lootItemObject.GetComponent<ObservedLootItem>();
-
-            ObservedLootItem componentWhoLivedComeToDie = remoteAccessObj.GetComponent<ObservedLootItem>();
-            if (componentWhoLivedComeToDie != null)
-            {
-                GameObject.Destroy(componentWhoLivedComeToDie); //hehe
-            }
-
-            RemoteInteractableComponent remoteInteractableComponent = remoteAccessObj.AddComponent<RemoteInteractableComponent>();
-            CustomInteractionAction openCacheAction = GetRemoteOpenCacheAction(lootItem);
-            remoteInteractableComponent.Actions.Add(openCacheAction);
-            remoteInteractableComponent.Actions.Add(new CustomInteractionAction("Demolish Cache", false, () => { DemolishCache(remoteInteractableComponent); }));
-
-            remoteAccessObj.transform.position = position;
-
-            return remoteInteractableComponent;
-        }
-
-        public static CustomInteractionAction GetRemoteOpenCacheAction(LootItem lootItem)
-        {
-            GetActionsClass.Class1612 @class = new GetActionsClass.Class1612();
-            @class.rootItem = lootItem.Item;
-            @class.owner = _owner;
-            @class.lootItemLastOwner = lootItem.LastOwner;
-            @class.lootItemOwner = lootItem.ItemOwner;
-            @class.controller = @class.owner.Player.InventoryController;
-
-            return new CustomInteractionAction("Open Cache", false, @class.method_3);
-        }
-
-        public static void DemolishCache(RemoteInteractableComponent remoteInteractableComponent)
-        {
-            var session = PersistentCachesSession.GetSession();
-            var pair = session.GetPairOrNull(remoteInteractableComponent);
-
-            remoteInteractableComponent.gameObject.transform.position = new Vector3(0, -9999, 0);
-            pair.LootItem.gameObject.transform.position = pair.CachePosition;
-            GameObject.Destroy(remoteInteractableComponent.gameObject);
-            session.DeletePair(pair);
         }
     }
 }

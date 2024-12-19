@@ -1,13 +1,13 @@
 ﻿using Comfort.Common;
 using EFT;
+using EFT.InventoryLogic;
 using PersistentCaches.Components;
+using PersistentCaches.Helpers;
 using SPT.Reflection.Patching;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PersistentCaches.Patches
 {
@@ -22,7 +22,14 @@ namespace PersistentCaches.Patches
         public static bool PatchPrefix()
         {
             Player player = Singleton<GameWorld>.Instance.MainPlayer;
-            player.gameObject.AddComponent<PersistentCachesSession>();
+            PersistentCachesSession.CreateNewSession();
+
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/test.json";
+            Item item = ItemHelper.GetItemFromFile(dirName);
+            if (item == null) return true;
+
+            ItemHelper.SpawnItem(item, player.Transform.position);
+
             return true;
         }
     }

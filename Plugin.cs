@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using PersistentCaches.Helpers;
 using PersistentCaches.Patches;
 using System;
 using System.Collections.Generic;
@@ -14,13 +15,15 @@ namespace PersistentCaches
     {
         public static ManualLogSource LogSource;
 
-        // BaseUnityPlugin inherits MonoBehaviour, so you can use base unity functions like Awake() and Update()
         private void Awake()
         {
+            Settings.Init(Config);
             LogSource = Logger;
+            LogSource.LogWarning("Ebu is cute :3");
 
             new GetAvailableActionsPatch().Enable();
             new GameStartedPatch().Enable();
+            new GameEndedPatch().Enable();
         }
     }
 }

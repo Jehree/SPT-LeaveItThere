@@ -112,12 +112,16 @@
     <Reference Include="DissonanceVoip" HintPath="..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll" Private="false" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CacheController.cs" />
     <Compile Include="Common\CustomInteractionAction.cs" />
-    <Compile Include="Components\CacheObjectPair.cs" />
+    <Compile Include="Common\CacheObjectPair.cs" />
+    <Compile Include="Common\PersistentCacheData.cs" />
     <Compile Include="Components\RemoteInteractableComponent.cs" />
     <Compile Include="Components\PersistentCachesSession.cs" />
     <Compile Include="Helpers\InteractionHelper.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
+    <Compile Include="Helpers\Settings.cs" />
+    <Compile Include="Patches\GameEndedPatch.cs" />
     <Compile Include="Patches\GameStartedPatch.cs" />
     <Compile Include="Patches\GetAvailableActionsPatch.cs" />
     <Compile Include="Plugin.cs" />
@@ -125,6 +129,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\PersistentCaches\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
