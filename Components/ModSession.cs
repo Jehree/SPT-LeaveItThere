@@ -44,7 +44,7 @@ namespace PersistentItemPlacement.Components
             _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.AddComponent<ModSession>();
         }
 
-        public ItemRemotePair AddOrUpdatePair(ObservedLootItem lootItem, RemoteInteractableComponent remoteInteractableComponent, Vector3 placementPosition, bool placed)
+        public ItemRemotePair AddOrUpdatePair(ObservedLootItem lootItem, RemoteInteractable remoteInteractableComponent, Vector3 placementPosition, bool placed)
         {
             var pair = GetPairOrNull(lootItem);
             if (pair == null)
@@ -71,7 +71,7 @@ namespace PersistentItemPlacement.Components
             return null;
         }
 
-        public ItemRemotePair GetPairOrNull(RemoteInteractableComponent remoteInteractableComponent)
+        public ItemRemotePair GetPairOrNull(RemoteInteractable remoteInteractableComponent)
         {
             foreach (var pair in ItemRemotePairs)
             {

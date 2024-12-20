@@ -48,10 +48,10 @@ namespace PersistentItemPlacement.Patches
                 __result = HandleLootItemInteractive(interactive, owner);
             }
 
-            if (interactive is RemoteInteractableComponent)
+            if (interactive is RemoteInteractable)
             {
-                var component = interactive as RemoteInteractableComponent;
-                __result = new ActionsReturnClass { Actions = CustomInteractionAction.GetActionsTypesClassList(component.Actions) };
+                var component = interactive as RemoteInteractable;
+                __result = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(component.Actions) };
             }
 
             return false;
@@ -66,7 +66,7 @@ namespace PersistentItemPlacement.Patches
             actions.AddRange(InteractionHelper.GetVanillaInteractionActions<LootItem>(owner, interactive, _getLootItemActions));
             if (!actions.Any())
             {
-                actions.Add(new CustomInteractionAction("No Space", true, null).GetActionsTypesClass());
+                actions.Add(new CustomInteraction(string.Format("No Space ({0})".Localized(null), lootItem.Name.Localized(null)), true, null).GetActionsTypesClass());
             }
             actions.Add(placeAction.GetActionsTypesClass());
 
@@ -75,8 +75,14 @@ namespace PersistentItemPlacement.Patches
 
         private static bool WeCareAboutInteractive(object interactive)
         {
-            if (interactive is LootItem) return true;
-            if (interactive is RemoteInteractableComponent) return true;
+            if (interactive is LootItem)
+            {
+                if (Settings.MinimumCostItemsArePlaceable.Value) return true;
+                var lootItem = interactive as LootItem;
+                int cost = PlacementController.GetItemCost(lootItem.Item);
+                return cost > Settings.MinimumPlacementCost.Value;
+            }
+            if (interactive is RemoteInteractable) return true;
             return false;
         }
     }

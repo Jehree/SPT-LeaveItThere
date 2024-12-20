@@ -6,13 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace PersistentItemPlacement.Helpers
 {
     internal class Settings
     {
         public static ConfigEntry<int> MinimumPlacementCost;
+        public static ConfigEntry<bool> MinimumCostItemsArePlaceable;
         public static ConfigEntry<bool> CostSystemEnabled;
+        public static ConfigEntry<Color> PlacedItemTint;
 
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
@@ -31,19 +34,29 @@ namespace PersistentItemPlacement.Helpers
 
         public static void Init(ConfigFile config)
         {
-            MinimumPlacementCost = config.Bind(
-                "1: General",
-                "Minimum Placement Cost",
-                3,
-                "Minimum cost for placing an item. Any items that would otherwise cost less than this will cost this amount instead."
-            );
             CostSystemEnabled = config.Bind(
                 "1: General",
                 "Cost System Enabled",
                 true,
                 "It is highly reccomended to leave this enabled. Disabling it will allow infinite placement of items on all maps."
             );
-
+            MinimumPlacementCost = config.Bind(
+                "1: General",
+                "Minimum Placement Cost",
+                3,
+                "Minimum cost for placing an item. Any items that would otherwise cost less than this will cost this amount instead."
+            );
+            MinimumCostItemsArePlaceable = config.Bind(
+                "1: General",
+                "Minimum Placement Cost Items Can Be Placed",
+                true,
+                "Set to false to prevent mininum cost or less items from being placeable entirely."
+            ); PlacedItemTint = config.Bind(
+                "1: General",
+                "Placed Item Color Tint",
+                new Color(1, 0.7667f, 0.8667f, 1),
+                "Color tint that will be applied to items when they are placed"
+            );
 
             CustomsAllottedPoints = config.Bind(
                 _section1Name,

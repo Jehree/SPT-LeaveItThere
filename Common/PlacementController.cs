@@ -21,7 +21,7 @@ namespace PersistentItemPlacement.Common
 
         public static void OnRaidStart()
         {
-            string mapId = Singleton<GameWorld>.Instance.LocationId;
+            string mapId = Singleton<GameWorld>.Instance.LocationId; 
             PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(DataToClientURL, new PlacedItemDataPack(mapId));
             foreach (var data in dataPack.ItemTemplates)
             {
@@ -51,56 +51,7 @@ namespace PersistentItemPlacement.Common
             SPTServerHelper.ServerRoute(DataToServerURL, dataPack);
         }
 
-        public static RemoteInteractableComponent GetOrCreateRemoteAccessComponent(Vector3 position, LootItem lootItem, ItemRemotePair pair = null)
-        {
-            if (pair == null)
-            {
-                return CreateNewRemoteItemAccessObject(position, lootItem.gameObject.transform.rotation, lootItem as ObservedLootItem);
-            }
-            else
-            {
-                pair.RemoteInteractableComponent.gameObject.transform.position = position;
-                pair.RemoteInteractableComponent.gameObject.transform.rotation = lootItem.gameObject.transform.rotation;
-                return pair.RemoteInteractableComponent;
-            }
-        }
-
-        private static RemoteInteractableComponent CreateNewRemoteItemAccessObject(Vector3 position, Quaternion rotation, ObservedLootItem lootItem)
-        {
-            GameObject remoteAccessObj = GameObject.Instantiate(lootItem.gameObject);
-
-            ObservedLootItem componentWhoLivedComeToDie = remoteAccessObj.GetComponent<ObservedLootItem>();
-            if (componentWhoLivedComeToDie != null)
-            {
-                GameObject.Destroy(componentWhoLivedComeToDie); //hehe
-            }
-
-            MeshRenderer[] renderers = remoteAccessObj.GetComponentsInChildren<MeshRenderer>();
-
-            foreach (var renderer in renderers)
-            {
-                var material = renderer.material;
-                if (!material.HasProperty("_Color")) continue;
-
-                var originalColor = renderer.material.color;
-                renderer.material.color = Color.yellow;
-            }
-
-            RemoteInteractableComponent remoteInteractableComponent = remoteAccessObj.AddComponent<RemoteInteractableComponent>();
-            if (lootItem.Item.IsContainer)
-            {
-                remoteInteractableComponent.Actions.Add(GetRemoteOpenItemAction(lootItem));
-            }
-            remoteInteractableComponent.Actions.Add(GetDemolishItemAction(remoteInteractableComponent));
-
-            remoteAccessObj.transform.position = position;
-            remoteAccessObj.transform.rotation = rotation;
-            remoteAccessObj.transform.localScale = remoteAccessObj.transform.localScale * 0.95f;
-
-            return remoteInteractableComponent;
-        }
-
-        public static CustomInteractionAction GetRemoteOpenItemAction(LootItem lootItem)
+        public static CustomInteraction GetRemoteOpenItemAction(LootItem lootItem)
         {
             GetActionsClass.Class1612 @class = new GetActionsClass.Class1612();
             @class.rootItem = lootItem.Item;
@@ -110,12 +61,12 @@ namespace PersistentItemPlacement.Common
             @class.controller = @class.owner.Player.InventoryController;
 
             
-            return new CustomInteractionAction("Search", false, @class.method_3);
+            return new CustomInteraction("Search", false, @class.method_3);
         }
 
-        public static CustomInteractionAction GetDemolishItemAction(RemoteInteractableComponent remoteInteractableComponent)
+        public static CustomInteraction GetDemolishItemAction(RemoteInteractable remoteInteractableComponent)
         {
-            return new CustomInteractionAction(
+            return new CustomInteraction(
                 "Reclaim",
                 false,
                 () =>
@@ -134,11 +85,11 @@ namespace PersistentItemPlacement.Common
             );
         }
 
-        public static CustomInteractionAction GetPlaceItemAction(LootItem lootItem)
+        public static CustomInteraction GetPlaceItemAction(LootItem lootItem)
         {
             var session = ModSession.GetSession();
             bool allowed = session.PlacementIsAllowed(lootItem.Item);
-            return new CustomInteractionAction(
+            return new CustomInteraction(
             "Place Item",
             !allowed,
             () =>
@@ -162,7 +113,7 @@ namespace PersistentItemPlacement.Common
             var session = ModSession.GetSession();
             lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
 
-            RemoteInteractableComponent remoteInteractableComponent = GetOrCreateRemoteAccessComponent(location, lootItem, session.GetPairOrNull(lootItem));
+            RemoteInteractable remoteInteractableComponent = RemoteInteractable.GetOrCreateRemoteInteractable(location, lootItem, session.GetPairOrNull(lootItem));
             session.AddOrUpdatePair(lootItem, remoteInteractableComponent, location, true);
         }
 
@@ -192,14 +143,14 @@ namespace PersistentItemPlacement.Common
         public static void PlacedPlayerFeedback(Item item)
         {
             var session = ModSession.GetSession();
-            InteractionHelper.NotificationLong($"Placement cost: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent}/{Settings.GetAllottedPoints()} points remaining");
+            InteractionHelper.NotificationLong($"Placement cost: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponAssemble);
         }
 
         public static void DemolishPlayerFeedback(Item item)
         {
             var session = ModSession.GetSession();
-            InteractionHelper.NotificationLong($"Points rufunded: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent}/{Settings.GetAllottedPoints()} points remaining");
+            InteractionHelper.NotificationLong($"Points rufunded: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponDisassemble);
         }
     }
