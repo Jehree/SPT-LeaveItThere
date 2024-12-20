@@ -1,8 +1,9 @@
 ﻿using EFT;
 using HarmonyLib;
 using Newtonsoft.Json;
-using PersistentCaches.Components;
-using PersistentCaches.Helpers;
+using PersistentItemPlacement.Common;
+using PersistentItemPlacement.Components;
+using PersistentItemPlacement.Helpers;
 using SPT.Reflection.Patching;
 using SPT.Reflection.Utils;
 using System;
@@ -10,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace PersistentCaches.Patches
+namespace PersistentItemPlacement.Patches
 {
     internal class GameEndedPatch : ModulePatch
     {
@@ -36,9 +37,7 @@ namespace PersistentCaches.Patches
         [PatchPostfix]
         static void Postfix(object[] __args)
         {
-            var pair = PersistentCachesSession.GetSession().CacheObjectPairs.First();
-            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/test.json";
-            ItemHelper.WriteItemToFile(dirName, pair.LootItem.Item);
+            PlacementController.OnRaidEnd();
         }
     }
 }

@@ -7,105 +7,122 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PersistentCaches.Helpers
+namespace PersistentItemPlacement.Helpers
 {
     internal class Settings
     {
-        public static ConfigEntry<int> CustomsMaxCacheCount;
-        public static ConfigEntry<int> FactoryMaxCacheCount;
-        public static ConfigEntry<int> InterchangeMaxCacheCount;
-        public static ConfigEntry<int> LabMaxCacheCount;
-        public static ConfigEntry<int> LighthouseMaxCacheCount;
-        public static ConfigEntry<int> ReserveMaxCacheCount;
-        public static ConfigEntry<int> GroundZeroMaxCacheCount;
-        public static ConfigEntry<int> ShorelineMaxCacheCount;
-        public static ConfigEntry<int> StreetsMaxCacheCount;
-        public static ConfigEntry<int> WoodsMaxCacheCount;
+        public static ConfigEntry<int> MinimumPlacementCost;
+        public static ConfigEntry<bool> CostSystemEnabled;
 
-        private const string _section1Name = "1: Cache Limit Per Map";
-        private const string _section1Description = "Number of caches allowed on map";
-        private static Dictionary<string, ConfigEntry<int>> _cacheCountLookup = new();
+        public static ConfigEntry<int> CustomsAllottedPoints;
+        public static ConfigEntry<int> FactoryAllottedPoints;
+        public static ConfigEntry<int> InterchangeAllottedPoints;
+        public static ConfigEntry<int> LabAllottedPoints;
+        public static ConfigEntry<int> LighthouseAllottedPoints;
+        public static ConfigEntry<int> ReserveAllottedPoints;
+        public static ConfigEntry<int> GroundZeroAllottedPoints;
+        public static ConfigEntry<int> ShorelineAllottedPoints;
+        public static ConfigEntry<int> StreetsAllottedPoints;
+        public static ConfigEntry<int> WoodsAllottedPoints;
+
+        private const string _section1Name = "2: Allotted point limit Limit Per Map";
+        private const string _section1Description = "Maximum number of placement points that can be used on this map. An items costs the amount of inventory cells it holds if it is a container, or it's size if it is not.";
+        private static Dictionary<string, ConfigEntry<int>> _itemCountLookup = new();
 
         public static void Init(ConfigFile config)
         {
-            CustomsMaxCacheCount = config.Bind(
+            MinimumPlacementCost = config.Bind(
+                "1: General",
+                "Minimum Placement Cost",
+                3,
+                "Minimum cost for placing an item. Any items that would otherwise cost less than this will cost this amount instead."
+            );
+            CostSystemEnabled = config.Bind(
+                "1: General",
+                "Cost System Enabled",
+                true,
+                "It is highly reccomended to leave this enabled. Disabling it will allow infinite placement of items on all maps."
+            );
+
+
+            CustomsAllottedPoints = config.Bind(
                 _section1Name,
                 "Customs",
-                3,
+                120,
                 _section1Description
             );
-            FactoryMaxCacheCount = config.Bind(
+            FactoryAllottedPoints = config.Bind(
                 _section1Name,
                 "Factory",
-                3,
+                60,
                 _section1Description
             );
-            InterchangeMaxCacheCount = config.Bind(
+            InterchangeAllottedPoints = config.Bind(
                 _section1Name,
                 "Interchange",
-                3,
+                120,
                 _section1Description
             );
-            LabMaxCacheCount = config.Bind(
+            LabAllottedPoints = config.Bind(
                 _section1Name,
                 "Lab",
-                3,
+                120,
                 _section1Description
             );
-            LighthouseMaxCacheCount = config.Bind(
+            LighthouseAllottedPoints = config.Bind(
                 _section1Name,
                 "Lighthouse",
-                3,
+                120,
                 _section1Description
             );
-            ReserveMaxCacheCount = config.Bind(
+            ReserveAllottedPoints = config.Bind(
                 _section1Name,
                 "Reserve",
-                3,
+                120,
                 _section1Description
             );
-            GroundZeroMaxCacheCount = config.Bind(
+            GroundZeroAllottedPoints = config.Bind(
                 _section1Name,
                 "Ground Zero",
-                3,
+                120,
                 _section1Description
             );
-            ShorelineMaxCacheCount = config.Bind(
+            ShorelineAllottedPoints = config.Bind(
                 _section1Name,
                 "Shoreline",
-                3,
+                120,
                 _section1Description
             );
-            StreetsMaxCacheCount = config.Bind(
+            StreetsAllottedPoints = config.Bind(
                 _section1Name,
                 "Streets",
-                3,
+                120,
                 _section1Description
             );
-            WoodsMaxCacheCount = config.Bind(
+            WoodsAllottedPoints = config.Bind(
                 _section1Name,
                 "Woods",
-                3,
+                120,
                 _section1Description
             );
 
-            _cacheCountLookup.Add("bigmap", CustomsMaxCacheCount);
-            _cacheCountLookup.Add("factory4_day", FactoryMaxCacheCount);
-            _cacheCountLookup.Add("factory4_night", FactoryMaxCacheCount);
-            _cacheCountLookup.Add("interchange", InterchangeMaxCacheCount);
-            _cacheCountLookup.Add("laboratory", LabMaxCacheCount);
-            _cacheCountLookup.Add("lighthouse", LighthouseMaxCacheCount);
-            _cacheCountLookup.Add("rezervbase", ReserveMaxCacheCount);
-            _cacheCountLookup.Add("sandbox", GroundZeroMaxCacheCount);
-            _cacheCountLookup.Add("sandbox_high", GroundZeroMaxCacheCount);
-            _cacheCountLookup.Add("shoreline", ShorelineMaxCacheCount);
-            _cacheCountLookup.Add("tarkovstreets", StreetsMaxCacheCount);
-            _cacheCountLookup.Add("woods", WoodsMaxCacheCount);
+            _itemCountLookup.Add("bigmap", CustomsAllottedPoints);
+            _itemCountLookup.Add("factory4_day", FactoryAllottedPoints);
+            _itemCountLookup.Add("factory4_night", FactoryAllottedPoints);
+            _itemCountLookup.Add("interchange", InterchangeAllottedPoints);
+            _itemCountLookup.Add("laboratory", LabAllottedPoints);
+            _itemCountLookup.Add("lighthouse", LighthouseAllottedPoints);
+            _itemCountLookup.Add("rezervbase", ReserveAllottedPoints);
+            _itemCountLookup.Add("sandbox", GroundZeroAllottedPoints);
+            _itemCountLookup.Add("sandbox_high", GroundZeroAllottedPoints);
+            _itemCountLookup.Add("shoreline", ShorelineAllottedPoints);
+            _itemCountLookup.Add("tarkovstreets", StreetsAllottedPoints);
+            _itemCountLookup.Add("woods", WoodsAllottedPoints);
         }
 
-        public static int GetMaxCacheCount()
+        public static int GetAllottedPoints()
         {
-            return _cacheCountLookup[Singleton<GameWorld>.Instance.LocationId].Value;
+            return _itemCountLookup[Singleton<GameWorld>.Instance.LocationId].Value;
         }
     }
 }

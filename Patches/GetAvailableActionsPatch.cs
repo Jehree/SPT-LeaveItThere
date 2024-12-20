@@ -10,15 +10,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Comfort.Common;
 using InteractableInteractionsAPI.Common;
-using PersistentCaches.Helpers;
+using PersistentItemPlacement.Helpers;
 using UnityEngine;
 using EFT.InventoryLogic;
-using PersistentCaches.Components;
+using PersistentItemPlacement.Components;
 using static RootMotion.FinalIK.InteractionTrigger.Range;
 using System.ComponentModel;
-using PersistentCaches.Common;
+using PersistentItemPlacement.Common;
 
-namespace PersistentCaches.Patches
+namespace PersistentItemPlacement.Patches
 {
     internal class GetAvailableActionsPatch : ModulePatch
     {
@@ -60,29 +60,15 @@ namespace PersistentCaches.Patches
         private static ActionsReturnClass HandleLootItemInteractive(object interactive, GamePlayerOwner owner)
         {
             var lootItem = interactive as LootItem;
-            var session = PersistentCachesSession.GetSession();
-            bool allowed = session.CachePlacementIsAllowed();
-
-            var action = new CustomInteractionAction(
-            "Place Cache",
-            !allowed,
-            () =>
-            {
-                if (allowed)
-                {
-                    CacheController.PlaceCache(lootItem as ObservedLootItem);
-                    session.PlacedChachesCount++;
-                }
-                else
-                {
-                    NotificationManagerClass.DisplayWarningNotification("Maximum cache count for this map already met!");
-                    InteractionHelper.RefreshPrompt();
-                }
-            });
+            var placeAction = PlacementController.GetPlaceItemAction(lootItem);
 
             List<ActionsTypesClass> actions = new List<ActionsTypesClass>();
             actions.AddRange(InteractionHelper.GetVanillaInteractionActions<LootItem>(owner, interactive, _getLootItemActions));
-            actions.Add(action.GetActionsTypesClass());
+            if (!actions.Any())
+            {
+                actions.Add(new CustomInteractionAction("No Space", true, null).GetActionsTypesClass());
+            }
+            actions.Add(placeAction.GetActionsTypesClass());
 
             return new ActionsReturnClass { Actions = actions };
         }

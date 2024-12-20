@@ -6,33 +6,29 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Comfort.Common;
 using System.Collections;
-using Newtonsoft.Json;
-using System.Text;
 using System.IO;
-using System.Reflection;
-using EFT.UI.DragAndDrop;
-using System.Net.Http;
+using EFT.Interactive;
 
-namespace PersistentCaches.Helpers
+namespace PersistentItemPlacement.Helpers
 {
     public static class ItemHelper
     {
-        public static void SpawnItem(Item item, Vector3 position, Quaternion rotation = default(Quaternion))
+        public static void SpawnItem(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {
-            StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation));
+            StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback));
         }
 
-        public static void SpawnItem(string itemTpl, Vector3 position, Quaternion rotation = default(Quaternion))
+        public static void SpawnItem(string itemTpl, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {
             ItemFactoryClass itemFactory = Singleton<ItemFactoryClass>.Instance;
             var gameWorld = Singleton<GameWorld>.Instance;
 
             Item item = itemFactory.CreateItem(MongoID.Generate(), itemTpl, null);
 
-            StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation));
+            StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback));
         }
 
-        public static IEnumerator SpawnItemRoutine(Item item, Vector3 position, Quaternion rotation = default(Quaternion))
+        public static IEnumerator SpawnItemRoutine(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {
             if (!Singleton<GameWorld>.Instantiated)
             {
@@ -51,7 +47,11 @@ namespace PersistentCaches.Helpers
                 yield return new WaitForEndOfFrame();
             }
 
-            gameWorld.SetupItem(item, gameWorld.MainPlayer, position, rotation);
+            LootItem lootItem = gameWorld.SetupItem(item, gameWorld.MainPlayer, position, rotation);
+            if (callback != null)
+            {
+                callback(lootItem);
+            }
         }
 
         private static List<ResourceKey> GetBundleResourceKeys(Item item)
@@ -110,6 +110,40 @@ namespace PersistentCaches.Helpers
         {
             byte[] bytes = Convert.FromBase64String(base64String);
             return BytesToItem(bytes);
+        }
+
+        public static void MakeSearchableItemFullySearched(SearchableItemItemClass searchableItem)
+        {
+            var controller = Singleton<GameWorld>.Instance.MainPlayer.SearchController;
+            controller.SetItemAsSearched(searchableItem);
+
+            ForAllChildrenInItem(
+                searchableItem,
+                (Item item) =>
+                {
+                    controller.SetItemAsKnown(item);
+                    if (item is SearchableItemItemClass)
+                    {
+                        controller.SetItemAsSearched(item as SearchableItemItemClass);
+                    }
+                }
+            );
+        }
+
+        public static void ForAllChildrenInItem(Item parent, Action<Item> callable)
+        {
+            if (parent is not CompoundItem) return;
+            var compoundParent = parent as CompoundItem;
+            foreach (var grid in compoundParent.Grids)
+            {
+                IEnumerable<Item> children = grid.Items;
+
+                foreach (Item child in children)
+                {
+                    callable(child);
+                    ForAllChildrenInItem(child, callable);
+                }
+            }
         }
     }
 }

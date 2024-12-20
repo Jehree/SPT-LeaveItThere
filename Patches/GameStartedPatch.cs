@@ -1,15 +1,20 @@
 ﻿using Comfort.Common;
 using EFT;
 using EFT.InventoryLogic;
-using PersistentCaches.Components;
-using PersistentCaches.Helpers;
+using EFT.UI;
+using HarmonyLib;
+using PersistentItemPlacement.Common;
+using PersistentItemPlacement.Components;
+using PersistentItemPlacement.Helpers;
 using SPT.Reflection.Patching;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace PersistentCaches.Patches
+namespace PersistentItemPlacement.Patches
 {
     internal class GameStartedPatch : ModulePatch
     {
@@ -19,18 +24,10 @@ namespace PersistentCaches.Patches
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix()
+        public static void PatchPrefix()
         {
-            Player player = Singleton<GameWorld>.Instance.MainPlayer;
-            PersistentCachesSession.CreateNewSession();
-
-            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/test.json";
-            Item item = ItemHelper.GetItemFromFile(dirName);
-            if (item == null) return true;
-
-            ItemHelper.SpawnItem(item, player.Transform.position);
-
-            return true;
+            ModSession.CreateNewSession();
+            PlacementController.OnRaidStart();
         }
     }
 }

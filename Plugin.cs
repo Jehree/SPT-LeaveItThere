@@ -1,16 +1,16 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
-using PersistentCaches.Helpers;
-using PersistentCaches.Patches;
+using PersistentItemPlacement.Helpers;
+using PersistentItemPlacement.Patches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PersistentCaches
+namespace PersistentItemPlacement
 {
-    [BepInPlugin("Jehree.PersistentCaches", "PersistentCaches", "1.0.0")]
+    [BepInPlugin("Jehree.PersistentItemPlacement", "PersistentItemPlacement", "1.0.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource LogSource;

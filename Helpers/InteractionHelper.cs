@@ -1,9 +1,15 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
+using EFT.Interactive;
+using EFT.InventoryLogic;
+using EFT.UI;
 using HarmonyLib;
+using PersistentItemPlacement.Common;
+using PersistentItemPlacement.Components;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace PersistentCaches.Helpers
+namespace PersistentItemPlacement.Helpers
 {
     public static class InteractionHelper
     {
@@ -40,6 +46,11 @@ namespace PersistentCaches.Helpers
         public static void RefreshPrompt()
         {
             _owner.ClearInteractionState();
+        }
+
+        public static void NotificationLong(string message)
+        {
+            NotificationManagerClass.DisplayMessageNotification(message, EFT.Communications.ENotificationDurationType.Long);
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PersistentCaches.Components
+namespace PersistentItemPlacement.Components
 {
     internal class RemoteInteractableComponent : InteractableObject
     {
