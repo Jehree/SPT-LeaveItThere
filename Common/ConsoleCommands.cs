@@ -12,7 +12,7 @@ namespace LeaveItThere.Common
 {
     internal class ConsoleCommands
     {
-        [ConsoleCommand("lit_unplace_all_items_below_cost-", "", null, "Un-Place all items on the map below a cost amount.")]
+        [ConsoleCommand("lit_unplace_all_items_below_cost", "", null, "Un-Place all items on the map below a cost amount.")]
         public static void ClearPlacedItems([ConsoleArgument(0, "Cost Amount")] int costAmount)
         {
             ForAllItemsUnderCost(
