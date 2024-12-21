@@ -122,7 +122,7 @@ export class FileUtils {
 }
 
 export class ModHelper {
-    public static modName: string = "BOOBS";
+    public static modName: string = "LeaveItThere";
 
     //useful paths
     public static modPath: string = FileUtils.pathCombine(__dirname, "..");

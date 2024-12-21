@@ -13,8 +13,8 @@ class Mod implements IPreSptLoadMod {
     public preSptLoad(container: DependencyContainer): void {
         this.Helper.init(container, InitStage.PRE_SPT_LOAD);
 
-        this.Helper.registerStaticRoute(this.DataToServer, "PersistentItemPlacement-DataToServer", Routes.onDataToServer, Routes);
-        this.Helper.registerStaticRoute(this.DataToClient, "PersistentItemPlacement-DataToClient", Routes.onDataToClient, Routes, true);
+        this.Helper.registerStaticRoute(this.DataToServer, "LeaveItThere-DataToServer", Routes.onDataToServer, Routes);
+        this.Helper.registerStaticRoute(this.DataToClient, "LeaveItThere-DataToClient", Routes.onDataToClient, Routes, true);
     }
 }
 

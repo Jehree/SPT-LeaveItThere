@@ -8,11 +8,65 @@ using Comfort.Common;
 using System.Collections;
 using System.IO;
 using EFT.Interactive;
+using System.Reflection;
+using SPT.Reflection.Utils;
+using System.Linq;
 
-namespace PersistentItemPlacement.Helpers
+namespace LeaveItThere.Helpers
 {
     public static class ItemHelper
     {
+        /* fuck this lol I'll just update the gclass numbers
+        private static ConstructorInfo _writerConstructorMethodInfo;
+        private static ConstructorInfo _readerConstructorMethodInfo;
+        private static ConstructorInfo _descriptorConstructorMethodInfo;
+        private static MethodInfo _serializeItemMethodInfo;
+        private static MethodInfo _deserializeItemMethodInfo;
+
+        public static void InitObfuscatedMethods()
+        {
+
+            Type writerClass = PatchConstants.EftTypes.Single(targetClass =>
+                !targetClass.IsInterface &&
+                !targetClass.IsNested &&
+                targetClass.GetMethods().Any(method => method.Name == "WriteByte") &&
+                targetClass.GetMethods().Any(method => method.Name == "Write") &&
+                targetClass.GetFields().Any(field => field.Name == "MaxStringLength") &&
+                targetClass.GetFields().Any(field => field.Name == "DefaultCapacity")
+            );
+            _writerConstructorMethodInfo = writerClass.GetConstructor(BindingFlags.Default, null, CallingConventions.Standard, new Type[0], null);
+
+            Type readerClass = PatchConstants.EftTypes.Single(targetClass =>
+                !targetClass.IsInterface &&
+                !targetClass.IsNested &&
+                targetClass.GetMethods().Any(method => method.Name == "ReadByte") &&
+                targetClass.GetMethods().Any(method => method.Name == "ReadBytesSegment") &&
+                targetClass.GetFields().Any(field => field.Name == "Position")
+            );
+            _readerConstructorMethodInfo = readerClass.GetConstructor(BindingFlags.Default, null, new Type[] { typeof(byte[])}, null);
+
+            Type descriptorClass = PatchConstants.EftTypes.Single(targetClass =>
+                !targetClass.IsInterface &&
+                !targetClass.IsNested &&
+                targetClass.GetMethods().Any(method => method.Name == "Deserialize" && method.GetParameters()[0].Name == "items" && method.GetParameters()[0].GetType() == typeof(Dictionary<MongoID, Item>)) &&
+                targetClass.GetFields().Any(field => field.Name == "IsUnderBarrelDeviceActive")
+            );
+            _descriptorConstructorMethodInfo = descriptorClass.GetConstructor(BindingFlags.Default, null, new Type[0], null);
+
+            Type itemSerizalizationClass = PatchConstants.EftTypes.Single(targetClass =>
+                !targetClass.IsInterface &&
+                !targetClass.IsNested &&
+                targetClass.IsAbstract &&
+                targetClass.GetMethods().Any(method => method.Name == "SerializeNestedItem" &&
+                method.GetParameters().Length == 3 && 
+                method.GetParameters()[0].GetType() == typeof(Item) &&
+                method.IsStatic)
+            );
+            _serializeItemMethodInfo = itemSerizalizationClass.GetMethod("SerializeItem");
+            _deserializeItemMethodInfo = itemSerizalizationClass.GetMethod("DeserializeItem");
+        }
+        */
+
         public static void SpawnItem(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {
             StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback));
@@ -89,7 +143,7 @@ namespace PersistentItemPlacement.Helpers
         public static byte[] ItemToBytes(Item item)
         {
             GClass1198 eftWriter = new();
-            GClass1659 descriptor = GClass1685.SerializeItem(item, GClass1971.Instance);
+            GClass1659 descriptor = GClass1685.SerializeItem(item, Singleton<GameWorld>.Instance.MainPlayer.SearchController);
             eftWriter.WriteEFTItemDescriptor(descriptor);
             return eftWriter.ToArray();
         }

@@ -10,15 +10,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Comfort.Common;
 using InteractableInteractionsAPI.Common;
-using PersistentItemPlacement.Helpers;
+using LeaveItThere.Helpers;
 using UnityEngine;
 using EFT.InventoryLogic;
-using PersistentItemPlacement.Components;
+using LeaveItThere.Components;
 using static RootMotion.FinalIK.InteractionTrigger.Range;
 using System.ComponentModel;
-using PersistentItemPlacement.Common;
+using LeaveItThere.Common;
 
-namespace PersistentItemPlacement.Patches
+namespace LeaveItThere.Patches
 {
     internal class GetAvailableActionsPatch : ModulePatch
     {
@@ -77,8 +77,8 @@ namespace PersistentItemPlacement.Patches
         {
             if (interactive is LootItem)
             {
+                LootItem lootItem = interactive as LootItem;
                 if (Settings.MinimumCostItemsArePlaceable.Value) return true;
-                var lootItem = interactive as LootItem;
                 int cost = PlacementController.GetItemCost(lootItem.Item);
                 return cost > Settings.MinimumPlacementCost.Value;
             }

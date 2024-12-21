@@ -4,12 +4,12 @@ using EFT.Interactive;
 using EFT.InventoryLogic;
 using EFT.UI;
 using HarmonyLib;
-using PersistentItemPlacement.Common;
-using PersistentItemPlacement.Components;
+using LeaveItThere.Common;
+using LeaveItThere.Components;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace PersistentItemPlacement.Helpers
+namespace LeaveItThere.Helpers
 {
     public static class InteractionHelper
     {

@@ -2,11 +2,11 @@
 using EFT;
 using EFT.InventoryLogic;
 using Newtonsoft.Json;
-using PersistentItemPlacement.Helpers;
+using LeaveItThere.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PersistentItemPlacement.Common
+namespace LeaveItThere.Common
 {
     internal class PlacedItemData
     {

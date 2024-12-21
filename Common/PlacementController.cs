@@ -1,10 +1,10 @@
 ﻿using EFT.Interactive;
 using InteractableInteractionsAPI.Common;
-using PersistentItemPlacement.Components;
+using LeaveItThere.Components;
 using UnityEngine;
 using Comfort.Common;
 using EFT;
-using PersistentItemPlacement.Helpers;
+using LeaveItThere.Helpers;
 using Diz.LanguageExtensions;
 using EFT.InventoryLogic;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using EFT.UI;
 
-namespace PersistentItemPlacement.Common
+namespace LeaveItThere.Common
 {
     internal class PlacementController
     {
@@ -64,25 +64,30 @@ namespace PersistentItemPlacement.Common
             return new CustomInteraction("Search", false, @class.method_3);
         }
 
-        public static CustomInteraction GetDemolishItemAction(RemoteInteractable remoteInteractableComponent)
+        public static CustomInteraction GetDemolishItemAction(RemoteInteractable remoteInteractable)
         {
             return new CustomInteraction(
                 "Reclaim",
                 false,
                 () =>
                 {
-                    var session = ModSession.GetSession();
-                    var pair = session.GetPairOrNull(remoteInteractableComponent);
-
-                    remoteInteractableComponent.gameObject.transform.position = new Vector3(0, -9999, 0);
-                    pair.LootItem.gameObject.transform.position = pair.PlacementPosition;
-                    pair.LootItem.gameObject.transform.rotation = remoteInteractableComponent.gameObject.transform.rotation;
-                    pair.Placed = false;
-                    session.PointsSpent -= GetItemCost(pair.LootItem.Item);
-
-                    DemolishPlayerFeedback(pair.LootItem.Item);
+                    DemolishItem(remoteInteractable);
                 }
             );
+        }
+
+        public static void DemolishItem(RemoteInteractable remoteInteractable)
+        {
+            var session = ModSession.GetSession();
+            var pair = session.GetPairOrNull(remoteInteractable);
+
+            remoteInteractable.gameObject.transform.position = new Vector3(0, -9999, 0);
+            pair.LootItem.gameObject.transform.position = pair.PlacementPosition;
+            pair.LootItem.gameObject.transform.rotation = remoteInteractable.gameObject.transform.rotation;
+            pair.Placed = false;
+            session.PointsSpent -= GetItemCost(pair.LootItem.Item);
+
+            DemolishPlayerFeedback(pair.LootItem.Item);
         }
 
         public static CustomInteraction GetPlaceItemAction(LootItem lootItem)
@@ -113,11 +118,11 @@ namespace PersistentItemPlacement.Common
             var session = ModSession.GetSession();
             lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
 
-            RemoteInteractable remoteInteractableComponent = RemoteInteractable.GetOrCreateRemoteInteractable(location, lootItem, session.GetPairOrNull(lootItem));
-            session.AddOrUpdatePair(lootItem, remoteInteractableComponent, location, true);
+            RemoteInteractable remoteInteractable = RemoteInteractable.GetOrCreateRemoteInteractable(location, lootItem, session.GetPairOrNull(lootItem));
+            session.AddOrUpdatePair(lootItem, remoteInteractable, location, true);
         }
 
-        public static int GetItemCost(Item item)
+        public static int GetItemCost(Item item, bool ignoreMinimumCostSetting = false)
         {
             int cost = 0;
  
@@ -135,22 +140,35 @@ namespace PersistentItemPlacement.Common
                 cost += cellSizeStruct.X * cellSizeStruct.Y;
             }
     
-            return cost >= Settings.MinimumPlacementCost.Value 
-                ? cost 
-                : Settings.MinimumPlacementCost.Value;
+            if (ignoreMinimumCostSetting)
+            {
+                return cost;
+            }
+            else
+            {
+                return cost >= Settings.MinimumPlacementCost.Value
+                    ? cost
+                    : Settings.MinimumPlacementCost.Value;
+            }
         }
 
         public static void PlacedPlayerFeedback(Item item)
         {
             var session = ModSession.GetSession();
-            InteractionHelper.NotificationLong($"Placement cost: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
+            if (Settings.CostSystemEnabled.Value)
+            {
+                InteractionHelper.NotificationLong($"Placement cost: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
+            }
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponAssemble);
         }
 
         public static void DemolishPlayerFeedback(Item item)
         {
             var session = ModSession.GetSession();
-            InteractionHelper.NotificationLong($"Points rufunded: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
+            if (Settings.CostSystemEnabled.Value)
+            {
+                InteractionHelper.NotificationLong($"Points rufunded: {PlacementController.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
+            }
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponDisassemble);
         }
     }

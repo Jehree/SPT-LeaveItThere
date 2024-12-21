@@ -1,9 +1,9 @@
 ﻿using EFT;
 using HarmonyLib;
 using Newtonsoft.Json;
-using PersistentItemPlacement.Common;
-using PersistentItemPlacement.Components;
-using PersistentItemPlacement.Helpers;
+using LeaveItThere.Common;
+using LeaveItThere.Components;
+using LeaveItThere.Helpers;
 using SPT.Reflection.Patching;
 using SPT.Reflection.Utils;
 using System;
@@ -11,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace PersistentItemPlacement.Patches
+namespace LeaveItThere.Patches
 {
     internal class GameEndedPatch : ModulePatch
     {

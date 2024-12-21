@@ -7,8 +7,8 @@
     <ProjectGuid>{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PersistentItemPlacement</RootNamespace>
-    <AssemblyName>PersistentItemPlacement</AssemblyName>
+    <RootNamespace>LeaveItThere</RootNamespace>
+    <AssemblyName>LeaveItThere</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
@@ -109,9 +109,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
+    <Reference Include="bsg.console.core, Version=0.0.0.0, Culture=neutral, processorArchitecture=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EscapeFromTarkov_Data\Managed\bsg.console.core.dll</HintPath>
+    </Reference>
     <Reference Include="DissonanceVoip" HintPath="..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll" Private="false" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\ConsoleCommands.cs" />
     <Compile Include="Common\PlacementController.cs" />
     <Compile Include="Common\CustomInteraction.cs" />
     <Compile Include="Common\ItemRemotePair.cs" />
@@ -122,6 +127,7 @@
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\SPTServerHelper.cs" />
+    <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Patches\GameEndedPatch.cs" />
     <Compile Include="Patches\GameStartedPatch.cs" />
     <Compile Include="Patches\GetAvailableActionsPatch.cs" />
@@ -130,6 +136,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\PersistentItemPlacement\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\LeaveItThere\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

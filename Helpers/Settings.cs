@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PersistentItemPlacement.Helpers
+namespace LeaveItThere.Helpers
 {
     internal class Settings
     {
@@ -28,7 +28,7 @@ namespace PersistentItemPlacement.Helpers
         public static ConfigEntry<int> StreetsAllottedPoints;
         public static ConfigEntry<int> WoodsAllottedPoints;
 
-        private const string _section1Name = "2: Allotted point limit Limit Per Map";
+        private const string _section1Name = "2: Allotted Point Limits Per Map";
         private const string _section1Description = "Maximum number of placement points that can be used on this map. An items costs the amount of inventory cells it holds if it is a container, or it's size if it is not.";
         private static Dictionary<string, ConfigEntry<int>> _itemCountLookup = new();
 
@@ -61,7 +61,7 @@ namespace PersistentItemPlacement.Helpers
             CustomsAllottedPoints = config.Bind(
                 _section1Name,
                 "Customs",
-                120,
+                140,
                 _section1Description
             );
             FactoryAllottedPoints = config.Bind(
@@ -73,49 +73,49 @@ namespace PersistentItemPlacement.Helpers
             InterchangeAllottedPoints = config.Bind(
                 _section1Name,
                 "Interchange",
-                120,
+                140,
                 _section1Description
             );
             LabAllottedPoints = config.Bind(
                 _section1Name,
                 "Lab",
-                120,
+                60,
                 _section1Description
             );
             LighthouseAllottedPoints = config.Bind(
                 _section1Name,
                 "Lighthouse",
-                120,
+                180,
                 _section1Description
             );
             ReserveAllottedPoints = config.Bind(
                 _section1Name,
                 "Reserve",
-                120,
+                160,
                 _section1Description
             );
             GroundZeroAllottedPoints = config.Bind(
                 _section1Name,
                 "Ground Zero",
-                120,
+                90,
                 _section1Description
             );
             ShorelineAllottedPoints = config.Bind(
                 _section1Name,
                 "Shoreline",
-                120,
+                140,
                 _section1Description
             );
             StreetsAllottedPoints = config.Bind(
                 _section1Name,
                 "Streets",
-                120,
+                180,
                 _section1Description
             );
             WoodsAllottedPoints = config.Bind(
                 _section1Name,
                 "Woods",
-                120,
+                140,
                 _section1Description
             );
 

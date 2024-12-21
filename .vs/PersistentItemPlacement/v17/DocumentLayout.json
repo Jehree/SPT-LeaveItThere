@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\components\\remoteinteractable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:components\\remoteinteractable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\helpers\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:helpers\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\common\\placementcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -15,20 +15,12 @@
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:patches\\getavailableactionspatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\helpers\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:helpers\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\common\\placeditemdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:common\\placeditemdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\components\\modsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:components\\modsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\common\\custominteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:common\\custominteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\helpers\\interactionhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:helpers\\interactionhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\persistentitemplacement\\plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|PersistentItemPlacement.csproj|solutionrelative:plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,73 +30,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "GetAvailableActionsPatch.cs",
-              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Patches\\GetAvailableActionsPatch.cs",
-              "RelativeDocumentMoniker": "Patches\\GetAvailableActionsPatch.cs",
-              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Patches\\GetAvailableActionsPatch.cs",
-              "RelativeToolTip": "Patches\\GetAvailableActionsPatch.cs",
-              "ViewState": "AQIAACcAAAAAAAAAAAAowDgAAAAZAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-20T22:30:23.068Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ModSession.cs",
-              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Components\\ModSession.cs",
-              "RelativeDocumentMoniker": "Components\\ModSession.cs",
-              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Components\\ModSession.cs",
-              "RelativeToolTip": "Components\\ModSession.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-20T22:28:06.147Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Settings.cs",
-              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Helpers\\Settings.cs",
-              "RelativeDocumentMoniker": "Helpers\\Settings.cs",
-              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Helpers\\Settings.cs",
-              "RelativeToolTip": "Helpers\\Settings.cs",
-              "ViewState": "AQIAABoAAAAAAAAAAAAQwDQAAABhAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-20T21:39:56.318Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "CustomInteraction.cs",
-              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Common\\CustomInteraction.cs",
-              "RelativeDocumentMoniker": "Common\\CustomInteraction.cs",
-              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Common\\CustomInteraction.cs",
-              "RelativeToolTip": "Common\\CustomInteraction.cs",
-              "ViewState": "AQIAAAUAAAAAAAAAAAAxwAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-20T19:28:43.352Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "RemoteInteractable.cs",
-              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Components\\RemoteInteractable.cs",
-              "RelativeDocumentMoniker": "Components\\RemoteInteractable.cs",
-              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Components\\RemoteInteractable.cs",
-              "RelativeToolTip": "Components\\RemoteInteractable.cs",
-              "ViewState": "AQIAABsAAAAAAAAAAAAkwDIAAAB8AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-20T19:21:53.578Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 1,
@@ -113,22 +40,62 @@
               "RelativeDocumentMoniker": "Common\\PlacementController.cs",
               "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Common\\PlacementController.cs",
               "RelativeToolTip": "Common\\PlacementController.cs",
-              "ViewState": "AQIAAG8AAAAAAAAAAAAmwJEAAACmAAAA",
+              "ViewState": "AQIAAIcAAAAAAAAAAAAmwKAAAAANAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-20T16:01:30.986Z",
+              "WhenOpened": "2024-12-21T04:13:35.001Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "InteractionHelper.cs",
-              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Helpers\\InteractionHelper.cs",
-              "RelativeDocumentMoniker": "Helpers\\InteractionHelper.cs",
-              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Helpers\\InteractionHelper.cs",
-              "RelativeToolTip": "Helpers\\InteractionHelper.cs",
-              "ViewState": "AQIAABYAAAAAAAAAAAAgwDUAAAAJAAAA",
+              "DocumentIndex": 0,
+              "Title": "Settings.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Helpers\\Settings.cs",
+              "RelativeDocumentMoniker": "Helpers\\Settings.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Helpers\\Settings.cs",
+              "RelativeToolTip": "Helpers\\Settings.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAAQwCMAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-20T15:57:39.26Z"
+              "WhenOpened": "2024-12-21T04:12:17.878Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PlacedItemData.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Common\\PlacedItemData.cs",
+              "RelativeDocumentMoniker": "Common\\PlacedItemData.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Common\\PlacedItemData.cs",
+              "RelativeToolTip": "Common\\PlacedItemData.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-21T04:03:11.318Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Plugin.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Plugin.cs",
+              "RelativeDocumentMoniker": "Plugin.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Plugin.cs",
+              "RelativeToolTip": "Plugin.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACIAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-21T04:02:50.208Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GetAvailableActionsPatch.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Patches\\GetAvailableActionsPatch.cs",
+              "RelativeDocumentMoniker": "Patches\\GetAvailableActionsPatch.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\PersistentItemPlacement\\Patches\\GetAvailableActionsPatch.cs",
+              "RelativeToolTip": "Patches\\GetAvailableActionsPatch.cs",
+              "ViewState": "AQIAABoAAAAAAAAAAAD4vzAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-21T04:01:06.655Z",
+              "EditorCaption": ""
             }
           ]
         }

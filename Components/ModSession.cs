@@ -2,13 +2,13 @@
 using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
-using PersistentItemPlacement.Common;
-using PersistentItemPlacement.Helpers;
+using LeaveItThere.Common;
+using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PersistentItemPlacement.Components
+namespace LeaveItThere.Components
 {
     internal class ModSession : MonoBehaviour
     {
@@ -44,12 +44,12 @@ namespace PersistentItemPlacement.Components
             _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.AddComponent<ModSession>();
         }
 
-        public ItemRemotePair AddOrUpdatePair(ObservedLootItem lootItem, RemoteInteractable remoteInteractableComponent, Vector3 placementPosition, bool placed)
+        public ItemRemotePair AddOrUpdatePair(ObservedLootItem lootItem, RemoteInteractable remoteInteractable, Vector3 placementPosition, bool placed)
         {
             var pair = GetPairOrNull(lootItem);
             if (pair == null)
             {
-                ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractableComponent, placementPosition, lootItem.gameObject.transform.rotation, placed);
+                ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractable, placementPosition, lootItem.gameObject.transform.rotation, placed);
                 ItemRemotePairs.Add(newPair);
                 return newPair;
             }
@@ -71,11 +71,11 @@ namespace PersistentItemPlacement.Components
             return null;
         }
 
-        public ItemRemotePair GetPairOrNull(RemoteInteractable remoteInteractableComponent)
+        public ItemRemotePair GetPairOrNull(RemoteInteractable remoteInteractable)
         {
             foreach (var pair in ItemRemotePairs)
             {
-                if (pair.RemoteInteractableComponent == remoteInteractableComponent) return pair;
+                if (pair.RemoteInteractable == remoteInteractable) return pair;
             }
 
             return null;

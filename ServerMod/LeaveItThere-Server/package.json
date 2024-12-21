@@ -1,5 +1,5 @@
 {
-    "name": "PersistentItemPlacement-Server",
+    "name": "LeaveItThere-Server",
     "version": "1.0.0",
     "sptVersion": "~3.10",
     "loadBefore": [],

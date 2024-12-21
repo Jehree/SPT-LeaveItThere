@@ -2,8 +2,8 @@
 using EFT;
 using EFT.Interactive;
 using InteractableInteractionsAPI.Common;
-using PersistentItemPlacement.Common;
-using PersistentItemPlacement.Helpers;
+using LeaveItThere.Common;
+using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PersistentItemPlacement.Components
+namespace LeaveItThere.Components
 {
     internal class RemoteInteractable : InteractableObject
     {
@@ -25,10 +25,10 @@ namespace PersistentItemPlacement.Components
             }
             else
             {
-                pair.RemoteInteractableComponent.gameObject.transform.position = position;
-                pair.RemoteInteractableComponent.gameObject.transform.rotation = lootItem.gameObject.transform.rotation;
-                pair.RemoteInteractableComponent.SetItemColor(Settings.PlacedItemTint.Value);
-                return pair.RemoteInteractableComponent;
+                pair.RemoteInteractable.gameObject.transform.position = position;
+                pair.RemoteInteractable.gameObject.transform.rotation = lootItem.gameObject.transform.rotation;
+                pair.RemoteInteractable.SetItemColor(Settings.PlacedItemTint.Value);
+                return pair.RemoteInteractable;
             }
         }
 
@@ -42,19 +42,19 @@ namespace PersistentItemPlacement.Components
                 GameObject.Destroy(componentWhoLivedComeToDie); //hehe
             }
 
-            RemoteInteractable remoteInteractableComponent = remoteAccessObj.AddComponent<RemoteInteractable>();
-            remoteInteractableComponent.SetItemColor(Settings.PlacedItemTint.Value);
+            RemoteInteractable remoteInteractable = remoteAccessObj.AddComponent<RemoteInteractable>();
+            remoteInteractable.SetItemColor(Settings.PlacedItemTint.Value);
             if (lootItem.Item.IsContainer)
             {
-                remoteInteractableComponent.Actions.Add(PlacementController.GetRemoteOpenItemAction(lootItem));
+                remoteInteractable.Actions.Add(PlacementController.GetRemoteOpenItemAction(lootItem));
             }
-            remoteInteractableComponent.Actions.Add(PlacementController.GetDemolishItemAction(remoteInteractableComponent));
+            remoteInteractable.Actions.Add(PlacementController.GetDemolishItemAction(remoteInteractable));
 
             remoteAccessObj.transform.position = position;
             remoteAccessObj.transform.rotation = rotation;
             remoteAccessObj.transform.localScale = remoteAccessObj.transform.localScale * 0.99f;
 
-            return remoteInteractableComponent;
+            return remoteInteractable;
         }
 
         public void SetItemColor(Color color)

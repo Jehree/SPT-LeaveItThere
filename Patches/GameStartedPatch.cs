@@ -3,9 +3,9 @@ using EFT;
 using EFT.InventoryLogic;
 using EFT.UI;
 using HarmonyLib;
-using PersistentItemPlacement.Common;
-using PersistentItemPlacement.Components;
-using PersistentItemPlacement.Helpers;
+using LeaveItThere.Common;
+using LeaveItThere.Components;
+using LeaveItThere.Helpers;
 using SPT.Reflection.Patching;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace PersistentItemPlacement.Patches
+namespace LeaveItThere.Patches
 {
     internal class GameStartedPatch : ModulePatch
     {
