@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\leaveitthere\\common\\placementcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|solutionrelative:common\\placementcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\leaveitthere\\components\\modsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|solutionrelative:components\\modsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\leaveitthere\\components\\remoteinteractable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|solutionrelative:components\\remoteinteractable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\leaveitthere\\plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere.csproj|solutionrelative:plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -14,11 +26,50 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ModSession.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\Components\\ModSession.cs",
+              "RelativeDocumentMoniker": "Components\\ModSession.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\Components\\ModSession.cs",
+              "RelativeToolTip": "Components\\ModSession.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-22T04:38:35.442Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RemoteInteractable.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\Components\\RemoteInteractable.cs",
+              "RelativeDocumentMoniker": "Components\\RemoteInteractable.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\Components\\RemoteInteractable.cs",
+              "RelativeToolTip": "Components\\RemoteInteractable.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-22T04:38:08.343Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "PlacementController.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\Common\\PlacementController.cs",
+              "RelativeDocumentMoniker": "Common\\PlacementController.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\Common\\PlacementController.cs",
+              "RelativeToolTip": "Common\\PlacementController.cs",
+              "ViewState": "AQIAAJQAAAAAAAAAAADwv6QAAACHAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-22T04:38:04.48Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Plugin.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\LeaveItThere\\Plugin.cs",
               "RelativeDocumentMoniker": "Plugin.cs",

@@ -162,6 +162,7 @@ namespace LeaveItThere.Common
  
             if (item is SearchableItemItemClass)
             {
+                // it happens to be the case that this does NOT include item cases. I'm not fixing it because I think it's cool heh heh
                 var searchableItem = item as SearchableItemItemClass;
                 foreach (var grid in searchableItem.Grids)
                 {
