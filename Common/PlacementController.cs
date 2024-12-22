@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
 using EFT.UI;
+using System.Reflection;
 
 namespace LeaveItThere.Common
 {
@@ -38,17 +39,50 @@ namespace LeaveItThere.Common
             }
         }
 
-        public static void OnRaidEnd()
+        public static void SendPlacedItemDataToServer()
         {
+            /*
+            if (_idFieldInfo == null && lostInsuredItems.Any())
+            {
+                // lazy cacheing should be fine here.. I don't think it'll take THAT long to find it anyway
+                _idFieldInfo = lostInsuredItems[0].GetType().GetField("_id");
+            }
+            */
+
             var dataList = new List<PlacedItemData>();
             string mapId = Singleton<GameWorld>.Instance.LocationId;
+            List<string> placedItemInstanceIds = new();
             foreach (var pair in ModSession.GetSession().ItemRemotePairs)
             {
                 if (pair.Placed == false) continue;
                 dataList.Add(new PlacedItemData(pair.LootItem.Item, pair.PlacementPosition, pair.PlacementRotation));
+                placedItemInstanceIds.Add(pair.LootItem.ItemId);
             }
             var dataPack = new PlacedItemDataPack(mapId, dataList);
             SPTServerHelper.ServerRoute(DataToServerURL, dataPack);
+
+            /*
+            object[]
+            foreach (var lostItem in lostInsuredItems)
+            {
+                string _id = _idFieldInfo.GetValue(lostItem) as string;
+                if (placedItemInstanceIds.Contains(_id))
+                {
+                    lostInsuredItems.RemoveFirst()
+                }
+            }
+
+            for (int i = lostInsuredItems.Length - 1; i >= 0; i--)
+            {
+                object lostItem = lostInsuredItems[i];
+                string _id = _idFieldInfo.GetValue(lostItem) as string;
+                if (placedItemInstanceIds.Contains(_id))
+                {
+                    lostInsuredItems.Rem;
+                }
+            }
+            */
+
         }
 
         public static CustomInteraction GetRemoteOpenItemAction(LootItem lootItem)

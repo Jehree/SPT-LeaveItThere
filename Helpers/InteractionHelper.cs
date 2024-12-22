@@ -15,23 +15,6 @@ namespace LeaveItThere.Helpers
     {
         private static GamePlayerOwner _owner;
 
-        public static List<ActionsTypesClass> GetVanillaInteractionActions<TInteractive>(GamePlayerOwner gamePlayerOwner, object interactive, MethodInfo methodInfo)
-        {
-            object[] args = new object[2];
-            args[0] = gamePlayerOwner;
-            args[1] = interactive;
-            _owner = gamePlayerOwner;
-
-            if (!(interactive is TInteractive))
-            {
-                return new List<ActionsTypesClass>();
-            }
-
-            List<ActionsTypesClass> vanillaExfilActions = ((ActionsReturnClass)methodInfo.Invoke(null, args))?.Actions;
-
-            return vanillaExfilActions ?? new List<ActionsTypesClass>();
-        }
-
         public static MethodInfo GetInteractiveActionsMethodInfo<TIneractive>()
         {
             

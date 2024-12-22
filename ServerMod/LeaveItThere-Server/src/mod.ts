@@ -1,10 +1,13 @@
 import { DependencyContainer } from "tsyringe";
 import { IPreSptLoadMod } from "@spt/models/external/IPreSptLoadMod";
+import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { FileUtils, InitStage, ModHelper } from "./mod_helper";
 import * as fs from "fs";
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
+import Config from "../config.json";
+import { BaseClasses } from "@spt/models/enums/BaseClasses";
 
-class Mod implements IPreSptLoadMod {
+class Mod implements IPreSptLoadMod, IPostDBLoadMod {
     public Helper = new ModHelper();
 
     public DataToServer = "/jehree/pip/data_to_server";
@@ -15,6 +18,34 @@ class Mod implements IPreSptLoadMod {
 
         this.Helper.registerStaticRoute(this.DataToServer, "LeaveItThere-DataToServer", Routes.onDataToServer, Routes);
         this.Helper.registerStaticRoute(this.DataToClient, "LeaveItThere-DataToClient", Routes.onDataToClient, Routes, true);
+    }
+
+    public postDBLoad(container: DependencyContainer): void {
+        this.Helper.init(container, InitStage.POST_DB_LOAD);
+        if (Config.remove_in_raid_restrictions) {
+            this.Helper.dbGlobals.config.RestrictionsInRaid = [];
+        }
+        if (Config.everything_is_discardable) {
+        }
+        for (const [_, item] of Object.entries(this.Helper.dbItems)) {
+            if (item._type !== "Item") continue;
+
+            if (Config.everything_is_discardable) {
+                item._props.DiscardLimit = -1;
+            }
+
+            if (Config.remove_backpack_restrictions && this.Helper.itemHelper.isOfBaseclass(item._id, BaseClasses.BACKPACK)) {
+                for (const [_, grid] of Object.entries(item._props.Grids)) {
+                    if (!grid?._props?.filters) continue;
+                    grid._props.filters = [
+                        {
+                            Filter: [BaseClasses.ITEM],
+                            ExcludedFilter: [],
+                        },
+                    ];
+                }
+            }
+        }
     }
 }
 

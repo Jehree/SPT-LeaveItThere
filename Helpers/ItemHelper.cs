@@ -11,61 +11,13 @@ using EFT.Interactive;
 using System.Reflection;
 using SPT.Reflection.Utils;
 using System.Linq;
+using LeaveItThere.Components;
 
 namespace LeaveItThere.Helpers
 {
     public static class ItemHelper
     {
-        /* fuck this lol I'll just update the gclass numbers
-        private static ConstructorInfo _writerConstructorMethodInfo;
-        private static ConstructorInfo _readerConstructorMethodInfo;
-        private static ConstructorInfo _descriptorConstructorMethodInfo;
-        private static MethodInfo _serializeItemMethodInfo;
-        private static MethodInfo _deserializeItemMethodInfo;
-
-        public static void InitObfuscatedMethods()
-        {
-
-            Type writerClass = PatchConstants.EftTypes.Single(targetClass =>
-                !targetClass.IsInterface &&
-                !targetClass.IsNested &&
-                targetClass.GetMethods().Any(method => method.Name == "WriteByte") &&
-                targetClass.GetMethods().Any(method => method.Name == "Write") &&
-                targetClass.GetFields().Any(field => field.Name == "MaxStringLength") &&
-                targetClass.GetFields().Any(field => field.Name == "DefaultCapacity")
-            );
-            _writerConstructorMethodInfo = writerClass.GetConstructor(BindingFlags.Default, null, CallingConventions.Standard, new Type[0], null);
-
-            Type readerClass = PatchConstants.EftTypes.Single(targetClass =>
-                !targetClass.IsInterface &&
-                !targetClass.IsNested &&
-                targetClass.GetMethods().Any(method => method.Name == "ReadByte") &&
-                targetClass.GetMethods().Any(method => method.Name == "ReadBytesSegment") &&
-                targetClass.GetFields().Any(field => field.Name == "Position")
-            );
-            _readerConstructorMethodInfo = readerClass.GetConstructor(BindingFlags.Default, null, new Type[] { typeof(byte[])}, null);
-
-            Type descriptorClass = PatchConstants.EftTypes.Single(targetClass =>
-                !targetClass.IsInterface &&
-                !targetClass.IsNested &&
-                targetClass.GetMethods().Any(method => method.Name == "Deserialize" && method.GetParameters()[0].Name == "items" && method.GetParameters()[0].GetType() == typeof(Dictionary<MongoID, Item>)) &&
-                targetClass.GetFields().Any(field => field.Name == "IsUnderBarrelDeviceActive")
-            );
-            _descriptorConstructorMethodInfo = descriptorClass.GetConstructor(BindingFlags.Default, null, new Type[0], null);
-
-            Type itemSerizalizationClass = PatchConstants.EftTypes.Single(targetClass =>
-                !targetClass.IsInterface &&
-                !targetClass.IsNested &&
-                targetClass.IsAbstract &&
-                targetClass.GetMethods().Any(method => method.Name == "SerializeNestedItem" &&
-                method.GetParameters().Length == 3 && 
-                method.GetParameters()[0].GetType() == typeof(Item) &&
-                method.IsStatic)
-            );
-            _serializeItemMethodInfo = itemSerizalizationClass.GetMethod("SerializeItem");
-            _deserializeItemMethodInfo = itemSerizalizationClass.GetMethod("DeserializeItem");
-        }
-        */
+        private static FieldInfo _idFieldInfo = null;
 
         public static void SpawnItem(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {
@@ -198,6 +150,26 @@ namespace LeaveItThere.Helpers
                     ForAllChildrenInItem(child, callable);
                 }
             }
+        }
+
+        public static object[] RemoveLostInsuredItemsByIds(object[] lostInsuredItems, List<string> idsToRemove)
+        {
+            if (_idFieldInfo == null && lostInsuredItems.Any())
+            {
+                // lazy initilization should be fine here.. I don't think it'll take THAT long to find it anyway
+                _idFieldInfo = lostInsuredItems[0].GetType().GetField("_id");
+            }
+
+            List<string> placedItemIds = ModSession.GetSession().GetPlacedItemInstanceIds();
+            List<object> editedLostInsuredItems = new();
+            foreach (object item in lostInsuredItems)
+            {
+                string _id = _idFieldInfo.GetValue(item).ToString();
+                if (!placedItemIds.Contains(_id)) continue;
+                editedLostInsuredItems.Add(item);
+            }
+
+            return editedLostInsuredItems.ToArray();
         }
     }
 }

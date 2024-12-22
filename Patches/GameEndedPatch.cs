@@ -10,19 +10,18 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Comfort.Common;
+using EFT.Interactive;
+using System.Collections.Generic;
 
 namespace LeaveItThere.Patches
 {
     internal class GameEndedPatch : ModulePatch
     {
         private static Type _targetClassType;
-        private static JsonConverter[] _defaultJsonConverters;
 
         protected override MethodBase GetTargetMethod()
         {
-            var converterClass = typeof(AbstractGame).Assembly.GetTypes().First(t => t.GetField("Converters", BindingFlags.Static | BindingFlags.Public) != null);
-            _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
-
             _targetClassType = PatchConstants.EftTypes.Single(targetClass =>
                 !targetClass.IsInterface &&
                 !targetClass.IsNested &&
@@ -34,10 +33,11 @@ namespace LeaveItThere.Patches
         }
 
         // LocalRaidSettings settings, GClass1924 results, GClass1301[] lostInsuredItems, Dictionary<string, GClass1301[]> transferItems
-        [PatchPostfix]
-        static void Postfix(object[] __args)
+        [PatchPrefix]
+        static void Prefix(LocalRaidSettings settings, object results, ref object[] lostInsuredItems, object transferItems)
         {
-            PlacementController.OnRaidEnd();
+            PlacementController.SendPlacedItemDataToServer();
+            lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems, ModSession.GetSession().GetPlacedItemInstanceIds());
         }
     }
 }

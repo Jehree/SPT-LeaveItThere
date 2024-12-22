@@ -6,6 +6,7 @@ using LeaveItThere.Common;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO.Pipes;
 using UnityEngine;
 
 namespace LeaveItThere.Components
@@ -81,7 +82,7 @@ namespace LeaveItThere.Components
             return null;
         }
 
-        public bool PlacementIsAllowed(Item item)
+        public bool PlacementIsAllowed(Item item) 
         {
             if (Settings.CostSystemEnabled.Value)
             {
@@ -91,6 +92,17 @@ namespace LeaveItThere.Components
             {
                 return true;
             }
+        }
+
+        public List<string> GetPlacedItemInstanceIds()
+        {
+            List<string> ids = new();
+            foreach (var pair in ItemRemotePairs)
+            {
+                if (pair.Placed == false) continue;
+                ids.Add(pair.LootItem.StaticId);
+            }
+            return ids;
         }
     }
 }

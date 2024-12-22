@@ -29,5 +29,13 @@ namespace LeaveItThere.Patches
             ModSession.CreateNewSession();
             PlacementController.OnRaidStart();
         }
+
+        //fix list:
+
+        // some maps not working right... ToLower() ideally should fix this
+
+        // insurance - need to make sure it doesn't cause duping (it likely does)
+
+        // add item whitelist and blacklist
     }
 }

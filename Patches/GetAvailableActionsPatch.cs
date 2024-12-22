@@ -22,68 +22,45 @@ namespace LeaveItThere.Patches
 {
     internal class GetAvailableActionsPatch : ModulePatch
     {
-        private static MethodInfo _getLootItemActions;
-        private static FieldInfo _staticLootIdField;
-        private const string CRATE_ID = "5811ce772459770e9e5f9532";
-
         protected override MethodBase GetTargetMethod()
         {
-            _getLootItemActions = InteractionHelper.GetInteractiveActionsMethodInfo<LootItem>();
-            _staticLootIdField = AccessTools.Field(typeof(StaticLoot), "_id");
-
             return AccessTools.FirstMethod(typeof(GetActionsClass), method => method.Name == nameof(GetActionsClass.GetAvailableActions) && method.GetParameters()[0].Name == "owner");
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(object[] __args, ref ActionsReturnClass __result)
+        public static bool PatchPrefix(GamePlayerOwner owner, object interactive, ref ActionsReturnClass __result)
         {
-            var player = Singleton<GameWorld>.Instance.MainPlayer;
-            var owner = __args[0] as GamePlayerOwner;
-            var interactive = __args[1]; // as GInterface139 as of SPT 3.10 
+            if (interactive is not RemoteInteractable) return true;
 
-            if (!WeCareAboutInteractive(interactive)) return true;
-
-            if (interactive is LootItem)
-            {
-                __result = HandleLootItemInteractive(interactive, owner);
-            }
-
-            if (interactive is RemoteInteractable)
-            {
-                var component = interactive as RemoteInteractable;
-                __result = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(component.Actions) };
-            }
-
+            var component = interactive as RemoteInteractable;
+            __result = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(component.Actions) };
             return false;
         }
 
-        private static ActionsReturnClass HandleLootItemInteractive(object interactive, GamePlayerOwner owner)
+        [PatchPostfix]
+        public static void PatchPostfix(GamePlayerOwner owner, object interactive, ref ActionsReturnClass __result)
         {
-            var lootItem = interactive as LootItem;
+            if (interactive is not LootItem) return;
+            LootItem lootItem = interactive as LootItem;
+            if (!LootItemIsTarget(lootItem)) return;
+
             var placeAction = PlacementController.GetPlaceItemAction(lootItem);
-
-            List<ActionsTypesClass> actions = new List<ActionsTypesClass>();
-            actions.AddRange(InteractionHelper.GetVanillaInteractionActions<LootItem>(owner, interactive, _getLootItemActions));
-            if (!actions.Any())
+            if (__result.Error != null)
             {
-                actions.Add(new CustomInteraction(string.Format("No Space ({0})".Localized(null), lootItem.Name.Localized(null)), true, null).GetActionsTypesClass());
+                __result.Actions.Insert(0, new CustomInteraction(string.Format("No Space ({0})".Localized(null), lootItem.Name.Localized(null)), true, null).GetActionsTypesClass());
             }
-            actions.Add(placeAction.GetActionsTypesClass());
-
-            return new ActionsReturnClass { Actions = actions };
+            __result.Actions.Add(placeAction.GetActionsTypesClass());
         }
 
-        private static bool WeCareAboutInteractive(object interactive)
+        private static bool LootItemIsTarget(LootItem lootItem)
         {
-            if (interactive is LootItem)
-            {
-                LootItem lootItem = interactive as LootItem;
-                if (Settings.MinimumCostItemsArePlaceable.Value) return true;
-                int cost = PlacementController.GetItemCost(lootItem.Item);
-                return cost > Settings.MinimumPlacementCost.Value;
-            }
-            if (interactive is RemoteInteractable) return true;
-            return false;
+            if (Plugin.PlaceableItemFilter.WhitelistEnabled && !Plugin.PlaceableItemFilter.Whitelist.Contains(lootItem.Item.TemplateId)) return false;
+            if (Plugin.PlaceableItemFilter.BlacklistEnabled && Plugin.PlaceableItemFilter.Blacklist.Contains(lootItem.Item.TemplateId)) return false;
+
+            if (Settings.MinimumCostItemsArePlaceable.Value) return true;
+
+            int cost = PlacementController.GetItemCost(lootItem.Item);
+            return cost > Settings.MinimumPlacementCost.Value;
         }
     }
 }

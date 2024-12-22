@@ -135,7 +135,7 @@ namespace LeaveItThere.Helpers
 
         public static int GetAllottedPoints()
         {
-            return _itemCountLookup[Singleton<GameWorld>.Instance.LocationId].Value;
+            return _itemCountLookup[Singleton<GameWorld>.Instance.LocationId.ToLower()].Value;
         }
     }
 }

@@ -12,17 +12,23 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration.Assemblies;
 
 namespace LeaveItThere
 {
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.0.0")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.1.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource LogSource;
+        private static string _assemblyPath = Assembly.GetExecutingAssembly().Location;
+        public static string AssemblyFolderPath = Path.GetDirectoryName(_assemblyPath);
+        private static string _itemFilterPath = Path.Combine(AssemblyFolderPath, "placeable_item_filter.json");
+        internal static ItemFilter PlaceableItemFilter { get; private set; }
         private void Awake()
         {
-            Settings.Init(Config);
             LogSource = Logger;
+            PlaceableItemFilter = JsonConvert.DeserializeObject<ItemFilter>(File.ReadAllText(_itemFilterPath));
+            Settings.Init(Config);
             LogSource.LogWarning("Ebu is cute :3");
 
             new GetAvailableActionsPatch().Enable();
