@@ -46,7 +46,7 @@ namespace LeaveItThere.Components
                 ItemHelper.SpawnItem(data.Item, new Vector3(0, -9999, 0), data.Rotation,
                 (LootItem lootItem) =>
                 {
-                    ItemPlacer.PlaceItem(lootItem as ObservedLootItem, data.Location);
+                    ItemPlacer.PlaceItem(lootItem as ObservedLootItem, data.Location, data.Rotation);
                     if (lootItem.Item is SearchableItemItemClass)
                     {
                         ItemHelper.MakeSearchableItemFullySearched(lootItem.Item as SearchableItemItemClass);
@@ -76,18 +76,19 @@ namespace LeaveItThere.Components
             _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.AddComponent<ModSession>();
         }
 
-        public ItemRemotePair AddOrUpdatePair(ObservedLootItem lootItem, RemoteInteractable remoteInteractable, Vector3 placementPosition, bool placed)
+        public ItemRemotePair AddOrUpdatePair(ObservedLootItem lootItem, RemoteInteractable remoteInteractable, Vector3 placementPosition, Quaternion placementRotation, bool placed)
         {
             var pair = GetPairOrNull(lootItem);
             if (pair == null)
             {
-                ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractable, placementPosition, lootItem.gameObject.transform.rotation, placed);
+                ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractable, placementPosition, placementRotation, placed);
                 ItemRemotePairs.Add(newPair);
                 return newPair;
             }
             else
             {
                 pair.PlacementPosition = placementPosition;
+                pair.PlacementRotation = placementRotation;
                 pair.Placed = placed;
                 return pair;
             }

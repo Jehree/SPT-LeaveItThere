@@ -41,5 +41,9 @@ namespace LeaveItThere.Helpers
         {
             NotificationManagerClass.DisplayMessageNotification(message, EFT.Communications.ENotificationDurationType.Long);
         }
+        public static void NotificationLongWarning(string message)
+        {
+            NotificationManagerClass.DisplayWarningNotification(message, EFT.Communications.ENotificationDurationType.Long);
+        }
     }
 }

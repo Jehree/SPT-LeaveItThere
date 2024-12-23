@@ -69,5 +69,12 @@ namespace LeaveItThere.Helpers
             yield return null;
             callback();
         }
+
+        public static Quaternion ScaleQuaternion(Quaternion rotation, float scale)
+        {
+            rotation.ToAngleAxis(out float angle, out Vector3 axis);
+            angle *= scale;
+            return Quaternion.AngleAxis(angle, axis);
+        }
     }
 }

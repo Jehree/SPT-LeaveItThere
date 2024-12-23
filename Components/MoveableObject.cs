@@ -12,18 +12,19 @@ namespace LeaveItThere.Components
     internal class MoveableObject : MonoBehaviour
     {
         private ActionsReturnClass _moveMenu;
-        private Action<GameObject> _exitMenuCallback;
+        private Action<MoveableObject> _exitMenuCallback;
+        private Action<MoveableObject> _moveModeActiveUpdateCallback;
 
         public bool MoveModeActive = false;
-        private bool _isInitialized = false;
+        public bool IsInitialized { get; private set; } = false;
         private bool _translationModeEnabled = false;
         private bool _rotationModeEnabled = false;
         private bool _physicsEnabled = false;
 
-        private Vector3 _lockedPosition;
         private Quaternion _lockedRotation;
+        private Vector3 _lockedPosition;
 
-        public void Init(Action<GameObject> exitMenuCallback)
+        public void Init(Action<MoveableObject> exitMenuCallback, Action<MoveableObject> moveModeActiveUpdateCallback)
         {
             var rigidBody = gameObject.GetOrAddComponent<Rigidbody>();
             EFTPhysicsClass.GClass712.SupportRigidbody(rigidBody);
@@ -36,13 +37,16 @@ namespace LeaveItThere.Components
             interactions.Add(GetExitMoveModeAction().GetActionsTypesClass());
 
             _moveMenu = new ActionsReturnClass { Actions = interactions };
-            _isInitialized = true;
+            IsInitialized = true;
             _exitMenuCallback = exitMenuCallback;
+            _moveModeActiveUpdateCallback = moveModeActiveUpdateCallback;
         }
 
         public void Update()
         {
             if (!MoveModeActive) return;
+            if (_moveModeActiveUpdateCallback != null) _moveModeActiveUpdateCallback(this);
+            if (!MoveModeActive) return; //checking this again is necessary in case the callback changes it
 
             if (_translationModeEnabled)
             {
@@ -56,6 +60,17 @@ namespace LeaveItThere.Components
             var session = ModSession.GetSession();
             if (session.GamePlayerOwner.AvailableInteractionState.Value == _moveMenu) return;
             session.GamePlayerOwner.AvailableInteractionState.Value = _moveMenu;
+        }
+
+        /// <param name="exitMenuCallback">Called once when move mode is exited.</param>
+        /// <param name="moveModeActiveUpdateCallback">Called every frame that move mode is active, return false to force exit move mode.</param>
+        public void EnterMoveMode(Action<MoveableObject> exitMenuCallback = null, Action<MoveableObject> moveModeActiveUpdateCallback = null)
+        {
+            if (!IsInitialized)
+            {
+                Init(exitMenuCallback, moveModeActiveUpdateCallback);
+            }
+            MoveModeActive = true;
         }
 
         public void RotationModeActive()
@@ -181,7 +196,7 @@ namespace LeaveItThere.Components
             _rotationModeEnabled = false;
 
             InteractionHelper.RefreshPrompt(true);
-            _exitMenuCallback(gameObject);
+            if (_exitMenuCallback != null) _exitMenuCallback(this);
         }
 
         public void SetPhysicsEnabled(bool enabled)
@@ -203,22 +218,6 @@ namespace LeaveItThere.Components
         public bool PhysicsIsEnabled()
         {
             return !gameObject.GetComponent<Rigidbody>().isKinematic;
-        }
-
-        public CustomInteraction GetEnterMoveModeAction(Action<GameObject> exitMenuCallback)
-        {
-            return new CustomInteraction(
-                "Move",
-                false,
-                () =>
-                {
-                    if (!_isInitialized)
-                    {
-                        Init(exitMenuCallback);
-                    }
-                    MoveModeActive = true;
-                }
-            );
         }
     }
 }

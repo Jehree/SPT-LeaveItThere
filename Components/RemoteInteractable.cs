@@ -20,16 +20,16 @@ namespace LeaveItThere.Components
     {
         public List<CustomInteraction> Actions = new List<CustomInteraction>();
 
-        public static RemoteInteractable GetOrCreateRemoteInteractable(Vector3 position, LootItem lootItem, ItemRemotePair pair = null)
+        public static RemoteInteractable GetOrCreateRemoteInteractable(Vector3 position, Quaternion rotation, LootItem lootItem, ItemRemotePair pair = null)
         {
             if (pair == null)
             {
-                return CreateNewRemoteInteractable(position, lootItem.gameObject.transform.rotation, lootItem as ObservedLootItem);
+                return CreateNewRemoteInteractable(position, rotation, lootItem as ObservedLootItem);
             }
             else
             {
                 pair.RemoteInteractable.gameObject.transform.position = position;
-                pair.RemoteInteractable.gameObject.transform.rotation = lootItem.gameObject.transform.rotation;
+                pair.RemoteInteractable.gameObject.transform.rotation = rotation;
                 ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, pair.RemoteInteractable.gameObject);
                 return pair.RemoteInteractable;
             }
@@ -53,7 +53,8 @@ namespace LeaveItThere.Components
 
             }
             MoveableObject moveable = remoteAccessObj.AddComponent<MoveableObject>();
-            remoteInteractable.Actions.Add(moveable.GetEnterMoveModeAction(OnMoveModeExited));
+            CustomInteraction enterMoveModeAction = remoteInteractable.GetEnterMoveModeAction(moveable);
+            remoteInteractable.Actions.Add(enterMoveModeAction);
             remoteInteractable.Actions.Add(remoteInteractable.GetDemolishItemAction());
 
             remoteAccessObj.transform.position = position;
@@ -61,15 +62,6 @@ namespace LeaveItThere.Components
             remoteAccessObj.transform.localScale = remoteAccessObj.transform.localScale * 0.99f;
 
             return remoteInteractable;
-        }
-
-        private static void OnMoveModeExited(GameObject gameObject)
-        {
-            InteractionHelper.RefreshPrompt(true);
-            var session = ModSession.GetSession();
-            var remoteInteractable = gameObject.GetComponent<RemoteInteractable>();
-            var pair = session.GetPairOrNull(remoteInteractable);
-            session.AddOrUpdatePair(pair.LootItem, remoteInteractable, remoteInteractable.gameObject.transform.position, true);
         }
 
         public static CustomInteraction GetRemoteOpenItemAction(LootItem lootItem)
@@ -90,10 +82,7 @@ namespace LeaveItThere.Components
             return new CustomInteraction(
                 "Reclaim",
                 false,
-                () =>
-                {
-                    DemolishItem();
-                }
+                DemolishItem
             );
         }
 
@@ -104,7 +93,7 @@ namespace LeaveItThere.Components
 
             gameObject.transform.position = new Vector3(0, -9999, 0);
             pair.LootItem.gameObject.transform.position = pair.PlacementPosition;
-            pair.LootItem.gameObject.transform.rotation = gameObject.transform.rotation;
+            pair.LootItem.gameObject.transform.rotation = pair.PlacementRotation;
             pair.Placed = false;
             session.PointsSpent -= ItemHelper.GetItemCost(pair.LootItem.Item);
 
@@ -119,6 +108,74 @@ namespace LeaveItThere.Components
                 InteractionHelper.NotificationLong($"Points rufunded: {ItemHelper.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
             }
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponDisassemble);
+        }
+
+        public CustomInteraction GetEnterMoveModeAction(MoveableObject moveable)
+        {
+            return new CustomInteraction(
+                () =>
+                {
+                    if (MoveModeDisallowed())
+                    {
+                        return "Move: No Space";
+                    }
+                    else
+                    {
+                        return "Move";
+                    }
+                },
+                MoveModeDisallowed,
+                () =>
+                {
+                    if (MoveModeDisallowed())
+                    {
+                        NotEnoughSpaceForMoveModePlayerFeedback();
+                        return;
+                    }
+                    moveable.EnterMoveMode(OnMoveModeExited, OnMoveModeActiveUpdate);
+                    ModSession.GetSession().Player.EnableSprint(false);
+                }
+            );
+        }
+
+        private bool MoveModeDisallowed()
+        {
+            if (!Settings.MoveModeRequiresInventorySpace.Value) return false;
+            var session = ModSession.GetSession();
+            LootItem lootItem = session.GetPairOrNull(this).LootItem;
+            if (!ItemHelper.ItemCanBePickedUp(lootItem.Item)) return true;
+            return false;
+        }
+
+        private void OnMoveModeExited(MoveableObject moveable)
+        {
+            InteractionHelper.RefreshPrompt(true);
+            var session = ModSession.GetSession();
+            var pair = session.GetPairOrNull(this);
+            session.AddOrUpdatePair(pair.LootItem, this, gameObject.transform.position, gameObject.transform.rotation, true);
+            session.Player.EnableSprint(true);
+        }
+
+        private void OnMoveModeActiveUpdate(MoveableObject moveable)
+        {
+            if (MoveModeDisallowed())
+            {
+                moveable.ExitMoveMode();
+                NotEnoughSpaceForMoveModePlayerFeedback();
+                return;
+            }
+            var session = ModSession.GetSession();
+            if (Settings.MoveModeCancelsSprinting.Value && session.Player.Physical.Sprinting)
+            {
+                moveable.ExitMoveMode();
+                InteractionHelper.NotificationLong("'MOVE' mode cancelled.");
+            }
+        }
+
+        public static void NotEnoughSpaceForMoveModePlayerFeedback()
+        {
+            InteractionHelper.NotificationLongWarning("Not enough space in inventory to move item!");
+            Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.ErrorMessage);
         }
     }
 }

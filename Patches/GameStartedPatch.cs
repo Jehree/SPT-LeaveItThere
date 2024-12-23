@@ -24,7 +24,7 @@ namespace LeaveItThere.Patches
         }
 
         [PatchPrefix]
-        public static void PatchPrefix()
+        static void PatchPrefix()
         {
             ModSession.CreateNewSession();
         }

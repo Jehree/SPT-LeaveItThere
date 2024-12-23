@@ -16,7 +16,8 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<bool> MinimumCostItemsArePlaceable;
         public static ConfigEntry<bool> CostSystemEnabled;
         public static ConfigEntry<Color> PlacedItemTint;
-        public static ConfigEntry<float> RotationSpeed;
+        public static ConfigEntry<bool> MoveModeRequiresInventorySpace;
+        public static ConfigEntry<bool> MoveModeCancelsSprinting;
 
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
@@ -52,17 +53,24 @@ namespace LeaveItThere.Helpers
                 "Minimum Placement Cost Items Can Be Placed",
                 true,
                 "Set to false to prevent mininum cost or less items from being placeable entirely."
-            ); PlacedItemTint = config.Bind(
+            );
+            PlacedItemTint = config.Bind(
                 "1: General",
                 "Placed Item Color Tint",
                 new Color(1, 0.7667f, 0.8667f, 1),
                 "Color tint that will be applied to items when they are placed"
             );
-            RotationSpeed = config.Bind(
+            MoveModeRequiresInventorySpace = config.Bind(
                 "1: General",
-                "Move Mode Rotation Speed",
-                3f,
-                "Rotation speed for objects in Move / Rotation Mode."
+                "Move Mode Requires Inventory Space",
+                true,
+                "When set to true, you can only use 'MOVE' on placed items when you have the inventory space to pick them up."
+            );
+            MoveModeCancelsSprinting = config.Bind(
+                "1: General",
+                "Move Mode Cancels Sprinting",
+                true,
+                "If true, sprinting will cancel 'MOVE' mode."
             );
 
             CustomsAllottedPoints = config.Bind(

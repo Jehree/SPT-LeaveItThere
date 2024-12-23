@@ -46,7 +46,7 @@ namespace LeaveItThere.Common
             {
                 if (allowed)
                 {
-                    PlaceItem(lootItem as ObservedLootItem, lootItem.gameObject.transform.position);
+                    PlaceItem(lootItem as ObservedLootItem, lootItem.gameObject.transform.position, lootItem.gameObject.transform.rotation);
                     session.PointsSpent += ItemHelper.GetItemCost(lootItem.Item);
                     PlacedPlayerFeedback(lootItem.Item);
                 }
@@ -58,12 +58,14 @@ namespace LeaveItThere.Common
             });
         }
 
-        public static void PlaceItem(ObservedLootItem lootItem, Vector3 location)
+        public static void PlaceItem(ObservedLootItem lootItem, Vector3 location, Quaternion rotation)
         {
             var session = ModSession.GetSession();
             lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
-            RemoteInteractable remoteInteractable = RemoteInteractable.GetOrCreateRemoteInteractable(location, lootItem, session.GetPairOrNull(lootItem));
-            session.AddOrUpdatePair(lootItem, remoteInteractable, location, true);
+            RemoteInteractable remoteInteractable = RemoteInteractable.GetOrCreateRemoteInteractable(location, rotation, lootItem, session.GetPairOrNull(lootItem));
+            session.AddOrUpdatePair(lootItem, remoteInteractable, location, rotation, true);
+            lootItem.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
+            remoteInteractable.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
         }
 
         public static void PlacedPlayerFeedback(Item item)

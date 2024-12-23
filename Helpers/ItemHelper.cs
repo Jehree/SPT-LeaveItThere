@@ -224,5 +224,14 @@ namespace LeaveItThere.Helpers
                 callable(pair.LootItem, pair.RemoteInteractable);
             }
         }
+
+        public static bool ItemCanBePickedUp(Item item)
+        {
+            var session = ModSession.GetSession();
+            InventoryController playerInventoryController = session.Player.InventoryController;
+            InventoryEquipment playerEquipment = playerInventoryController.Inventory.Equipment;
+            var pickedUpResult = InteractionsHandlerClass.QuickFindAppropriatePlace(item, playerInventoryController, playerEquipment.ToEnumerable<InventoryEquipment>(), InteractionsHandlerClass.EMoveItemOrder.PickUp, true);
+            return pickedUpResult.Succeeded;
+        }
     }
 }

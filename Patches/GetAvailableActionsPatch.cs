@@ -29,7 +29,7 @@ namespace LeaveItThere.Patches
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(GamePlayerOwner owner, object interactive, ref ActionsReturnClass __result)
+        static bool PatchPrefix(GamePlayerOwner owner, object interactive, ref ActionsReturnClass __result)
         {
             if (interactive is not RemoteInteractable) return true;
 
@@ -41,7 +41,7 @@ namespace LeaveItThere.Patches
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(GamePlayerOwner owner, object interactive, ref ActionsReturnClass __result)
+        static void PatchPostfix(GamePlayerOwner owner, object interactive, ref ActionsReturnClass __result)
         {
             if (interactive is not LootItem) return;
             LootItem lootItem = interactive as LootItem;
@@ -55,7 +55,7 @@ namespace LeaveItThere.Patches
             __result.Actions.Add(placeAction.GetActionsTypesClass());
         }
 
-        private static bool LootItemIsTarget(LootItem lootItem)
+        static bool LootItemIsTarget(LootItem lootItem)
         {
             if (Plugin.PlaceableItemFilter.WhitelistEnabled && !Plugin.PlaceableItemFilter.Whitelist.Contains(lootItem.Item.TemplateId)) return false;
             if (Plugin.PlaceableItemFilter.BlacklistEnabled && Plugin.PlaceableItemFilter.Blacklist.Contains(lootItem.Item.TemplateId)) return false;

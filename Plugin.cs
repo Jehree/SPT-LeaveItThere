@@ -16,7 +16,7 @@ using System.Configuration.Assemblies;
 
 namespace LeaveItThere
 {
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.2.0")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.2.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource LogSource;
