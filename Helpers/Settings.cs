@@ -16,6 +16,7 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<bool> MinimumCostItemsArePlaceable;
         public static ConfigEntry<bool> CostSystemEnabled;
         public static ConfigEntry<Color> PlacedItemTint;
+        public static ConfigEntry<float> RotationSpeed;
 
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
@@ -56,6 +57,12 @@ namespace LeaveItThere.Helpers
                 "Placed Item Color Tint",
                 new Color(1, 0.7667f, 0.8667f, 1),
                 "Color tint that will be applied to items when they are placed"
+            );
+            RotationSpeed = config.Bind(
+                "1: General",
+                "Move Mode Rotation Speed",
+                3f,
+                "Rotation speed for objects in Move / Rotation Mode."
             );
 
             CustomsAllottedPoints = config.Bind(

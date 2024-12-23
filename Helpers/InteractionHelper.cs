@@ -13,8 +13,6 @@ namespace LeaveItThere.Helpers
 {
     public static class InteractionHelper
     {
-        private static GamePlayerOwner _owner;
-
         public static MethodInfo GetInteractiveActionsMethodInfo<TIneractive>()
         {
             
@@ -26,9 +24,17 @@ namespace LeaveItThere.Helpers
             );
         }
 
-        public static void RefreshPrompt()
+        public static void RefreshPrompt(bool force = false)
         {
-            _owner.ClearInteractionState();
+            var session = ModSession.GetSession();
+            if (force)
+            {
+                session.GamePlayerOwner.AvailableInteractionState.Value = null;
+            } 
+            else
+            {
+                session.GamePlayerOwner.ClearInteractionState();
+            }
         }
 
         public static void NotificationLong(string message)

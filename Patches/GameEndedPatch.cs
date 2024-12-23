@@ -36,8 +36,10 @@ namespace LeaveItThere.Patches
         [PatchPrefix]
         static void Prefix(LocalRaidSettings settings, object results, ref object[] lostInsuredItems, object transferItems)
         {
-            PlacementController.SendPlacedItemDataToServer();
-            lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems, ModSession.GetSession().GetPlacedItemInstanceIds());
+            var session = ModSession.GetSession();
+            ItemPlacer.SendPlacedItemDataToServer();
+            lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems, session.GetPlacedItemInstanceIds());
+            session.DestroyAllRemoteObjects();
         }
     }
 }

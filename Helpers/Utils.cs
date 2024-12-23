@@ -1,6 +1,7 @@
 ﻿using Comfort.Common;
 using EFT;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,6 +46,28 @@ namespace LeaveItThere.Helpers
 
 
             return "this shouldn't ever be reached";
+        }
+
+        public static void ExecuteAfterSeconds(int seconds, Action callback)
+        {
+            StaticManager.BeginCoroutine(ExecuteAfterSecondsRoutine(seconds, callback));
+        }
+
+        public static IEnumerator ExecuteAfterSecondsRoutine(int seconds, Action callback)
+        {
+            yield return new WaitForSeconds(seconds);
+            callback();
+        }
+
+        public static void ExecuteNextFrame(Action callback)
+        {
+            StaticManager.BeginCoroutine(ExecuteNextFrameRoutine(callback));
+        }
+
+        public static IEnumerator ExecuteNextFrameRoutine(Action callback)
+        {
+            yield return null;
+            callback();
         }
     }
 }

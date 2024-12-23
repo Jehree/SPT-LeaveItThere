@@ -15,7 +15,7 @@ using LeaveItThere.Components;
 
 namespace LeaveItThere.Helpers
 {
-    public static class ItemHelper
+    internal static class ItemHelper
     {
         private static FieldInfo _idFieldInfo = null;
 
@@ -170,6 +170,59 @@ namespace LeaveItThere.Helpers
             }
 
             return editedLostInsuredItems.ToArray();
+        }
+
+        public static void SetItemColor(Color color, GameObject gameObject)
+        {
+            var renderers = gameObject.GetComponentsInChildren<MeshRenderer>();
+            foreach (var renderer in renderers)
+            {
+                var material = renderer.material;
+                if (!material.HasProperty("_Color")) continue;
+                renderer.material.color = color;
+            }
+        }
+
+        public static int GetItemCost(Item item, bool ignoreMinimumCostSetting = false)
+        {
+            int cost = 0;
+
+            if (item is SearchableItemItemClass)
+            {
+                // it happens to be the case that this does NOT include item cases. I'm not fixing it because I think it's cool heh heh
+                var searchableItem = item as SearchableItemItemClass;
+                foreach (var grid in searchableItem.Grids)
+                {
+                    cost += grid.GridWidth * grid.GridHeight;
+                }
+            }
+            else
+            {
+                var cellSizeStruct = item.CalculateCellSize();
+                cost += cellSizeStruct.X * cellSizeStruct.Y;
+            }
+
+            if (ignoreMinimumCostSetting)
+            {
+                return cost;
+            }
+            else
+            {
+                return cost >= Settings.MinimumPlacementCost.Value
+                    ? cost
+                    : Settings.MinimumPlacementCost.Value;
+            }
+        }
+
+        public static void ForAllItemsUnderCost(int costAmount, Action<LootItem, RemoteInteractable> callable)
+        {
+            var session = ModSession.GetSession();
+            foreach (var pair in session.ItemRemotePairs)
+            {
+                if (pair.Placed == false) continue;
+                if (ItemHelper.GetItemCost(pair.LootItem.Item, true) > costAmount) continue;
+                callable(pair.LootItem, pair.RemoteInteractable);
+            }
         }
     }
 }

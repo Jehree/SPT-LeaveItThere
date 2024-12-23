@@ -15,11 +15,11 @@ namespace LeaveItThere.Common
         [ConsoleCommand("lit_unplace_all_items_below_cost", "", null, "Un-Place all items on the map below a cost amount.")]
         public static void ClearPlacedItems([ConsoleArgument(0, "Cost Amount")] int costAmount)
         {
-            ForAllItemsUnderCost(
+            ItemHelper.ForAllItemsUnderCost(
                 costAmount,
                 (LootItem lootItem, RemoteInteractable interactable) =>
                 {
-                    PlacementController.DemolishItem(interactable);
+                    interactable.DemolishItem();
                 } 
             );
         }
@@ -29,11 +29,11 @@ namespace LeaveItThere.Common
         {
             if (iAmSure != "IAMSURE") return;
 
-            ForAllItemsUnderCost(
+            ItemHelper.ForAllItemsUnderCost(
                 costAmount,
                 (LootItem lootItem, RemoteInteractable interactable) =>
                 {
-                    PlacementController.DemolishItem(interactable);
+                    interactable.DemolishItem();
                     lootItem.gameObject.transform.position = Singleton<GameWorld>.Instance.MainPlayer.Transform.position;
                 }
             );
@@ -43,7 +43,7 @@ namespace LeaveItThere.Common
         public static void ListPlacedItems()
         {
             ConsoleScreen.Log("---------------------------------------");
-            ForAllItemsUnderCost(
+            ItemHelper.ForAllItemsUnderCost(
                 999999999,
                 (LootItem lootItem, RemoteInteractable interactable) =>
                 {
@@ -55,17 +55,6 @@ namespace LeaveItThere.Common
                 }
             );
             ConsoleScreen.Log("---------------------------------------");
-        }
-
-        public static void ForAllItemsUnderCost(int costAmount, Action<LootItem, RemoteInteractable> callable)
-        {
-            var session = ModSession.GetSession();
-            foreach (var pair in session.ItemRemotePairs)
-            {
-                if (pair.Placed == false) continue;
-                if (PlacementController.GetItemCost(pair.LootItem.Item, true) > costAmount) continue;
-                callable(pair.LootItem, pair.RemoteInteractable);
-            }
         }
     }
 }

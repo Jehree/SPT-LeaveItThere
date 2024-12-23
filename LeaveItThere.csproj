@@ -118,11 +118,12 @@
   <ItemGroup>
     <Compile Include="Common\ConsoleCommands.cs" />
     <Compile Include="Common\ItemFilter.cs" />
-    <Compile Include="Common\PlacementController.cs" />
+    <Compile Include="Common\ItemPlacer.cs" />
     <Compile Include="Common\CustomInteraction.cs" />
     <Compile Include="Common\ItemRemotePair.cs" />
     <Compile Include="Common\PlacedItemData.cs" />
     <Compile Include="Components\ModSession.cs" />
+    <Compile Include="Components\MoveableObject.cs" />
     <Compile Include="Components\RemoteInteractable.cs" />
     <Compile Include="Helpers\InteractionHelper.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />

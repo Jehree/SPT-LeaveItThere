@@ -17,6 +17,7 @@ using LeaveItThere.Components;
 using static RootMotion.FinalIK.InteractionTrigger.Range;
 using System.ComponentModel;
 using LeaveItThere.Common;
+using System.Runtime.CompilerServices;
 
 namespace LeaveItThere.Patches
 {
@@ -33,7 +34,9 @@ namespace LeaveItThere.Patches
             if (interactive is not RemoteInteractable) return true;
 
             var component = interactive as RemoteInteractable;
-            __result = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(component.Actions) };
+            var newResult = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(component.Actions) };
+
+            __result = newResult;
             return false;
         }
 
@@ -44,7 +47,7 @@ namespace LeaveItThere.Patches
             LootItem lootItem = interactive as LootItem;
             if (!LootItemIsTarget(lootItem)) return;
 
-            var placeAction = PlacementController.GetPlaceItemAction(lootItem);
+            var placeAction = ItemPlacer.GetPlaceItemAction(lootItem);
             if (__result.Error != null)
             {
                 __result.Actions.Insert(0, new CustomInteraction(string.Format("No Space ({0})".Localized(null), lootItem.Name.Localized(null)), true, null).GetActionsTypesClass());
@@ -59,7 +62,7 @@ namespace LeaveItThere.Patches
 
             if (Settings.MinimumCostItemsArePlaceable.Value) return true;
 
-            int cost = PlacementController.GetItemCost(lootItem.Item);
+            int cost = ItemHelper.GetItemCost(lootItem.Item);
             return cost > Settings.MinimumPlacementCost.Value;
         }
     }
