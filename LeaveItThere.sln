@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveItThere", "LeaveItThere.csproj", "{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveItThere", "LeaveItThere_Core\LeaveItThere.csproj", "{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveItThere_FikaBridge", "LeaveItThere_FikaBridge\LeaveItThere_FikaBridge.csproj", "{F2F6A3E6-D43D-4B1A-8A98-05900FDA5247}"
 EndProject

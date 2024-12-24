@@ -37,7 +37,7 @@ namespace LeaveItThere
             LogSource = Logger;
             PlaceableItemFilter = JsonConvert.DeserializeObject<ItemFilter>(File.ReadAllText(_itemFilterPath));
             Settings.Init(Config);
-            LogSource.LogWarning("Ebu is cute :3");
+            LogSource.LogWarning("Ebu is cute :3 BOBOBO");
 
             new GetAvailableActionsPatch().Enable();
             new GameStartedPatch().Enable();
