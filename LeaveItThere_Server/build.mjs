@@ -237,7 +237,7 @@ function createProjectName(packageJson) {
  * @returns {Promise<string>} A promise that resolves to the absolute path to the distribution directory.
  */
 async function removeOldDistDirectory(projectDir) {
-    const distPath = path.join(projectDir, "..", "..", "..", "..", "user", "mods", "LeaveItThere-Server");
+    const distPath = path.join(projectDir, "..", "..", "..", "user", "mods", "LeaveItThere-Server");
     await fs.remove(distPath);
     return distPath;
 }
