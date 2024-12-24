@@ -13,12 +13,17 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration.Assemblies;
+using BepInEx.Bootstrap;
+using LeaveItThere.Fika;
 
 namespace LeaveItThere
 {
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.2.1")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.3.0")]
     public class Plugin : BaseUnityPlugin
     {
+        public static bool FikaInstalled { get; private set; }
+        public static bool IAmDedicatedClient { get; private set; }
+
         public static ManualLogSource LogSource;
         private static string _assemblyPath = Assembly.GetExecutingAssembly().Location;
         public static string AssemblyFolderPath = Path.GetDirectoryName(_assemblyPath);
@@ -26,6 +31,9 @@ namespace LeaveItThere
         internal static ItemFilter PlaceableItemFilter { get; private set; }
         private void Awake()
         {
+            FikaInstalled = Chainloader.PluginInfos.ContainsKey("com.fika.core");
+            IAmDedicatedClient = Chainloader.PluginInfos.ContainsKey("com.fika.dedicated");
+
             LogSource = Logger;
             PlaceableItemFilter = JsonConvert.DeserializeObject<ItemFilter>(File.ReadAllText(_itemFilterPath));
             Settings.Init(Config);
@@ -37,5 +45,15 @@ namespace LeaveItThere
 
             ConsoleScreen.Processor.RegisterCommandGroup<ConsoleCommands>();
         }
+
+        private void OnEnable()
+        {
+            FikaInterface.InitOnPluginEnabled();
+        }
     }
 }
+    // packet needed for the server to send all clients containing "spawn this item" info
+    // packet needed for changing 'placed' state
+        // idea: make the ItemRemotePair class contain the id of the loot item so it can be looked up via a packet received with that id
+        // packet contains id of loot item, position and rotation of placement, and 'placed' state. item on receiving client then updates the pair and places or unplaces it.
+        // same exact packet could probably be used for 'move' mode

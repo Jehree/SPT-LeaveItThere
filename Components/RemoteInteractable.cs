@@ -5,11 +5,13 @@ using EFT.InventoryLogic;
 using EFT.UI;
 using InteractableInteractionsAPI.Common;
 using LeaveItThere.Common;
+using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -20,22 +22,7 @@ namespace LeaveItThere.Components
     {
         public List<CustomInteraction> Actions = new List<CustomInteraction>();
 
-        public static RemoteInteractable GetOrCreateRemoteInteractable(Vector3 position, Quaternion rotation, LootItem lootItem, ItemRemotePair pair = null)
-        {
-            if (pair == null)
-            {
-                return CreateNewRemoteInteractable(position, rotation, lootItem as ObservedLootItem);
-            }
-            else
-            {
-                pair.RemoteInteractable.gameObject.transform.position = position;
-                pair.RemoteInteractable.gameObject.transform.rotation = rotation;
-                ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, pair.RemoteInteractable.gameObject);
-                return pair.RemoteInteractable;
-            }
-        }
-
-        private static RemoteInteractable CreateNewRemoteInteractable(Vector3 position, Quaternion rotation, ObservedLootItem lootItem)
+        public static RemoteInteractable CreateNewRemoteInteractable(Vector3 position, Quaternion rotation, ObservedLootItem lootItem)
         {
             GameObject remoteAccessObj = GameObject.Instantiate(lootItem.gameObject);
 
@@ -82,27 +69,33 @@ namespace LeaveItThere.Components
             return new CustomInteraction(
                 "Reclaim",
                 false,
-                DemolishItem
+                () =>
+                {
+                    DemolishItem();
+                    DemolishPlayerFeedback();
+                    FikaInterface.SendPlacedStateChangedPacket(ModSession.GetSession().GetPairOrNull(this));
+                }
             );
         }
 
-        public  void DemolishItem()
+        public void DemolishItem()
         {
             var session = ModSession.GetSession();
             var pair = session.GetPairOrNull(this);
+            if (!pair.Placed) return;
 
             gameObject.transform.position = new Vector3(0, -9999, 0);
             pair.LootItem.gameObject.transform.position = pair.PlacementPosition;
             pair.LootItem.gameObject.transform.rotation = pair.PlacementRotation;
             pair.Placed = false;
             session.PointsSpent -= ItemHelper.GetItemCost(pair.LootItem.Item);
-
-            DemolishPlayerFeedback(pair.LootItem.Item);
         }
 
-        public static void DemolishPlayerFeedback(Item item)
+        public void DemolishPlayerFeedback()
         {
             var session = ModSession.GetSession();
+            var pair = session.GetPairOrNull(this);
+            Item item = pair.LootItem.Item;
             if (Settings.CostSystemEnabled.Value)
             {
                 InteractionHelper.NotificationLong($"Points rufunded: {ItemHelper.GetItemCost(item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
@@ -152,23 +145,27 @@ namespace LeaveItThere.Components
             InteractionHelper.RefreshPrompt(true);
             var session = ModSession.GetSession();
             var pair = session.GetPairOrNull(this);
-            session.AddOrUpdatePair(pair.LootItem, this, gameObject.transform.position, gameObject.transform.rotation, true);
-            session.Player.EnableSprint(true);
+            ItemPlacer.PlaceItem(pair.LootItem, gameObject.transform.position, gameObject.transform.rotation);
+            FikaInterface.SendPlacedStateChangedPacket(pair);
         }
 
         private void OnMoveModeActiveUpdate(MoveableObject moveable)
         {
+            var session = ModSession.GetSession();
+
             if (MoveModeDisallowed())
             {
                 moveable.ExitMoveMode();
                 NotEnoughSpaceForMoveModePlayerFeedback();
+                FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(this));
                 return;
             }
-            var session = ModSession.GetSession();
             if (Settings.MoveModeCancelsSprinting.Value && session.Player.Physical.Sprinting)
             {
                 moveable.ExitMoveMode();
+                FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(this));
                 InteractionHelper.NotificationLong("'MOVE' mode cancelled.");
+                return;
             }
         }
 

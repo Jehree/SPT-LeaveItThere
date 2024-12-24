@@ -27,7 +27,7 @@ namespace LeaveItThere.Components
             set { _pointsSpent = Mathf.Clamp(value, 0, Settings.GetAllottedPoints()); }
         }
 
-        private ModSession() {}
+        private ModSession() { }
 
         public void Awake()
         {
@@ -51,7 +51,6 @@ namespace LeaveItThere.Components
                     {
                         ItemHelper.MakeSearchableItemFullySearched(lootItem.Item as SearchableItemItemClass);
                     }
-                    ModSession.GetSession().PointsSpent += ItemHelper.GetItemCost(lootItem.Item);
                 });
             }
         }
@@ -76,22 +75,19 @@ namespace LeaveItThere.Components
             _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.AddComponent<ModSession>();
         }
 
-        public ItemRemotePair AddOrUpdatePair(ObservedLootItem lootItem, RemoteInteractable remoteInteractable, Vector3 placementPosition, Quaternion placementRotation, bool placed)
+        public ItemRemotePair AddPair(ObservedLootItem lootItem, RemoteInteractable remoteInteractable, Vector3 placementPosition, Quaternion placementRotation, bool placed)
         {
-            var pair = GetPairOrNull(lootItem);
-            if (pair == null)
-            {
-                ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractable, placementPosition, placementRotation, placed);
-                ItemRemotePairs.Add(newPair);
-                return newPair;
-            }
-            else
-            {
-                pair.PlacementPosition = placementPosition;
-                pair.PlacementRotation = placementRotation;
-                pair.Placed = placed;
-                return pair;
-            }
+            ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractable, placementPosition, placementRotation, placed);
+            ItemRemotePairs.Add(newPair);
+            return newPair;
+        }
+
+        public ItemRemotePair UpdatePair(ItemRemotePair pair, Vector3 placementPosition, Quaternion placementRotation, bool placed)
+        {
+            pair.PlacementPosition = placementPosition;
+            pair.PlacementRotation = placementRotation;
+            pair.Placed = placed;
+            return pair;
         }
 
         public ItemRemotePair GetPairOrNull(ObservedLootItem lootItem)
@@ -109,6 +105,16 @@ namespace LeaveItThere.Components
             foreach (var pair in ItemRemotePairs)
             {
                 if (pair.RemoteInteractable == remoteInteractable) return pair;
+            }
+
+            return null;
+        }
+
+        public ItemRemotePair GetPairOrNull(string itemId)
+        {
+            foreach (var pair in ItemRemotePairs)
+            {
+                if (pair.LootItem.Item.Id == itemId) return pair;
             }
 
             return null;

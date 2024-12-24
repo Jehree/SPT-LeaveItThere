@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using EFT.UI;
 using System.Reflection;
+using LeaveItThere.Fika;
 
 namespace LeaveItThere.Common
 {
@@ -46,9 +47,10 @@ namespace LeaveItThere.Common
             {
                 if (allowed)
                 {
-                    PlaceItem(lootItem as ObservedLootItem, lootItem.gameObject.transform.position, lootItem.gameObject.transform.rotation);
-                    session.PointsSpent += ItemHelper.GetItemCost(lootItem.Item);
+                    var observedLootItem = lootItem as ObservedLootItem;
+                    PlaceItem(observedLootItem, lootItem.gameObject.transform.position, lootItem.gameObject.transform.rotation);
                     PlacedPlayerFeedback(lootItem.Item);
+                    FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(observedLootItem));
                 }
                 else
                 {
@@ -58,14 +60,40 @@ namespace LeaveItThere.Common
             });
         }
 
-        public static void PlaceItem(ObservedLootItem lootItem, Vector3 location, Quaternion rotation)
+        public static void PlaceItem(ObservedLootItem lootItem, Vector3 position, Quaternion rotation)
         {
             var session = ModSession.GetSession();
-            lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
-            RemoteInteractable remoteInteractable = RemoteInteractable.GetOrCreateRemoteInteractable(location, rotation, lootItem, session.GetPairOrNull(lootItem));
-            session.AddOrUpdatePair(lootItem, remoteInteractable, location, rotation, true);
-            lootItem.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
-            remoteInteractable.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
+            var pair = session.GetPairOrNull(lootItem);
+
+            bool newPairNeeded = pair == null; 
+            bool placementNeeded = newPairNeeded || !pair.Placed; 
+            bool pairUpdateNeeded = !newPairNeeded;
+            bool pointUpdateNeeded = newPairNeeded || placementNeeded; 
+
+            if (newPairNeeded)
+            {
+                RemoteInteractable interactable = RemoteInteractable.CreateNewRemoteInteractable(position, rotation, lootItem);
+                pair = session.AddPair(lootItem, interactable, position, rotation, true);
+            }
+
+            if (pairUpdateNeeded)
+            {
+                pair = session.UpdatePair(pair, position, rotation, true);
+            }
+
+            if (placementNeeded)
+            {
+                lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
+                pair.RemoteInteractable.gameObject.transform.position = position;
+            }
+
+            if (pointUpdateNeeded)
+            {
+                session.PointsSpent += ItemHelper.GetItemCost(lootItem.Item);
+            }
+
+            pair.LootItem.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
+            pair.RemoteInteractable.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
         }
 
         public static void PlacedPlayerFeedback(Item item)
