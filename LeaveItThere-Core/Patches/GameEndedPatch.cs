@@ -13,6 +13,7 @@ using System.Reflection;
 using Comfort.Common;
 using EFT.Interactive;
 using System.Collections.Generic;
+using LeaveItThere.Fika;
 
 namespace LeaveItThere.Patches
 {
@@ -37,8 +38,10 @@ namespace LeaveItThere.Patches
         static void Prefix(LocalRaidSettings settings, object results, ref object[] lostInsuredItems, object transferItems)
         {
             var session = ModSession.GetSession();
-            ItemPlacer.SendPlacedItemDataToServer();
             lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems, session.GetPlacedItemInstanceIds());
+
+            if (!FikaInterface.IAmHost()) return;
+            ItemPlacer.SendPlacedItemDataToServer();
             session.DestroyAllRemoteObjects();
         }
     }

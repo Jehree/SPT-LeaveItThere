@@ -142,7 +142,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LeaveItThere_FikaBridge\LeaveItThere_FikaBridge.csproj">
+    <ProjectReference Include="..\LeaveItThere-FikaBridge\LeaveItThere-FikaBridge.csproj">
       <Project>{f2f6a3e6-d43d-4b1a-8a98-05900fda5247}</Project>
       <Name>LeaveItThere_FikaBridge</Name>
     </ProjectReference>

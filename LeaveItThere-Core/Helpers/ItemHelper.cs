@@ -12,6 +12,7 @@ using System.Reflection;
 using SPT.Reflection.Utils;
 using System.Linq;
 using LeaveItThere.Components;
+using LeaveItThere.Common;
 
 namespace LeaveItThere.Helpers
 {
@@ -214,14 +215,14 @@ namespace LeaveItThere.Helpers
             }
         }
 
-        public static void ForAllItemsUnderCost(int costAmount, Action<LootItem, RemoteInteractable> callable)
+        public static void ForAllItemsUnderCost(int costAmount, Action<ItemRemotePair> callable)
         {
             var session = ModSession.GetSession();
             foreach (var pair in session.ItemRemotePairs)
             {
                 if (pair.Placed == false) continue;
                 if (ItemHelper.GetItemCost(pair.LootItem.Item, true) > costAmount) continue;
-                callable(pair.LootItem, pair.RemoteInteractable);
+                callable(pair);
             }
         }
 

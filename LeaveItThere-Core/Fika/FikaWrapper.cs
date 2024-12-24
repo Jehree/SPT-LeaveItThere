@@ -5,7 +5,7 @@ using Fika.Core.Modding.Events;
 using Fika.Core.Networking;
 using LeaveItThere.Common;
 using LeaveItThere.Components;
-using LeaveItThere_FikaBridge;
+using LeaveItThere.FikaBridge;
 using LiteNetLib;
 
 namespace LeaveItThere.Fika

@@ -66,9 +66,8 @@ namespace LeaveItThere.Common
             var pair = session.GetPairOrNull(lootItem);
 
             bool newPairNeeded = pair == null; 
-            bool placementNeeded = newPairNeeded || !pair.Placed; 
             bool pairUpdateNeeded = !newPairNeeded;
-            bool pointUpdateNeeded = newPairNeeded || placementNeeded; 
+            bool pointUpdateNeeded = newPairNeeded || !pair.Placed; 
 
             if (newPairNeeded)
             {
@@ -81,16 +80,13 @@ namespace LeaveItThere.Common
                 pair = session.UpdatePair(pair, position, rotation, true);
             }
 
-            if (placementNeeded)
-            {
-                lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
-                pair.RemoteInteractable.gameObject.transform.position = position;
-            }
-
             if (pointUpdateNeeded)
             {
                 session.PointsSpent += ItemHelper.GetItemCost(lootItem.Item);
             }
+
+            lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
+            pair.RemoteInteractable.gameObject.transform.position = position;
 
             pair.LootItem.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
             pair.RemoteInteractable.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;

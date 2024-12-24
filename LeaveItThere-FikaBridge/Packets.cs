@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace LeaveItThere_FikaBridge
+namespace LeaveItThere.FikaBridge
 {
     public struct SpawnPlacedItemPacket : INetSerializable
     {
