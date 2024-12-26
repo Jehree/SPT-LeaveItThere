@@ -151,13 +151,30 @@ namespace LeaveItThere.Components
             return false;
         }
 
-        private void OnMoveModeDisabled(GameObject target)
+        private void OnMoveModeDisabled(GameObject target, bool save)
         {
             InteractionHelper.RefreshPrompt(true);
             var session = ModSession.GetSession();
             var pair = session.GetPairOrNull(this);
-            ItemPlacer.PlaceItem(pair.LootItem, gameObject.transform.position, gameObject.transform.rotation);
-            FikaInterface.SendPlacedStateChangedPacket(pair);
+
+            if (save)
+            {
+                ItemPlacer.PlaceItem(pair.LootItem, gameObject.transform.position, gameObject.transform.rotation);
+                FikaInterface.SendPlacedStateChangedPacket(pair);
+            }
+            else
+            {
+                if (pair.Placed)
+                {
+                    gameObject.transform.position = pair.PlacementPosition;
+                    gameObject.transform.rotation = pair.PlacementRotation;
+                }
+                else
+                {
+                    gameObject.transform.position = new Vector3(0, -99999, 0);
+                    gameObject.transform.rotation = pair.PlacementRotation;
+                }
+            }
         }
 
         private void OnMoveModeEnabledUpdate(GameObject target)
@@ -167,14 +184,14 @@ namespace LeaveItThere.Components
 
             if (MoveModeDisallowed())
             {
-                mover.Disable();
+                mover.Disable(true);
                 NotEnoughSpaceForMoveModePlayerFeedback();
                 FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(this));
                 return;
             }
             if (Settings.MoveModeCancelsSprinting.Value && session.Player.Physical.Sprinting)
             {
-                mover.Disable();
+                mover.Disable(true);
                 FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(this));
                 InteractionHelper.NotificationLong("'MOVE' mode cancelled.");
                 return;

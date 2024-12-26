@@ -47,6 +47,7 @@ namespace LeaveItThere.Fika
         public static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet, NetPeer peer)
         {
             ObservedLootItem lootItem = ItemHelper.GetLootItem(packet.ItemId) as ObservedLootItem;
+            var pair = ModSession.GetSession().GetPairOrNull(packet.ItemId);
 
             if (packet.IsPlaced)
             {
@@ -55,8 +56,6 @@ namespace LeaveItThere.Fika
             }
             else
             {
-                var pair = ModSession.GetSession().GetPairOrNull(packet.ItemId);
-
                 if (pair == null)
                 {
                     string err = "Something is wrong! packet.IsPlaced was false, but the pair couldn't be found. This shouldn't happen!";
@@ -65,6 +64,12 @@ namespace LeaveItThere.Fika
                 }
 
                 pair.RemoteInteractable.DemolishItem();
+            }
+
+            var mover = ObjectMover.GetMover();
+            if (mover.Enabled && mover.Target == pair.RemoteInteractable.gameObject)
+            {
+                mover.Disable(false);
             }
 
             if (Singleton<FikaServer>.Instantiated)
