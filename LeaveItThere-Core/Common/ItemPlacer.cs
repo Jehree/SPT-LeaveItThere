@@ -33,7 +33,7 @@ namespace LeaveItThere.Common
                 dataList.Add(new PlacedItemData(pair.LootItem.Item, pair.PlacementPosition, pair.PlacementRotation));
                 placedItemInstanceIds.Add(pair.LootItem.ItemId);
             }
-            var dataPack = new PlacedItemDataPack(mapId, dataList);
+            var dataPack = new PlacedItemDataPack(FikaInterface.GetRaidId(), mapId, dataList);
             SPTServerHelper.ServerRoute(DataToServerURL, dataPack);
         }
 

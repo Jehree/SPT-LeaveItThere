@@ -3,6 +3,7 @@ using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
 using LeaveItThere.Common;
+using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace LeaveItThere.Components
         public static void OnRaidStart()
         {
             string mapId = Singleton<GameWorld>.Instance.LocationId;
-            PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(ItemPlacer.DataToClientURL, new PlacedItemDataPack(mapId));
+            PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(ItemPlacer.DataToClientURL, new PlacedItemDataPack(FikaInterface.GetRaidId(), mapId));
             foreach (var data in dataPack.ItemTemplates)
             {
                 ItemHelper.SpawnItem(data.Item, new Vector3(0, -9999, 0), data.Rotation,

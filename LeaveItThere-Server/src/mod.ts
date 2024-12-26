@@ -6,6 +6,8 @@ import * as fs from "fs";
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 import Config from "../config.json";
 import { BaseClasses } from "@spt/models/enums/BaseClasses";
+import { HealthHelper } from "@spt/helpers/HealthHelper";
+import path from "path";
 
 class Mod implements IPreSptLoadMod, IPostDBLoadMod {
     public Helper = new ModHelper();
@@ -18,6 +20,30 @@ class Mod implements IPreSptLoadMod, IPostDBLoadMod {
 
         this.Helper.registerStaticRoute(this.DataToServer, "LeaveItThere-DataToServer", Routes.onDataToServer, Routes);
         this.Helper.registerStaticRoute(this.DataToClient, "LeaveItThere-DataToClient", Routes.onDataToClient, Routes, true);
+
+        //item_data migration (should probably remove in a couple weeks):
+        this.Helper.registerStaticRoute(
+            "/client/game/start",
+            "LeaveItThere-ProfileMigrationRoute",
+            (url: string, info: any, sessionId: string, output: string, helper: ModHelper) => {
+                const oldFolderPath: string = FileUtils.pathCombine(ModHelper.modPath, "item_data");
+                if (!fs.existsSync(oldFolderPath)) return;
+                const entries = fs.readdirSync(oldFolderPath, { withFileTypes: true });
+                const files: string[] = entries.filter((entry) => entry.isFile()).map((entry) => path.join(oldFolderPath, entry.name));
+
+                for (const filePath of files) {
+                    if (path.extname(filePath) != ".json") continue;
+
+                    const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+                    data["ProfileId"] = sessionId;
+
+                    const newFilePath: string = Routes.getPath(sessionId, data.MapId);
+                    fs.writeFileSync(newFilePath, JSON.stringify(data));
+                }
+
+                fs.renameSync(oldFolderPath, oldFolderPath + "_OLD");
+            }
+        );
     }
 
     public postDBLoad(container: DependencyContainer): void {
@@ -51,33 +77,39 @@ class Mod implements IPreSptLoadMod, IPostDBLoadMod {
 
 export class Routes {
     public static onDataToServer(url: string, info: any, sessionId: string, output: string, helper: ModHelper): void {
-        const data: string = JSON.stringify(info);
-        const mapId: string = JSON.parse(data).MapId;
-        const path: string = this.getPath(mapId);
-        fs.writeFileSync(path, data);
+        const data = JSON.parse(JSON.stringify(info));
+        const mapId: string = data.MapId;
+        const profileId: string = data.ProfileId;
+        const path: string = this.getPath(profileId, mapId);
+        fs.writeFileSync(path, JSON.stringify(info));
     }
 
     public static onDataToClient(url: string, info: any, sessionId: string, output: string, helper: ModHelper): string {
-        const data: string = JSON.stringify(info);
-        const mapId: string = JSON.parse(data).MapId;
-        const path: string = this.getPath(mapId);
+        const data = JSON.parse(JSON.stringify(info));
+        const mapId: string = data.MapId;
+        const profileId: string = data.ProfileId;
+        const path: string = this.getPath(profileId, mapId);
         if (!fs.existsSync(path)) {
-            return `{"MapId": "${mapId}", "ItemTemplates": []}`;
+            return `{"ProfileId": "${profileId}", "MapId": "${mapId}", "ItemTemplates": []}`;
         } else {
             return fs.readFileSync(path, "utf8");
         }
     }
 
-    public static getPath(mapId: string): string {
-        let fileName: string = mapId;
+    public static getPath(profileId: string, mapId: string): string {
+        let mapName: string = mapId;
         if (mapId === "factory4_day" || mapId === "factory4_night") {
-            fileName = "factory";
+            mapName = "factory";
         }
         if (mapId === "sandbox_high") {
-            fileName = "sandbox";
+            mapName = "sandbox";
         }
 
-        return FileUtils.pathCombine(ModHelper.modPath, "item_data", `${fileName}.json`);
+        const folderPath: string = FileUtils.pathCombine(ModHelper.profilePath, "LeaveItThere-ItemData", profileId);
+        const filePath: string = FileUtils.pathCombine(folderPath, `${mapName}.json`);
+        fs.mkdirSync(folderPath, { recursive: true });
+
+        return filePath;
     }
 }
 

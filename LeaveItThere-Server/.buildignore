@@ -19,3 +19,5 @@
 /tsconfig.json
 /types
 /item_data/*
+/src/*.js
+/src/*.js.map

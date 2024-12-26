@@ -40,12 +40,14 @@ namespace LeaveItThere.Common
 
     internal class PlacedItemDataPack
     {
+        public string ProfileId;
         public string MapId;
         public List<PlacedItemData> ItemTemplates;
 
         public PlacedItemDataPack() { }
-        public PlacedItemDataPack(string mapId, List<PlacedItemData> itemTemplates = null)
+        public PlacedItemDataPack(string profileId, string mapId, List<PlacedItemData> itemTemplates = null)
         {
+            ProfileId = profileId;
             MapId = mapId;
             ItemTemplates = new List<PlacedItemData>();
             if (itemTemplates != null)
