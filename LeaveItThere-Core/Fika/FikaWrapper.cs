@@ -1,4 +1,6 @@
 ﻿using Comfort.Common;
+using EFT.Interactive;
+using EFT.UI;
 using Fika.Core.Coop.Utils;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
@@ -6,6 +8,7 @@ using Fika.Core.Networking;
 using LeaveItThere.Common;
 using LeaveItThere.Components;
 using LeaveItThere.FikaBridge;
+using LeaveItThere.Helpers;
 using LiteNetLib;
 
 namespace LeaveItThere.Fika
@@ -41,26 +44,26 @@ namespace LeaveItThere.Fika
             return FikaBackendUtils.GroupId;
         }
 
-        //public static void OnSpawnItemPacketReceived(SpawnPlacedItemPacket packet, NetPeer peer){}
-
         public static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet, NetPeer peer)
         {
-            var session = ModSession.GetSession();
-            var pair = session.GetPairOrNull(packet.ItemId);
-
-            if (pair == null)
-            {
-                throw new System.Exception($"Received a PlacedItemStateChangedPacket with an Item Id ({packet.ItemId}) that peer: {peer.ToString()} did not have a pair for!");
-            }
+            ObservedLootItem lootItem = ItemHelper.GetLootItem(packet.ItemId) as ObservedLootItem;
 
             if (packet.IsPlaced)
             {
-                // re-placing is necessary because if an item is placed, placing it again updates it's position
-                ItemPlacer.PlaceItem(pair.LootItem, pair.PlacementPosition, pair.PlacementRotation);
+                // re-placing is necessary because if an item is placed, placing it again updates its position
+                ItemPlacer.PlaceItem(lootItem, packet.Position, packet.Rotation);
             }
             else
             {
-                // not in this case, but DemolishItem() is safe and won't do anything if the item is not placed
+                var pair = ModSession.GetSession().GetPairOrNull(packet.ItemId);
+
+                if (pair == null)
+                {
+                    string err = "Something is wrong! packet.IsPlaced was false, but the pair couldn't be found. This shouldn't happen!";
+                    ConsoleScreen.LogError(err);
+                    throw new System.Exception(err);
+                }
+
                 pair.RemoteInteractable.DemolishItem();
             }
 

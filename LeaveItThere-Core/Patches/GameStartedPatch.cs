@@ -27,6 +27,7 @@ namespace LeaveItThere.Patches
         static void PatchPrefix()
         {
             ModSession.CreateNewSession();
+            ObjectMover.CreateNewObjectMover();
         }
     }
 }

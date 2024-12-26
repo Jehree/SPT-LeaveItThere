@@ -34,21 +34,24 @@ namespace LeaveItThere.Components
 
             RemoteInteractable remoteInteractable = remoteAccessObj.AddComponent<RemoteInteractable>();
             ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, remoteAccessObj.gameObject);
-            if (lootItem.Item.IsContainer)
-            {
-                remoteInteractable.Actions.Add(RemoteInteractable.GetRemoteOpenItemAction(lootItem));
-
-            }
-            MoveableObject moveable = remoteAccessObj.AddComponent<MoveableObject>();
-            CustomInteraction enterMoveModeAction = remoteInteractable.GetEnterMoveModeAction(moveable);
-            remoteInteractable.Actions.Add(enterMoveModeAction);
-            remoteInteractable.Actions.Add(remoteInteractable.GetDemolishItemAction());
 
             remoteAccessObj.transform.position = position;
             remoteAccessObj.transform.rotation = rotation;
             remoteAccessObj.transform.localScale = remoteAccessObj.transform.localScale * 0.99f;
 
             return remoteInteractable;
+        }
+
+        // interactions can't be added until the pair exists, so the ModSession class takes care of that in AddPair()
+        public void InitInteractions(ObservedLootItem lootItem)
+        {
+            if (lootItem.Item.IsContainer)
+            {
+                Actions.Add(RemoteInteractable.GetRemoteOpenItemAction(lootItem));
+            }
+            Actions.Add(GetEnterMoveModeAction());
+            Actions.Add(GetDemolishItemAction());
+
         }
 
         public static CustomInteraction GetRemoteOpenItemAction(LootItem lootItem)
@@ -66,14 +69,18 @@ namespace LeaveItThere.Components
 
         public CustomInteraction GetDemolishItemAction()
         {
+            // itemId is captured and passed into lambda
+            string itemId = ModSession.GetSession().GetPairOrNull(this).LootItem.ItemId;
+
             return new CustomInteraction(
                 "Reclaim",
                 false,
                 () =>
                 {
-                    DemolishItem();
-                    DemolishPlayerFeedback();
-                    FikaInterface.SendPlacedStateChangedPacket(ModSession.GetSession().GetPairOrNull(this));
+                    var pair = ModSession.GetSession().GetPairOrNull(itemId);
+                    pair.RemoteInteractable.DemolishItem();
+                    pair.RemoteInteractable.DemolishPlayerFeedback();
+                    FikaInterface.SendPlacedStateChangedPacket(pair);
                 }
             );
         }
@@ -103,12 +110,15 @@ namespace LeaveItThere.Components
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponDisassemble);
         }
 
-        public CustomInteraction GetEnterMoveModeAction(MoveableObject moveable)
+        public CustomInteraction GetEnterMoveModeAction()
         {
+            // itemId is captured and passed into lambdas to avoid a closure of 'this'
+            string itemId = ModSession.GetSession().GetPairOrNull(this).LootItem.ItemId;
             return new CustomInteraction(
                 () =>
                 {
-                    if (MoveModeDisallowed())
+                    RemoteInteractable interactable = ModSession.GetSession().GetPairOrNull(itemId).RemoteInteractable;
+                    if (interactable.MoveModeDisallowed())
                     {
                         return "Move: No Space";
                     }
@@ -117,16 +127,17 @@ namespace LeaveItThere.Components
                         return "Move";
                     }
                 },
-                MoveModeDisallowed,
+                ModSession.GetSession().GetPairOrNull(itemId).RemoteInteractable.MoveModeDisallowed,
                 () =>
                 {
-                    if (MoveModeDisallowed())
+                    RemoteInteractable interactable = ModSession.GetSession().GetPairOrNull(itemId).RemoteInteractable;
+                    var mover = ObjectMover.GetMover();
+                    if (interactable.MoveModeDisallowed())
                     {
                         NotEnoughSpaceForMoveModePlayerFeedback();
                         return;
                     }
-                    moveable.EnterMoveMode(OnMoveModeExited, OnMoveModeActiveUpdate);
-                    ModSession.GetSession().Player.EnableSprint(false);
+                    mover.Enable(interactable.gameObject, interactable.OnMoveModeDisabled, interactable.OnMoveModeEnabledUpdate);
                 }
             );
         }
@@ -140,7 +151,7 @@ namespace LeaveItThere.Components
             return false;
         }
 
-        private void OnMoveModeExited(MoveableObject moveable)
+        private void OnMoveModeDisabled(GameObject target)
         {
             InteractionHelper.RefreshPrompt(true);
             var session = ModSession.GetSession();
@@ -149,20 +160,21 @@ namespace LeaveItThere.Components
             FikaInterface.SendPlacedStateChangedPacket(pair);
         }
 
-        private void OnMoveModeActiveUpdate(MoveableObject moveable)
+        private void OnMoveModeEnabledUpdate(GameObject target)
         {
             var session = ModSession.GetSession();
+            var mover = ObjectMover.GetMover();
 
             if (MoveModeDisallowed())
             {
-                moveable.ExitMoveMode();
+                mover.Disable();
                 NotEnoughSpaceForMoveModePlayerFeedback();
                 FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(this));
                 return;
             }
             if (Settings.MoveModeCancelsSprinting.Value && session.Player.Physical.Sprinting)
             {
-                moveable.ExitMoveMode();
+                mover.Disable();
                 FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(this));
                 InteractionHelper.NotificationLong("'MOVE' mode cancelled.");
                 return;

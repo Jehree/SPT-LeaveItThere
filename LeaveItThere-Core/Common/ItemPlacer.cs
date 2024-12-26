@@ -13,6 +13,7 @@ using System.Linq;
 using EFT.UI;
 using System.Reflection;
 using LeaveItThere.Fika;
+using System;
 
 namespace LeaveItThere.Common
 {
@@ -38,18 +39,21 @@ namespace LeaveItThere.Common
 
         public static CustomInteraction GetPlaceItemAction(LootItem lootItem)
         {
-            var session = ModSession.GetSession();
-            bool allowed = session.PlacementIsAllowed(lootItem.Item);
+            string itemId = lootItem.ItemId;
+
             return new CustomInteraction(
             "Place Item",
-            !allowed,
+            !ModSession.GetSession().PlacementIsAllowed(lootItem.Item),
             () =>
             {
+                var session = ModSession.GetSession();
+                var observedLootItem = ItemHelper.GetLootItem(itemId) as ObservedLootItem;
+                bool allowed = session.PlacementIsAllowed(observedLootItem.Item);
+
                 if (allowed)
                 {
-                    var observedLootItem = lootItem as ObservedLootItem;
-                    PlaceItem(observedLootItem, lootItem.gameObject.transform.position, lootItem.gameObject.transform.rotation);
-                    PlacedPlayerFeedback(lootItem.Item);
+                    PlaceItem(observedLootItem, observedLootItem.gameObject.transform.position, observedLootItem.gameObject.transform.rotation);
+                    PlacedPlayerFeedback(observedLootItem.Item);
                     FikaInterface.SendPlacedStateChangedPacket(session.GetPairOrNull(observedLootItem));
                 }
                 else
@@ -63,7 +67,7 @@ namespace LeaveItThere.Common
         public static void PlaceItem(ObservedLootItem lootItem, Vector3 position, Quaternion rotation)
         {
             var session = ModSession.GetSession();
-            var pair = session.GetPairOrNull(lootItem);
+            var pair = session.GetPairOrNull(lootItem.ItemId);
 
             bool newPairNeeded = pair == null; 
             bool pairUpdateNeeded = !newPairNeeded;
@@ -86,9 +90,11 @@ namespace LeaveItThere.Common
             }
 
             lootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
+            lootItem.gameObject.transform.rotation = rotation;
             pair.RemoteInteractable.gameObject.transform.position = position;
+            pair.RemoteInteractable.gameObject.transform.rotation = rotation;
 
-            pair.LootItem.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
+            lootItem.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
             pair.RemoteInteractable.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
         }
 

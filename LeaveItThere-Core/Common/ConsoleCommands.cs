@@ -33,11 +33,11 @@ namespace LeaveItThere.Common
         {
             if (iAmSure != "IAMSURE") return;
 
-            var session = ModSession.GetSession();
             ItemHelper.ForAllItemsUnderCost(
                 costAmount,
                 (ItemRemotePair pair) =>
                 {
+                    var session = ModSession.GetSession();
                     ItemPlacer.PlaceItem(pair.LootItem, session.Player.Transform.position, session.Player.Transform.rotation);
                     FikaInterface.SendPlacedStateChangedPacket(pair);
                 }
@@ -50,28 +50,25 @@ namespace LeaveItThere.Common
             if (iAmSure != "IAMSURE") return;
 
             var session = ModSession.GetSession();
-            int index = 0;
-            ItemRemotePair selectedPair = null;
-            foreach (var pair in session.ItemRemotePairs)
-            {
-                if (index == itemNum)
-                {
-                    selectedPair = pair;
-                    break;
-                }
-                index++;
-            }
-            if (selectedPair == null || !selectedPair.Placed)
+
+            if (itemNum > session.ItemRemotePairs.Count - 1)
             {
                 ConsoleScreen.LogError("No placed item found!");
+                return;
             }
-            else
+
+            ItemRemotePair selectedPair = session.ItemRemotePairs[itemNum];
+
+            if (!selectedPair.Placed)
             {
-                ConsoleScreen.Log("Teleporting item!");
-                ItemPlacer.PlaceItem(selectedPair.LootItem, session.Player.Transform.position, session.Player.Transform.rotation);
-                ItemPlacer.PlacedPlayerFeedback(selectedPair.LootItem.Item);
-                FikaInterface.SendPlacedStateChangedPacket(selectedPair);
+                ConsoleScreen.LogError("No placed item found!");
+                return;
             }
+
+            ConsoleScreen.Log("Teleporting item!");
+            ItemPlacer.PlaceItem(selectedPair.LootItem, session.Player.Transform.position, session.Player.Transform.rotation);
+            ItemPlacer.PlacedPlayerFeedback(selectedPair.LootItem.Item);
+            FikaInterface.SendPlacedStateChangedPacket(selectedPair);
         }
 
         [ConsoleCommand("lit_list_placed_items", "", null, "List information about all placed items on the map.")]
@@ -83,12 +80,14 @@ namespace LeaveItThere.Common
             ConsoleScreen.Log("---------------------------------------");
             foreach (ItemRemotePair pair in session.ItemRemotePairs)
             {
-                if (pair.Placed == false) continue;
-                Vector3 playerPosition = Singleton<GameWorld>.Instance.MainPlayer.Transform.position;
-                string itemName = string.Format("({0})".Localized(null), pair.LootItem.Name.Localized(null));
-                string direction = Utils.GetCardinalDirection(playerPosition, pair.RemoteInteractable.gameObject.transform.position);
-                string distance = Vector3.Distance(playerPosition, pair.RemoteInteractable.gameObject.transform.position).ToString();
-                ConsoleScreen.Log($"{itemName} (item number: {index}) placed {distance} units away from player ({direction})");
+                if (pair.Placed != false)
+                {
+                    Vector3 playerPosition = Singleton<GameWorld>.Instance.MainPlayer.Transform.position;
+                    string itemName = string.Format("({0})".Localized(null), pair.LootItem.Name.Localized(null));
+                    string direction = Utils.GetCardinalDirection(playerPosition, pair.RemoteInteractable.gameObject.transform.position);
+                    string distance = Vector3.Distance(playerPosition, pair.RemoteInteractable.gameObject.transform.position).ToString();
+                    ConsoleScreen.Log($"{itemName} (item number: {index}) placed {distance} units away from player ({direction})");
+                }
                 index++;
             }
             ConsoleScreen.Log("---------------------------------------"); 

@@ -13,12 +13,22 @@ using SPT.Reflection.Utils;
 using System.Linq;
 using LeaveItThere.Components;
 using LeaveItThere.Common;
+using System.Net.Sockets;
 
 namespace LeaveItThere.Helpers
 {
     internal static class ItemHelper
     {
         private static FieldInfo _idFieldInfo = null;
+
+        public static LootItem GetLootItem(string itemId)
+        {
+            foreach (LootItem lootItem in ModSession.GetSession().GameWorld.LootItems.GetValuesEnumerator())
+            {
+                if (lootItem.ItemId == itemId) return lootItem;
+            }
+            return null;
+        }
 
         public static void SpawnItem(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {

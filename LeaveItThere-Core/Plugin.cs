@@ -52,8 +52,5 @@ namespace LeaveItThere
         }
     }
 }
-    // packet needed for the server to send all clients containing "spawn this item" info
-    // packet needed for changing 'placed' state
-        // idea: make the ItemRemotePair class contain the id of the loot item so it can be looked up via a packet received with that id
-        // packet contains id of loot item, position and rotation of placement, and 'placed' state. item on receiving client then updates the pair and places or unplaces it.
-        // same exact packet could probably be used for 'move' mode
+    // need a way for placed item initialization to happen when a another client places a NEW item
+    // moving isn't working, placing and unplacing is syncing fine, but moving does not show it in the new location on other clients, even when placing and reclaiming the item after moving

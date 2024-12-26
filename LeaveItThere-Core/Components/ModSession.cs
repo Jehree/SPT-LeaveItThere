@@ -79,6 +79,7 @@ namespace LeaveItThere.Components
         {
             ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractable, placementPosition, placementRotation, placed);
             ItemRemotePairs.Add(newPair);
+            newPair.RemoteInteractable.InitInteractions(lootItem);
             return newPair;
         }
 
@@ -96,7 +97,6 @@ namespace LeaveItThere.Components
             {
                 if (pair.LootItem == lootItem) return pair;
             }
-
             return null;
         }
 
@@ -106,7 +106,6 @@ namespace LeaveItThere.Components
             {
                 if (pair.RemoteInteractable == remoteInteractable) return pair;
             }
-
             return null;
         }
 
@@ -114,7 +113,7 @@ namespace LeaveItThere.Components
         {
             foreach (var pair in ItemRemotePairs)
             {
-                if (pair.LootItem.Item.Id == itemId) return pair;
+                if (pair.ItemId == itemId) return pair;
             }
 
             return null;
