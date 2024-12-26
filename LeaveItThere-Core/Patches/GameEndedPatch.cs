@@ -41,7 +41,6 @@ namespace LeaveItThere.Patches
             lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems, session.GetPlacedItemInstanceIds());
 
             if (!FikaInterface.IAmHost()) return;
-            Plugin.LogSource.LogError(FikaInterface.GetRaidId());
             ItemPlacer.SendPlacedItemDataToServer();
             session.DestroyAllRemoteObjects();
         }

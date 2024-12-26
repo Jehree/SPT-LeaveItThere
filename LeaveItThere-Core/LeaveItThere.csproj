@@ -128,7 +128,6 @@
     <Compile Include="Components\ModSession.cs" />
     <Compile Include="Components\ObjectMover.cs" />
     <Compile Include="Components\RemoteInteractable.cs" />
-    <Compile Include="Components\TestComponent.cs" />
     <Compile Include="Fika\FikaInterface.cs" />
     <Compile Include="Fika\FikaWrapper.cs" />
     <Compile Include="Helpers\InteractionHelper.cs" />
