@@ -7,14 +7,9 @@ using InteractableInteractionsAPI.Common;
 using LeaveItThere.Common;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace LeaveItThere.Components
 {
@@ -39,11 +34,19 @@ namespace LeaveItThere.Components
             remoteAccessObj.transform.rotation = rotation;
             remoteAccessObj.transform.localScale = remoteAccessObj.transform.localScale * 0.99f;
 
+            NavMeshObstacle obstacle = remoteAccessObj.AddComponent<NavMeshObstacle>();
+            BoxCollider collider = remoteAccessObj.GetComponent<BoxCollider>();
+            obstacle.shape = NavMeshObstacleShape.Box;
+            obstacle.center = collider.center;
+            obstacle.size = collider.size;
+            obstacle.carving = true;
+            obstacle.carveOnlyStationary = false;
+
             return remoteInteractable;
         }
 
         // interactions can't be added until the pair exists, so the ModSession class takes care of that in AddPair()
-        public void InitInteractions(ObservedLootItem lootItem)
+        public void Init(ObservedLootItem lootItem)
         {
             if (lootItem.Item.IsContainer)
             {
@@ -51,7 +54,7 @@ namespace LeaveItThere.Components
             }
             Actions.Add(GetEnterMoveModeAction());
             Actions.Add(GetDemolishItemAction());
-
+            SetPlayerAndBotCollision(Settings.PlacedItemsHaveCollision.Value);
         }
 
         public static CustomInteraction GetRemoteOpenItemAction(LootItem lootItem)
@@ -138,6 +141,7 @@ namespace LeaveItThere.Components
                         return;
                     }
                     mover.Enable(interactable.gameObject, interactable.OnMoveModeDisabled, interactable.OnMoveModeEnabledUpdate);
+                    interactable.SetPlayerAndBotCollision(false);
                 }
             );
         }
@@ -175,6 +179,8 @@ namespace LeaveItThere.Components
                     gameObject.transform.rotation = pair.PlacementRotation;
                 }
             }
+
+            pair.RemoteInteractable.SetPlayerAndBotCollision(Settings.PlacedItemsHaveCollision.Value);
         }
 
         private void OnMoveModeEnabledUpdate(GameObject target)
@@ -202,6 +208,32 @@ namespace LeaveItThere.Components
         {
             InteractionHelper.NotificationLongWarning("Not enough space in inventory to move item!");
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.ErrorMessage);
+        }
+
+        public void SetPlayerAndBotCollision(bool enabled)
+        {
+            gameObject.GetComponent<NavMeshObstacle>().enabled = enabled;
+
+            List<GameObject> descendants = Utils.GetAllDescendants(gameObject);
+            foreach (GameObject descendant in descendants)
+            {
+                if (
+                    descendant.GetComponent<BoxCollider>() == null &&
+                    descendant.GetComponent<MeshCollider>() == null
+                ) continue;
+
+                var pair = ModSession.GetSession().GetPairOrNull(this);
+                if (pair.LootItem.Item.Width * pair.LootItem.Item.Height < Settings.MinimumSizeItemToGetCollision.Value) continue;
+
+                if (enabled)
+                {
+                    descendant.layer = LayerMask.NameToLayer("Default");
+                }
+                else
+                {
+                    descendant.layer = LayerMask.NameToLayer("Loot");
+                }
+            }
         }
     }
 }

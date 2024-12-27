@@ -1,11 +1,7 @@
 ﻿using BepInEx.Configuration;
 using Comfort.Common;
 using EFT;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace LeaveItThere.Helpers
@@ -18,6 +14,9 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<Color> PlacedItemTint;
         public static ConfigEntry<bool> MoveModeRequiresInventorySpace;
         public static ConfigEntry<bool> MoveModeCancelsSprinting;
+        public static ConfigEntry<bool> PlacedItemsHaveCollision;
+        public static ConfigEntry<int> MinimumSizeItemToGetCollision;
+        public static ConfigEntry<bool> ImmersivePhysics;
 
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
@@ -30,26 +29,26 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<int> StreetsAllottedPoints;
         public static ConfigEntry<int> WoodsAllottedPoints;
 
-        private const string _section1Name = "2: Allotted Point Limits Per Map";
+        private const string _section1Name = "9: Allotted Point Limits Per Map";
         private const string _section1Description = "Maximum number of placement points that can be used on this map. An items costs the amount of inventory cells it holds if it is a container, or it's size if it is not.";
         private static Dictionary<string, ConfigEntry<int>> _itemCountLookup = new();
 
         public static void Init(ConfigFile config)
         {
             CostSystemEnabled = config.Bind(
-                "1: General",
+                "1: Cost System",
                 "Cost System Enabled",
                 true,
                 "It is highly reccomended to leave this enabled. Disabling it will allow infinite placement of items on all maps."
             );
             MinimumPlacementCost = config.Bind(
-                "1: General",
+                "1: Cost System",
                 "Minimum Placement Cost",
                 3,
                 "Minimum cost for placing an item. Any items that would otherwise cost less than this will cost this amount instead."
             );
             MinimumCostItemsArePlaceable = config.Bind(
-                "1: General",
+                "1: Cost System",
                 "Minimum Placement Cost Items Can Be Placed",
                 true,
                 "Set to false to prevent mininum cost or less items from being placeable entirely."
@@ -60,19 +59,39 @@ namespace LeaveItThere.Helpers
                 new Color(1, 0.7667f, 0.8667f, 1),
                 "Color tint that will be applied to items when they are placed"
             );
+
             MoveModeRequiresInventorySpace = config.Bind(
-                "1: General",
+                "2: Move Mode",
                 "Move Mode Requires Inventory Space",
                 true,
                 "When set to true, you can only use 'MOVE' on placed items when you have the inventory space to pick them up."
             );
             MoveModeCancelsSprinting = config.Bind(
-                "1: General",
+                "2: Move Mode",
                 "Move Mode Cancels Sprinting",
                 true,
                 "If true, sprinting will cancel 'MOVE' mode."
             );
+            ImmersivePhysics = config.Bind(
+                "2: Move Mode",
+                "Immersive Physics (no floating items)",
+                true,
+                "If you want to be able to make items float wherever you want, set to false."
+            );
 
+            PlacedItemsHaveCollision = config.Bind(
+                "3: Collision",
+                "Placed Items Collide With Player And Bots",
+                true,
+                "This setting requires a raid restart to fully take affect! Items at or larger than the minimum physical item size will collide with the player and block AI pathing."
+            );
+            MinimumSizeItemToGetCollision = config.Bind(
+                "3: Collision",
+                "Minimum Physical Item Size",
+                12,
+                "Items at or larger than this size will be considered physical when collision is enabled. It is HIGHLY recommended to keep this number above 10 to avoid having tons of small items that the player and AI cannot pass through. Size = the number of inventory spaces the item takes up."
+            );
+            
             CustomsAllottedPoints = config.Bind(
                 _section1Name,
                 "Customs",

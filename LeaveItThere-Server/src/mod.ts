@@ -8,6 +8,7 @@ import Config from "../config.json";
 import { BaseClasses } from "@spt/models/enums/BaseClasses";
 import { HealthHelper } from "@spt/helpers/HealthHelper";
 import path from "path";
+import { config } from "process";
 
 class Mod implements IPreSptLoadMod, IPostDBLoadMod {
     public Helper = new ModHelper();
@@ -104,8 +105,12 @@ export class Routes {
         if (mapId === "sandbox_high") {
             mapName = "sandbox";
         }
+        let profileName: string = profileId;
+        if (Config.global_item_data_profile) {
+            profileName = "global";
+        }
 
-        const folderPath: string = FileUtils.pathCombine(ModHelper.profilePath, "LeaveItThere-ItemData", profileId);
+        const folderPath: string = FileUtils.pathCombine(ModHelper.profilePath, "LeaveItThere-ItemData", profileName);
         const filePath: string = FileUtils.pathCombine(folderPath, `${mapName}.json`);
         fs.mkdirSync(folderPath, { recursive: true });
 

@@ -1,31 +1,9 @@
-﻿using EFT;
-using EFT.InventoryLogic;
-using Fika.Core.Networking;
+﻿using Fika.Core.Networking;
 using LiteNetLib.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace LeaveItThere.FikaBridge
+namespace LeaveItThere.Packets
 {
-    public struct SpawnPlacedItemPacket : INetSerializable
-    {
-        public Item Item;
-
-        public void Deserialize(NetDataReader reader)
-        {
-            Item = reader.GetItem();
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.PutItem(Item);
-        }
-    }
-
     public struct PlacedItemStateChangedPacket : INetSerializable
     {
         public string ItemId;

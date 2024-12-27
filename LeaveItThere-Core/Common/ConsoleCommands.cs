@@ -1,12 +1,10 @@
 ﻿using Comfort.Common;
 using EFT;
 using EFT.Console.Core;
-using EFT.Interactive;
 using EFT.UI;
 using LeaveItThere.Components;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
-using System;
 using UnityEngine;
 
 namespace LeaveItThere.Common

@@ -1,19 +1,17 @@
-﻿using EFT.InventoryLogic;
+﻿using Comfort.Common;
 using EFT;
+using EFT.Interactive;
+using EFT.InventoryLogic;
+using LeaveItThere.Common;
+using LeaveItThere.Components;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
-using Comfort.Common;
-using System.Collections;
-using System.IO;
-using EFT.Interactive;
-using System.Reflection;
-using SPT.Reflection.Utils;
-using System.Linq;
-using LeaveItThere.Components;
-using LeaveItThere.Common;
-using System.Net.Sockets;
 
 namespace LeaveItThere.Helpers
 {

@@ -5,15 +5,10 @@ using UnityEngine;
 using Comfort.Common;
 using EFT;
 using LeaveItThere.Helpers;
-using Diz.LanguageExtensions;
 using EFT.InventoryLogic;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.Linq;
 using EFT.UI;
-using System.Reflection;
 using LeaveItThere.Fika;
-using System;
 
 namespace LeaveItThere.Common
 {

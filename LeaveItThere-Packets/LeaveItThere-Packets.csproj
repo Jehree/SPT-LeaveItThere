@@ -7,8 +7,8 @@
     <ProjectGuid>{F2F6A3E6-D43D-4B1A-8A98-05900FDA5247}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LeaveItThere_FikaBridge</RootNamespace>
-    <AssemblyName>LeaveItThere-FikaBridge</AssemblyName>
+    <RootNamespace>LeaveItThere_Packets</RootNamespace>
+    <AssemblyName>LeaveItThere-Packets</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

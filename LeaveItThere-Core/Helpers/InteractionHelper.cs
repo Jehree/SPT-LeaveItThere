@@ -1,12 +1,5 @@
-﻿using Comfort.Common;
-using EFT;
-using EFT.Interactive;
-using EFT.InventoryLogic;
-using EFT.UI;
-using HarmonyLib;
-using LeaveItThere.Common;
+﻿using HarmonyLib;
 using LeaveItThere.Components;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace LeaveItThere.Helpers
@@ -15,7 +8,7 @@ namespace LeaveItThere.Helpers
     {
         public static MethodInfo GetInteractiveActionsMethodInfo<TIneractive>()
         {
-            
+
             return AccessTools.FirstMethod(
                 typeof(GetActionsClass),
                 method =>
@@ -30,7 +23,7 @@ namespace LeaveItThere.Helpers
             if (force)
             {
                 session.GamePlayerOwner.AvailableInteractionState.Value = null;
-            } 
+            }
             else
             {
                 session.GamePlayerOwner.ClearInteractionState();

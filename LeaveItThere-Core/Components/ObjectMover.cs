@@ -1,4 +1,7 @@
-﻿using InteractableInteractionsAPI.Common;
+﻿using EFT;
+using EFT.Interactive;
+using EFT.InventoryLogic;
+using InteractableInteractionsAPI.Common;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
@@ -54,14 +57,22 @@ namespace LeaveItThere.Components
         public void Disable(bool save)
         {
             Enabled = false;
-            SetPhysicsEnabled(false);
             _translationModeEnabled = false;
             _rotationModeEnabled = false;
+            Target.transform.parent = null;
 
             InteractionHelper.RefreshPrompt(true);
             ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target);
             if (_disabledCallback != null) _disabledCallback(Target, save);
-            Target = null;
+
+            if (Settings.ImmersivePhysics.Value)
+            {
+                SetPhysicsEnabled(true, false);
+            }
+            else
+            {
+                SetPhysicsEnabled(false);
+            }
         }
 
         public void Awake()
@@ -107,7 +118,7 @@ namespace LeaveItThere.Components
             Target.transform.rotation = _lockedRotation;
         }
 
-        public void SetPhysicsEnabled(bool enabled)
+        public void SetPhysicsEnabled(bool enabled, bool colorChange = true)
         {
             var rigidBody = Target.GetComponent<Rigidbody>();
             if (rigidBody == null)
@@ -117,7 +128,7 @@ namespace LeaveItThere.Components
             rigidBody.isKinematic = !enabled;
             Target.transform.parent = null;
 
-            if (enabled)
+            if (enabled && colorChange)
             {
                 ItemHelper.SetItemColor(Color.magenta, Target);
             }
@@ -251,19 +262,20 @@ namespace LeaveItThere.Components
         public static CustomInteraction GetMoveToPlayerAction()
         {
             return new CustomInteraction(
-                "Move To Player Feet",
+                "Move To Player",
                 false,
                 () =>
                 {
                     var mover = ObjectMover.GetMover();
-
-                    mover.Target.transform.position = ModSession.GetSession().Player.Transform.position;
+                    //Vector3 playerPosition = ModSession.GetSession().Player.Transform.position;
+                    Player player = ModSession.GetSession().Player;
+                    mover.Target.transform.position = player.Transform.Original.position + player.Transform.Original.forward + (player.Transform.Original.up / 2);
                     mover.SetPhysicsEnabled(false);
                     mover._translationModeEnabled = false;
                     mover._rotationModeEnabled = false;
 
                     InteractionHelper.RefreshPrompt();
-                    InteractionHelper.NotificationLong("Moved to player feet.");
+                    InteractionHelper.NotificationLong("Moved item to player");
                 }
             );
         }

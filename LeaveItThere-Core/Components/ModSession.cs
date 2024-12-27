@@ -7,7 +7,6 @@ using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
-using System.IO.Pipes;
 using UnityEngine;
 
 namespace LeaveItThere.Components
@@ -80,7 +79,7 @@ namespace LeaveItThere.Components
         {
             ItemRemotePair newPair = new ItemRemotePair(lootItem, remoteInteractable, placementPosition, placementRotation, placed);
             ItemRemotePairs.Add(newPair);
-            newPair.RemoteInteractable.InitInteractions(lootItem);
+            newPair.RemoteInteractable.Init(lootItem);
             return newPair;
         }
 

@@ -1,6 +1,4 @@
-﻿using Comfort.Common;
-using EFT;
-using EFT.InventoryLogic;
+﻿using EFT.InventoryLogic;
 using Newtonsoft.Json;
 using LeaveItThere.Helpers;
 using System.Collections.Generic;

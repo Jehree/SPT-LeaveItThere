@@ -1,23 +1,18 @@
 ﻿using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using EFT.UI;
-using Newtonsoft.Json;
 using LeaveItThere.Common;
+using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using LeaveItThere.Patches;
-using System;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Configuration.Assemblies;
-using BepInEx.Bootstrap;
-using LeaveItThere.Fika;
 
 namespace LeaveItThere
 {
+    [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.3.0")]
     public class Plugin : BaseUnityPlugin
     {
@@ -52,5 +47,3 @@ namespace LeaveItThere
         }
     }
 }
-    // need a way for placed item initialization to happen when a another client places a NEW item
-    // moving isn't working, placing and unplacing is syncing fine, but moving does not show it in the new location on other clients, even when placing and reclaiming the item after moving

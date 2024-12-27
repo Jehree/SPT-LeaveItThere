@@ -59,6 +59,7 @@ namespace LeaveItThere.Patches
         {
             if (Plugin.PlaceableItemFilter.WhitelistEnabled && !Plugin.PlaceableItemFilter.Whitelist.Contains(lootItem.Item.TemplateId)) return false;
             if (Plugin.PlaceableItemFilter.BlacklistEnabled && Plugin.PlaceableItemFilter.Blacklist.Contains(lootItem.Item.TemplateId)) return false;
+            if (lootItem is Corpse) return false;
 
             if (Settings.MinimumCostItemsArePlaceable.Value) return true;
 

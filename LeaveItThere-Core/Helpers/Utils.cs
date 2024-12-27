@@ -3,9 +3,6 @@ using EFT;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace LeaveItThere.Helpers
@@ -48,15 +45,15 @@ namespace LeaveItThere.Helpers
             return "this shouldn't ever be reached";
         }
 
-        public static void ExecuteAfterSeconds(int seconds, Action callback)
+        public static void ExecuteAfterSeconds(int seconds, Action<object> callback, object arg = null)
         {
-            StaticManager.BeginCoroutine(ExecuteAfterSecondsRoutine(seconds, callback));
+            StaticManager.BeginCoroutine(ExecuteAfterSecondsRoutine(seconds, callback, arg));
         }
 
-        public static IEnumerator ExecuteAfterSecondsRoutine(int seconds, Action callback)
+        public static IEnumerator ExecuteAfterSecondsRoutine(int seconds, Action<object> callback, object arg)
         {
             yield return new WaitForSeconds(seconds);
-            callback();
+            callback(arg);
         }
 
         public static void ExecuteNextFrame(Action callback)
@@ -75,6 +72,19 @@ namespace LeaveItThere.Helpers
             rotation.ToAngleAxis(out float angle, out Vector3 axis);
             angle *= scale;
             return Quaternion.AngleAxis(angle, axis);
+        }
+
+        public static List<GameObject> GetAllDescendants(GameObject parent)
+        {
+            List<GameObject> descendants = new List<GameObject>();
+
+            foreach (Transform child in parent.transform)
+            {
+                descendants.Add(child.gameObject);
+                descendants.AddRange(GetAllDescendants(child.gameObject));
+            }
+
+            return descendants;
         }
     }
 }

@@ -1,12 +1,5 @@
-﻿using Comfort.Common;
-using EFT;
-using LeaveItThere.Common;
+﻿using LeaveItThere.Common;
 using LeaveItThere.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LeaveItThere.Fika
 {
