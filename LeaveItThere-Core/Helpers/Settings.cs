@@ -8,6 +8,9 @@ namespace LeaveItThere.Helpers
 {
     internal class Settings
     {
+        public static ConfigEntry<float> RigidbodySleepThreshold;
+        public static ConfigEntry<int> FramesToWakeUpPhysicsObject;
+
         public static ConfigEntry<int> MinimumPlacementCost;
         public static ConfigEntry<bool> MinimumCostItemsArePlaceable;
         public static ConfigEntry<bool> CostSystemEnabled;
@@ -35,6 +38,19 @@ namespace LeaveItThere.Helpers
 
         public static void Init(ConfigFile config)
         {
+            RigidbodySleepThreshold = config.Bind(
+                "0: Debug",
+                "Rigidbody Sleep Threshold",
+                0.1f,
+                new ConfigDescription("When object velocity is less than this, the object stops interacting with physics systems.", null, new ConfigurationManagerAttributes { IsAdvanced = true })
+            );
+            FramesToWakeUpPhysicsObject = config.Bind(
+                "0: Debug",
+                "Number Of Frames To Wake Up Physics Object",
+                10,
+                new ConfigDescription("Number of frames to enable physics before Rigidbody Sleep Threshold checks start happening.", null, new ConfigurationManagerAttributes { IsAdvanced = true })
+            );
+            
             CostSystemEnabled = config.Bind(
                 "1: Cost System",
                 "Cost System Enabled",
@@ -72,26 +88,26 @@ namespace LeaveItThere.Helpers
                 true,
                 "If true, sprinting will cancel 'MOVE' mode."
             );
+
+            PlacedItemsHaveCollision = config.Bind(
+                "3: Collision / Physics",
+                "Placed Items Collide With Player And Bots",
+                true,
+                "This setting requires a raid restart to fully take affect! Items at or larger than the minimum physical item size will collide with the player and block AI pathing. If you are using Fika, it's recommended to sync this setting with all clients."
+            );
+            MinimumSizeItemToGetCollision = config.Bind(
+                "3: Collision / Physics",
+                "Minimum Physical Item Size",
+                12,
+                "Items at or larger than this size will be considered physical to the player and bots when collision is enabled. It is HIGHLY recommended to keep this number above 10 to avoid having tons of small items that the player and AI cannot pass through. Size = the number of inventory spaces the item takes up. If you are using Fika, it's recommended to sync this setting with all clients."
+            );
             ImmersivePhysics = config.Bind(
-                "2: Move Mode",
+                "3: Collision / Physics",
                 "Immersive Physics (no floating items)",
                 true,
                 "If you want to be able to make items float wherever you want, set to false."
             );
 
-            PlacedItemsHaveCollision = config.Bind(
-                "3: Collision",
-                "Placed Items Collide With Player And Bots",
-                true,
-                "This setting requires a raid restart to fully take affect! Items at or larger than the minimum physical item size will collide with the player and block AI pathing."
-            );
-            MinimumSizeItemToGetCollision = config.Bind(
-                "3: Collision",
-                "Minimum Physical Item Size",
-                12,
-                "Items at or larger than this size will be considered physical when collision is enabled. It is HIGHLY recommended to keep this number above 10 to avoid having tons of small items that the player and AI cannot pass through. Size = the number of inventory spaces the item takes up."
-            );
-            
             CustomsAllottedPoints = config.Bind(
                 _section1Name,
                 "Customs",

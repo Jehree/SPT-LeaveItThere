@@ -25,17 +25,18 @@ namespace LeaveItThere.Fika
             PlacedItemStateChangedPacket packet = new PlacedItemStateChangedPacket
             {
                 ItemId = pair.LootItem.ItemId,
-                Position = pair.PlacementPosition,
-                Rotation = pair.PlacementRotation,
-                IsPlaced = pair.Placed
+                Position = pair.RemoteInteractable.gameObject.transform.position,
+                Rotation = pair.RemoteInteractable.gameObject.transform.rotation,
+                IsPlaced = pair.Placed,
+                SourceHasImmersivePhysicsEnabled = Settings.ImmersivePhysics.Value
             };
             if (Singleton<FikaServer>.Instantiated)
             {
-                Singleton<FikaServer>.Instance.SendDataToAll<PlacedItemStateChangedPacket>(ref packet, LiteNetLib.DeliveryMethod.ReliableOrdered);
+                Singleton<FikaServer>.Instance.SendDataToAll<PlacedItemStateChangedPacket>(ref packet, DeliveryMethod.ReliableOrdered);
             }
             if (Singleton<FikaClient>.Instantiated)
             {
-                Singleton<FikaClient>.Instance.SendData<PlacedItemStateChangedPacket>(ref packet, LiteNetLib.DeliveryMethod.ReliableOrdered);
+                Singleton<FikaClient>.Instance.SendData<PlacedItemStateChangedPacket>(ref packet, DeliveryMethod.ReliableOrdered);
             }
         }
 
@@ -47,12 +48,27 @@ namespace LeaveItThere.Fika
         public static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet, NetPeer peer)
         {
             ObservedLootItem lootItem = ItemHelper.GetLootItem(packet.ItemId) as ObservedLootItem;
-            var pair = ModSession.GetSession().GetPairOrNull(packet.ItemId);
+            var session = ModSession.GetSession();
+            var pair = session.GetPairOrNull(lootItem);
 
             if (packet.IsPlaced)
             {
                 // re-placing is necessary because if an item is placed, placing it again updates its position
                 ItemPlacer.PlaceItem(lootItem, packet.Position, packet.Rotation);
+
+                // re initialize pair in case it was null before placing
+                pair = session.GetPairOrNull(lootItem);
+
+                // make sure physics behavior is synced with the sender of the packet
+                var moveable = pair.RemoteInteractable.gameObject.GetComponent<MoveableObject>();
+                if (packet.SourceHasImmersivePhysicsEnabled)
+                {
+                    moveable.EnablePhysics();
+                }
+                else
+                {
+                    moveable.DisablePhysics();
+                }
             }
             else
             {

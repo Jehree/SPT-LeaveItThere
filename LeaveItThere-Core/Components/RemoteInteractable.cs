@@ -16,6 +16,9 @@ namespace LeaveItThere.Components
     internal class RemoteInteractable : InteractableObject
     {
         public List<CustomInteraction> Actions = new List<CustomInteraction>();
+        private Vector3 _savedPosition;
+        private Quaternion _savedRotation;
+
 
         public static RemoteInteractable CreateNewRemoteInteractable(Vector3 position, Quaternion rotation, ObservedLootItem lootItem)
         {
@@ -34,6 +37,7 @@ namespace LeaveItThere.Components
             remoteAccessObj.transform.rotation = rotation;
             remoteAccessObj.transform.localScale = remoteAccessObj.transform.localScale * 0.99f;
 
+            MoveableObject moveable = remoteAccessObj.AddComponent<MoveableObject>();
             NavMeshObstacle obstacle = remoteAccessObj.AddComponent<NavMeshObstacle>();
             BoxCollider collider = remoteAccessObj.GetComponent<BoxCollider>();
             obstacle.shape = NavMeshObstacleShape.Box;
@@ -93,10 +97,10 @@ namespace LeaveItThere.Components
             var session = ModSession.GetSession();
             var pair = session.GetPairOrNull(this);
             if (!pair.Placed) return;
-
+            
+            pair.LootItem.gameObject.transform.position = gameObject.transform.position;
+            pair.LootItem.gameObject.transform.rotation = gameObject.transform.rotation;
             gameObject.transform.position = new Vector3(0, -9999, 0);
-            pair.LootItem.gameObject.transform.position = pair.PlacementPosition;
-            pair.LootItem.gameObject.transform.rotation = pair.PlacementRotation;
             pair.Placed = false;
             session.PointsSpent -= ItemHelper.GetItemCost(pair.LootItem.Item);
         }
@@ -140,7 +144,9 @@ namespace LeaveItThere.Components
                         NotEnoughSpaceForMoveModePlayerFeedback();
                         return;
                     }
-                    mover.Enable(interactable.gameObject, interactable.OnMoveModeDisabled, interactable.OnMoveModeEnabledUpdate);
+                    mover.Enable(interactable.gameObject.GetComponent<MoveableObject>(), interactable.OnMoveModeDisabled, interactable.OnMoveModeEnabledUpdate);
+                    interactable._savedPosition = interactable.gameObject.transform.position;
+                    interactable._savedRotation = interactable.gameObject.transform.rotation;
                     interactable.SetPlayerAndBotCollision(false);
                 }
             );
@@ -155,35 +161,42 @@ namespace LeaveItThere.Components
             return false;
         }
 
-        private void OnMoveModeDisabled(GameObject target, bool save)
+        private void OnMoveModeDisabled(bool saved)
         {
             InteractionHelper.RefreshPrompt(true);
             var session = ModSession.GetSession();
             var pair = session.GetPairOrNull(this);
 
-            if (save)
+            if (saved)
             {
                 ItemPlacer.PlaceItem(pair.LootItem, gameObject.transform.position, gameObject.transform.rotation);
                 FikaInterface.SendPlacedStateChangedPacket(pair);
             }
             else
             {
-                if (pair.Placed)
-                {
-                    gameObject.transform.position = pair.PlacementPosition;
-                    gameObject.transform.rotation = pair.PlacementRotation;
-                }
-                else
-                {
-                    gameObject.transform.position = new Vector3(0, -99999, 0);
-                    gameObject.transform.rotation = pair.PlacementRotation;
-                }
+                ResetPosition();
             }
 
             pair.RemoteInteractable.SetPlayerAndBotCollision(Settings.PlacedItemsHaveCollision.Value);
         }
 
-        private void OnMoveModeEnabledUpdate(GameObject target)
+        private void ResetPosition()
+        {
+            var pair = ModSession.GetSession().GetPairOrNull(this);
+
+            if (pair.Placed)
+            {
+                gameObject.transform.position = _savedPosition;
+                gameObject.transform.rotation = _savedRotation;
+            }
+            else
+            {
+                gameObject.transform.position = new Vector3(0, -99999, 0);
+                gameObject.transform.rotation = pair.LootItem.gameObject.transform.rotation;
+            }
+        }
+
+        private void OnMoveModeEnabledUpdate()
         {
             var session = ModSession.GetSession();
             var mover = ObjectMover.GetMover();

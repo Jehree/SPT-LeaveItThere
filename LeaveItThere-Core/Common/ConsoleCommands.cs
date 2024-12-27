@@ -36,7 +36,7 @@ namespace LeaveItThere.Common
                 (ItemRemotePair pair) =>
                 {
                     var session = ModSession.GetSession();
-                    ItemPlacer.PlaceItem(pair.LootItem, session.Player.Transform.position, session.Player.Transform.rotation);
+                    ItemPlacer.PlaceItem(pair.LootItem, Utils.PlayerFront, session.Player.Transform.rotation);
                     FikaInterface.SendPlacedStateChangedPacket(pair);
                 }
             );

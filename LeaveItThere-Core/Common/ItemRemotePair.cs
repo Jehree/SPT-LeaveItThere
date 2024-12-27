@@ -21,8 +21,6 @@ namespace LeaveItThere.Common
             }
         }
         public RemoteInteractable RemoteInteractable { get; private set; }
-        public Vector3 PlacementPosition { get; set; }
-        public Quaternion PlacementRotation { get; set; }
         public bool Placed { get; set; }
 
         public ItemRemotePair(ObservedLootItem lootItem, RemoteInteractable remoteInteractable, Vector3 placementPosition, Quaternion placementRotation, bool placed)
@@ -30,8 +28,6 @@ namespace LeaveItThere.Common
             _lootItem = lootItem;
             ItemId = lootItem.ItemId;
             RemoteInteractable = remoteInteractable;
-            PlacementPosition = placementPosition;
-            PlacementRotation = placementRotation;
             Placed = placed;
         }
     }

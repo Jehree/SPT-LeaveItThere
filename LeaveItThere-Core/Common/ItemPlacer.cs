@@ -25,7 +25,7 @@ namespace LeaveItThere.Common
             foreach (var pair in ModSession.GetSession().ItemRemotePairs)
             {
                 if (pair.Placed == false) continue;
-                dataList.Add(new PlacedItemData(pair.LootItem.Item, pair.PlacementPosition, pair.PlacementRotation));
+                dataList.Add(new PlacedItemData(pair.LootItem.Item, pair.RemoteInteractable.gameObject.transform.position, pair.RemoteInteractable.gameObject.transform.rotation));
                 placedItemInstanceIds.Add(pair.LootItem.ItemId);
             }
             var dataPack = new PlacedItemDataPack(FikaInterface.GetRaidId(), mapId, dataList);
@@ -88,9 +88,6 @@ namespace LeaveItThere.Common
             lootItem.gameObject.transform.rotation = rotation;
             pair.RemoteInteractable.gameObject.transform.position = position;
             pair.RemoteInteractable.gameObject.transform.rotation = rotation;
-
-            lootItem.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
-            pair.RemoteInteractable.gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
         }
 
         public static void PlacedPlayerFeedback(Item item)

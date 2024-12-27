@@ -1,5 +1,6 @@
 ﻿using Comfort.Common;
 using EFT;
+using LeaveItThere.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,15 @@ namespace LeaveItThere.Helpers
 {
     internal class Utils
     {
+        public static Vector3 PlayerFront
+        {
+            get
+            {
+                Player player = ModSession.GetSession().Player;
+                return player.Transform.Original.position + player.Transform.Original.forward + (player.Transform.Original.up / 2);
+            }
+        }
+
         public static string GetCardinalDirection(Vector3 from, Vector3 to)
         {
             Vector3 direction = to - from;

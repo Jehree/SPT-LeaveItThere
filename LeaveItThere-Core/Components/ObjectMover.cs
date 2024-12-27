@@ -12,11 +12,11 @@ namespace LeaveItThere.Components
     internal class ObjectMover : MonoBehaviour
     {
         public bool Enabled { get; private set; } = false;
-        public GameObject Target { get; private set; } = null;
+        public MoveableObject Target { get; private set; } = null; 
 
         private ActionsReturnClass _moveMenu;
-        private Action<GameObject, bool> _disabledCallback;
-        private Action<GameObject> _enabledUpdateCallback;
+        private Action<bool> _disabledCallback;
+        private Action _enabledUpdateCallback;
 
         private bool _translationModeEnabled = false;
         private bool _rotationModeEnabled = false;
@@ -37,7 +37,7 @@ namespace LeaveItThere.Components
 
         /// <param name="exitMenuCallback">Called once when move mode is exited.</param>
         /// <param name="moveModeActiveUpdateCallback">Called every frame that move mode is active, return false to force exit move mode.</param>
-        public void Enable(GameObject target, Action<GameObject, bool> disabledCallback, Action<GameObject> enabledUpdateCallback)
+        public void Enable(MoveableObject target, Action<bool> disabledCallback, Action enabledUpdateCallback)
         {
             if (Enabled)
             {
@@ -48,9 +48,7 @@ namespace LeaveItThere.Components
             _disabledCallback = disabledCallback;
             _enabledUpdateCallback = enabledUpdateCallback;
 
-            var rigidBody = Target.GetOrAddComponent<Rigidbody>();
-            EFTPhysicsClass.GClass712.SupportRigidbody(rigidBody);
-            rigidBody.isKinematic = true;
+            Target.DisablePhysics();
             Enabled = true;
         }
 
@@ -62,16 +60,16 @@ namespace LeaveItThere.Components
             Target.transform.parent = null;
 
             InteractionHelper.RefreshPrompt(true);
-            ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target);
-            if (_disabledCallback != null) _disabledCallback(Target, save);
+            ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target.gameObject);
+            if (_disabledCallback != null) _disabledCallback(save);
 
             if (Settings.ImmersivePhysics.Value)
             {
-                SetPhysicsEnabled(true, false);
+                SetPhysicsModeEnabled(true, false);
             }
             else
             {
-                SetPhysicsEnabled(false);
+                SetPhysicsModeEnabled(false);
             }
         }
 
@@ -91,7 +89,7 @@ namespace LeaveItThere.Components
         public void Update()
         {
             if (!Enabled) return;
-            if (_enabledUpdateCallback != null) _enabledUpdateCallback(Target);
+            if (_enabledUpdateCallback != null) _enabledUpdateCallback();
             if (!Enabled) return; //checking this again is necessary in case the callback changes it
 
             if (_translationModeEnabled)
@@ -110,42 +108,35 @@ namespace LeaveItThere.Components
 
         public void LockPosition()
         {
-            Target.transform.position = _lockedPosition;
+            Target.gameObject.transform.position = _lockedPosition;
         }
 
         public void LockRotation()
         {
-            Target.transform.rotation = _lockedRotation;
+            Target.gameObject.transform.rotation = _lockedRotation;
         }
 
-        public void SetPhysicsEnabled(bool enabled, bool colorChange = true)
+        public void SetPhysicsModeEnabled(bool enabled, bool colorChange = true)
         {
-            var rigidBody = Target.GetComponent<Rigidbody>();
-            if (rigidBody == null)
-            {
-                InteractionHelper.NotificationLongWarning("This game object has no rigidbody!");
-            }
-            rigidBody.isKinematic = !enabled;
-            Target.transform.parent = null;
+            Target.gameObject.transform.parent = null;
 
-            if (enabled && colorChange)
+            if (enabled)
             {
-                ItemHelper.SetItemColor(Color.magenta, Target);
+                Target.EnablePhysics();
             }
             else
             {
-                ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target);
+                Target.DisablePhysics();
             }
-        }
 
-        public bool PhysicsIsEnabled()
-        {
-            var rigidBody = Target.GetComponent<Rigidbody>();
-            if (rigidBody == null)
+            if (enabled && colorChange)
             {
-                return false;
+                ItemHelper.SetItemColor(Color.magenta, Target.gameObject);
             }
-            return !rigidBody.isKinematic;
+            else
+            {
+                ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target.gameObject);
+            }
         }
 
         public static CustomInteraction GetSaveAndExitMoveModeAction()
@@ -185,10 +176,10 @@ namespace LeaveItThere.Components
 
                     mover._translationModeEnabled = false;
                     mover._rotationModeEnabled = false;
-                    mover.SetPhysicsEnabled(!mover.PhysicsIsEnabled());
+                    mover.SetPhysicsModeEnabled(!mover.Target.PhysicsIsEnabled);
 
                     InteractionHelper.RefreshPrompt();
-                    InteractionHelper.NotificationLong($"Physics enabled: {mover.PhysicsIsEnabled()}");
+                    InteractionHelper.NotificationLong($"Physics enabled: {mover.Target.PhysicsIsEnabled}");
                 }
             );
         }
@@ -202,22 +193,22 @@ namespace LeaveItThere.Components
                 {
                     var mover = ObjectMover.GetMover();
 
-                    mover.SetPhysicsEnabled(false);
+                    mover.SetPhysicsModeEnabled(false);
                     mover._rotationModeEnabled = false;
 
-                    var targetTransform = mover.Target.transform;
+                    var targetTransform = mover.Target.gameObject.transform;
                     var cameraTransform = ModSession.GetSession().Player.CameraContainer.gameObject.transform;
                     mover._translationModeEnabled = !mover._translationModeEnabled;
                     if (mover._translationModeEnabled)
                     {
-                        mover._lockedRotation = mover.Target.transform.rotation;
+                        mover._lockedRotation = mover.Target.gameObject.transform.rotation;
                         targetTransform.parent = cameraTransform;
-                        ItemHelper.SetItemColor(Color.green, mover.Target);
+                        ItemHelper.SetItemColor(Color.green, mover.Target.gameObject);
                     }
                     else
                     {
                         targetTransform.parent = null;
-                        ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target);
+                        ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
                     }
 
                     InteractionHelper.RefreshPrompt();
@@ -235,22 +226,22 @@ namespace LeaveItThere.Components
                 {
                     var mover = ObjectMover.GetMover();
 
-                    mover.SetPhysicsEnabled(false);
+                    mover.SetPhysicsModeEnabled(false);
                     mover._translationModeEnabled = false;
 
-                    var targetTransform = mover.Target.transform;
+                    var targetTransform = mover.Target.gameObject.transform;
                     var cameraTransform = ModSession.GetSession().Player.CameraContainer.gameObject.transform;
                     mover._rotationModeEnabled = !mover._rotationModeEnabled;
                     if (mover._rotationModeEnabled)
                     {
-                        mover._lockedPosition = mover.Target.transform.position;
+                        mover._lockedPosition = mover.Target.gameObject.transform.position;
                         targetTransform.parent = cameraTransform;
-                        ItemHelper.SetItemColor(Color.red, mover.Target);
+                        ItemHelper.SetItemColor(Color.red, mover.Target.gameObject);
                     }
                     else
                     {
                         targetTransform.parent = null;
-                        ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target);
+                        ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
                     }
 
                     InteractionHelper.RefreshPrompt();
@@ -267,10 +258,9 @@ namespace LeaveItThere.Components
                 () =>
                 {
                     var mover = ObjectMover.GetMover();
-                    //Vector3 playerPosition = ModSession.GetSession().Player.Transform.position;
                     Player player = ModSession.GetSession().Player;
-                    mover.Target.transform.position = player.Transform.Original.position + player.Transform.Original.forward + (player.Transform.Original.up / 2);
-                    mover.SetPhysicsEnabled(false);
+                    mover.Target.MoveToPlayer();
+                    mover.SetPhysicsModeEnabled(false);
                     mover._translationModeEnabled = false;
                     mover._rotationModeEnabled = false;
 

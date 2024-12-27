@@ -47,6 +47,7 @@ namespace LeaveItThere.Components
                 (LootItem lootItem) =>
                 {
                     ItemPlacer.PlaceItem(lootItem as ObservedLootItem, data.Location, data.Rotation);
+                    
                     if (lootItem.Item is SearchableItemItemClass)
                     {
                         ItemHelper.MakeSearchableItemFullySearched(lootItem.Item as SearchableItemItemClass);
@@ -85,8 +86,8 @@ namespace LeaveItThere.Components
 
         public ItemRemotePair UpdatePair(ItemRemotePair pair, Vector3 placementPosition, Quaternion placementRotation, bool placed)
         {
-            pair.PlacementPosition = placementPosition;
-            pair.PlacementRotation = placementRotation;
+            //pair.PlacementPosition = placementPosition;
+            //pair.PlacementRotation = placementRotation;
             pair.Placed = placed;
             return pair;
         }

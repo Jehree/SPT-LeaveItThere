@@ -10,6 +10,7 @@ namespace LeaveItThere.Packets
         public Vector3 Position;
         public Quaternion Rotation;
         public bool IsPlaced;
+        public bool SourceHasImmersivePhysicsEnabled;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -17,6 +18,7 @@ namespace LeaveItThere.Packets
             Position = reader.GetVector3();
             Rotation = reader.GetQuaternion();
             IsPlaced = reader.GetBool();
+            SourceHasImmersivePhysicsEnabled = reader.GetBool();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -25,6 +27,7 @@ namespace LeaveItThere.Packets
             writer.Put(Position);
             writer.Put(Rotation);
             writer.Put(IsPlaced);
+            writer.Put(SourceHasImmersivePhysicsEnabled);
         }
     }
 }
