@@ -95,61 +95,61 @@ namespace LeaveItThere.Helpers
             CustomsAllottedPoints = config.Bind(
                 _section1Name,
                 "Customs",
-                140,
+                280,
                 _section1Description
             );
             FactoryAllottedPoints = config.Bind(
                 _section1Name,
                 "Factory",
-                60,
+                160,
                 _section1Description
             );
             InterchangeAllottedPoints = config.Bind(
                 _section1Name,
                 "Interchange",
-                140,
+                280,
                 _section1Description
             );
             LabAllottedPoints = config.Bind(
                 _section1Name,
                 "Lab",
-                60,
+                160,
                 _section1Description
             );
             LighthouseAllottedPoints = config.Bind(
                 _section1Name,
                 "Lighthouse",
-                180,
+                320,
                 _section1Description
             );
             ReserveAllottedPoints = config.Bind(
                 _section1Name,
                 "Reserve",
-                160,
+                280,
                 _section1Description
             );
             GroundZeroAllottedPoints = config.Bind(
                 _section1Name,
                 "Ground Zero",
-                90,
+                200,
                 _section1Description
             );
             ShorelineAllottedPoints = config.Bind(
                 _section1Name,
                 "Shoreline",
-                140,
+                280,
                 _section1Description
             );
             StreetsAllottedPoints = config.Bind(
                 _section1Name,
                 "Streets",
-                180,
+                320,
                 _section1Description
             );
             WoodsAllottedPoints = config.Bind(
                 _section1Name,
                 "Woods",
-                140,
+                320,
                 _section1Description
             );
 
