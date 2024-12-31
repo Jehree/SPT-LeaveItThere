@@ -135,10 +135,18 @@ namespace LeaveItThere.Components
         public List<string> GetPlacedItemInstanceIds()
         {
             List<string> ids = new();
+
             foreach (var pair in ItemRemotePairs)
             {
                 if (pair.Placed == false) continue;
-                ids.Add(pair.LootItem.StaticId);
+
+                ids.Add(pair.LootItem.Item.Id);
+                ItemHelper.ForAllChildrenInItem(pair.LootItem.Item,
+                    (Item item) =>
+                    {
+                        ids.Add(item.Id);
+                    }
+                );
             }
             return ids;
         }

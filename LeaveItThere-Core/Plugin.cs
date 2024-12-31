@@ -13,7 +13,7 @@ using System.Reflection;
 namespace LeaveItThere
 {
     [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.3.0")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.3.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool FikaInstalled { get; private set; }

@@ -169,12 +169,11 @@ namespace LeaveItThere.Helpers
                 _idFieldInfo = lostInsuredItems[0].GetType().GetField("_id");
             }
 
-            List<string> placedItemIds = ModSession.GetSession().GetPlacedItemInstanceIds();
             List<object> editedLostInsuredItems = new();
             foreach (object item in lostInsuredItems)
             {
                 string _id = _idFieldInfo.GetValue(item).ToString();
-                if (!placedItemIds.Contains(_id)) continue;
+                if (idsToRemove.Contains(_id)) continue;
                 editedLostInsuredItems.Add(item);
             }
 
