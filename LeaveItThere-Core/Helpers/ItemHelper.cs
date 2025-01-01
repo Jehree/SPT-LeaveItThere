@@ -2,7 +2,6 @@
 using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
-using LeaveItThere.Common;
 using LeaveItThere.Components;
 using System;
 using System.Collections;
@@ -21,7 +20,7 @@ namespace LeaveItThere.Helpers
 
         public static LootItem GetLootItem(string itemId)
         {
-            foreach (LootItem lootItem in ModSession.GetSession().GameWorld.LootItems.GetValuesEnumerator())
+            foreach (LootItem lootItem in ModSession.Instance.GameWorld.LootItems.GetValuesEnumerator())
             {
                 if (lootItem.ItemId == itemId) return lootItem;
             }
@@ -222,20 +221,20 @@ namespace LeaveItThere.Helpers
             }
         }
 
-        public static void ForAllItemsUnderCost(int costAmount, Action<ItemRemotePair> callable)
+        public static void ForAllItemsUnderCost(int costAmount, Action<FakeItem> callable)
         {
-            var session = ModSession.GetSession();
-            foreach (var pair in session.ItemRemotePairs)
+            foreach (var kvp in ModSession.Instance.FakeItems)
             {
-                if (pair.Placed == false) continue;
-                if (ItemHelper.GetItemCost(pair.LootItem.Item, true) > costAmount) continue;
-                callable(pair);
+                FakeItem fakeItem = kvp.Value;
+                if (fakeItem.Placed == false) continue;
+                if (ItemHelper.GetItemCost(fakeItem.LootItem.Item, true) > costAmount) continue;
+                callable(fakeItem);
             }
         }
 
         public static bool ItemCanBePickedUp(Item item)
         {
-            var session = ModSession.GetSession();
+            var session = ModSession.Instance;
             InventoryController playerInventoryController = session.Player.InventoryController;
             InventoryEquipment playerEquipment = playerInventoryController.Inventory.Equipment;
             var pickedUpResult = InteractionsHandlerClass.QuickFindAppropriatePlace(item, playerInventoryController, playerEquipment.ToEnumerable<InventoryEquipment>(), InteractionsHandlerClass.EMoveItemOrder.PickUp, true);

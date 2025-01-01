@@ -1,10 +1,10 @@
-﻿using EFT;
-using EFT.Interactive;
-using EFT.InventoryLogic;
+﻿using Comfort.Common;
+using EFT;
 using InteractableInteractionsAPI.Common;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace LeaveItThere.Components
@@ -12,7 +12,7 @@ namespace LeaveItThere.Components
     internal class ObjectMover : MonoBehaviour
     {
         public bool Enabled { get; private set; } = false;
-        public MoveableObject Target { get; private set; } = null; 
+        public MoveableObject Target { get; private set; } = null;
 
         private ActionsReturnClass _moveMenu;
         private Action<bool> _disabledCallback;
@@ -27,12 +27,12 @@ namespace LeaveItThere.Components
 
         public static ObjectMover GetMover()
         {
-            return ModSession.GetSession().Player.gameObject.GetComponent<ObjectMover>();
+            return ModSession.Instance.Player.gameObject.GetComponent<ObjectMover>();
         }
 
         public static void CreateNewObjectMover()
         {
-            ModSession.GetSession().Player.gameObject.AddComponent<ObjectMover>();
+            ModSession.Instance.Player.gameObject.AddComponent<ObjectMover>();
         }
 
         /// <param name="exitMenuCallback">Called once when move mode is exited.</param>
@@ -50,20 +50,21 @@ namespace LeaveItThere.Components
 
             Target.DisablePhysics();
             Enabled = true;
+            ModSession.Instance.SetInteractionsEnabled(false);
         }
 
         public void Disable(bool save)
         {
             Enabled = false;
             _translationModeEnabled = false;
-            _rotationModeEnabled = false;
+            SetRotationModeEnabled(false);
             Target.transform.parent = null;
 
             InteractionHelper.RefreshPrompt(true);
             ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target.gameObject);
             if (_disabledCallback != null) _disabledCallback(save);
 
-            if (Settings.ImmersivePhysics.Value)
+            if (save && Settings.ImmersivePhysics.Value)
             {
                 SetPhysicsModeEnabled(true, false);
             }
@@ -71,6 +72,9 @@ namespace LeaveItThere.Components
             {
                 SetPhysicsModeEnabled(false);
             }
+
+            ModSession.Instance.SetInteractionsEnabled(true);
+            InteractionHelper.SetCameraRotationLocked(false);
         }
 
         public void Awake()
@@ -98,17 +102,29 @@ namespace LeaveItThere.Components
             }
             if (_rotationModeEnabled)
             {
-                LockPosition();
+                RotationProcess();
             }
 
-            var session = ModSession.GetSession();
+            var session = ModSession.Instance;
             if (session.GamePlayerOwner.AvailableInteractionState.Value == _moveMenu) return;
             session.GamePlayerOwner.AvailableInteractionState.Value = _moveMenu;
         }
 
-        public void LockPosition()
+        public void RotationProcess()
         {
-            Target.gameObject.transform.position = _lockedPosition;
+            float mouseX = Input.GetAxis("Mouse X");
+            float mouseY = Input.GetAxis("Mouse Y");
+
+            int xInversion = Settings.InvertHorizontalRotation.Value ? 1 : -1;
+            int yInversion = Settings.InvertVerticalRotation.Value ? 1 : -1;
+
+            Target.gameObject.transform.Rotate(Vector3.up, xInversion * mouseX * Settings.RotationSpeed.Value, Space.World);
+
+            // vertical rotation is relative to player camera
+            Vector3 cameraForward = Camera.main.transform.forward;
+            cameraForward.y = 0;
+            Quaternion cameraRotation = Quaternion.LookRotation(cameraForward);
+            Target.gameObject.transform.Rotate(cameraRotation * Vector3.left, yInversion * mouseY * Settings.RotationSpeed.Value, Space.World);
         }
 
         public void LockRotation()
@@ -137,6 +153,12 @@ namespace LeaveItThere.Components
             {
                 ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target.gameObject);
             }
+        }
+
+        public void SetRotationModeEnabled(bool enabled)
+        {
+            _rotationModeEnabled = enabled;
+            InteractionHelper.SetCameraRotationLocked(enabled);
         }
 
         public static CustomInteraction GetSaveAndExitMoveModeAction()
@@ -175,10 +197,9 @@ namespace LeaveItThere.Components
                     var mover = ObjectMover.GetMover();
 
                     mover._translationModeEnabled = false;
-                    mover._rotationModeEnabled = false;
+                    mover.SetRotationModeEnabled(false);
                     mover.SetPhysicsModeEnabled(!mover.Target.PhysicsIsEnabled);
 
-                    InteractionHelper.RefreshPrompt();
                     InteractionHelper.NotificationLong($"Physics enabled: {mover.Target.PhysicsIsEnabled}");
                 }
             );
@@ -194,10 +215,10 @@ namespace LeaveItThere.Components
                     var mover = ObjectMover.GetMover();
 
                     mover.SetPhysicsModeEnabled(false);
-                    mover._rotationModeEnabled = false;
+                    mover.SetRotationModeEnabled(false);
 
                     var targetTransform = mover.Target.gameObject.transform;
-                    var cameraTransform = ModSession.GetSession().Player.CameraContainer.gameObject.transform;
+                    var cameraTransform = ModSession.Instance.Player.CameraContainer.gameObject.transform;
                     mover._translationModeEnabled = !mover._translationModeEnabled;
                     if (mover._translationModeEnabled)
                     {
@@ -211,7 +232,6 @@ namespace LeaveItThere.Components
                         ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
                     }
 
-                    InteractionHelper.RefreshPrompt();
                     InteractionHelper.NotificationLong($"Translation mode enabled: {mover._translationModeEnabled}");
                 }
             );
@@ -230,8 +250,8 @@ namespace LeaveItThere.Components
                     mover._translationModeEnabled = false;
 
                     var targetTransform = mover.Target.gameObject.transform;
-                    var cameraTransform = ModSession.GetSession().Player.CameraContainer.gameObject.transform;
-                    mover._rotationModeEnabled = !mover._rotationModeEnabled;
+                    var cameraTransform = ModSession.Instance.Player.CameraContainer.gameObject.transform;
+                    mover.SetRotationModeEnabled(!mover._rotationModeEnabled);
                     if (mover._rotationModeEnabled)
                     {
                         mover._lockedPosition = mover.Target.gameObject.transform.position;
@@ -243,8 +263,6 @@ namespace LeaveItThere.Components
                         targetTransform.parent = null;
                         ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
                     }
-
-                    InteractionHelper.RefreshPrompt();
                     InteractionHelper.NotificationLong($"Rotation mode enabled: {mover._rotationModeEnabled}");
                 }
             );
@@ -258,13 +276,12 @@ namespace LeaveItThere.Components
                 () =>
                 {
                     var mover = ObjectMover.GetMover();
-                    Player player = ModSession.GetSession().Player;
+                    Player player = ModSession.Instance.Player;
                     mover.Target.MoveToPlayer();
                     mover.SetPhysicsModeEnabled(false);
                     mover._translationModeEnabled = false;
-                    mover._rotationModeEnabled = false;
+                    mover.SetRotationModeEnabled(false);
 
-                    InteractionHelper.RefreshPrompt();
                     InteractionHelper.NotificationLong("Moved item to player");
                 }
             );

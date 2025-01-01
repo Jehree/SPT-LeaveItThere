@@ -1,6 +1,6 @@
 ﻿using EFT.InventoryLogic;
-using Newtonsoft.Json;
 using LeaveItThere.Helpers;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,7 +26,7 @@ namespace LeaveItThere.Common
                 return _item;
             }
         }
-        
+
         public PlacedItemData() { }
         public PlacedItemData(Item item, Vector3 location, Quaternion rotation)
         {

@@ -14,7 +14,7 @@ namespace LeaveItThere.Helpers
         {
             get
             {
-                Player player = ModSession.GetSession().Player;
+                Player player = ModSession.Instance.Player;
                 return player.Transform.Original.position + player.Transform.Original.forward + (player.Transform.Original.up / 2);
             }
         }

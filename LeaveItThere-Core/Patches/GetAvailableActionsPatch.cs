@@ -1,23 +1,11 @@
-﻿using EFT.Interactive;
-using EFT;
+﻿using EFT;
+using EFT.Interactive;
 using HarmonyLib;
-using SPT.Reflection.Patching;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Comfort.Common;
 using InteractableInteractionsAPI.Common;
-using LeaveItThere.Helpers;
-using UnityEngine;
-using EFT.InventoryLogic;
 using LeaveItThere.Components;
-using static RootMotion.FinalIK.InteractionTrigger.Range;
-using System.ComponentModel;
-using LeaveItThere.Common;
-using System.Runtime.CompilerServices;
+using LeaveItThere.Helpers;
+using SPT.Reflection.Patching;
+using System.Reflection;
 
 namespace LeaveItThere.Patches
 {
@@ -31,9 +19,9 @@ namespace LeaveItThere.Patches
         [PatchPrefix]
         static bool PatchPrefix(GamePlayerOwner owner, object interactive, ref ActionsReturnClass __result)
         {
-            if (interactive is not RemoteInteractable) return true;
+            if (interactive is not FakeItem) return true;
 
-            var component = interactive as RemoteInteractable;
+            var component = interactive as FakeItem;
             var newResult = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(component.Actions) };
 
             __result = newResult;
@@ -47,7 +35,7 @@ namespace LeaveItThere.Patches
             LootItem lootItem = interactive as LootItem;
             if (!LootItemIsTarget(lootItem)) return;
 
-            var placeAction = ItemPlacer.GetPlaceItemAction(lootItem);
+            var placeAction = FakeItem.GetPlaceItemAction(lootItem);
             if (__result.Error != null)
             {
                 __result.Actions.Insert(0, new CustomInteraction(string.Format("No Space ({0})".Localized(null), lootItem.Name.Localized(null)), true, null).GetActionsTypesClass());

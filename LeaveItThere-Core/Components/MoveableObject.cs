@@ -1,11 +1,4 @@
-﻿using EFT;
-using EFT.UI;
-using LeaveItThere.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LeaveItThere.Helpers;
 using UnityEngine;
 
 namespace LeaveItThere.Components
@@ -64,6 +57,18 @@ namespace LeaveItThere.Components
             )
             {
                 _frameCounter = 0;
+                DisablePhysics();
+            }
+        }
+
+        public void SetPhysicsEnabled(bool enabled)
+        {
+            if (enabled)
+            {
+                EnablePhysics();
+            }
+            else
+            {
                 DisablePhysics();
             }
         }

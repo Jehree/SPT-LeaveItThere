@@ -1,5 +1,4 @@
-﻿using LeaveItThere.Common;
-using LeaveItThere.Components;
+﻿using LeaveItThere.Components;
 
 namespace LeaveItThere.Fika
 {
@@ -11,15 +10,15 @@ namespace LeaveItThere.Fika
             return FikaWrapper.IAmHost();
         }
 
-        public static void SendPlacedStateChangedPacket(ItemRemotePair pair)
+        public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool physicsEnableRequested = false)
         {
             if (!Plugin.FikaInstalled) return;
-            FikaWrapper.SendPlacedStateChangedPacket(pair);
+            FikaWrapper.SendPlacedStateChangedPacket(fakeItem, physicsEnableRequested);
         }
 
         public static string GetRaidId()
         {
-            if (!Plugin.FikaInstalled) return ModSession.GetSession().Player.ProfileId;
+            if (!Plugin.FikaInstalled) return ModSession.Instance.Player.ProfileId;
             return FikaWrapper.GetRaidId();
         }
 

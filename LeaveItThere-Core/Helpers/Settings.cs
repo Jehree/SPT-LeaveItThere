@@ -20,6 +20,9 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<bool> PlacedItemsHaveCollision;
         public static ConfigEntry<int> MinimumSizeItemToGetCollision;
         public static ConfigEntry<bool> ImmersivePhysics;
+        public static ConfigEntry<float> RotationSpeed;
+        public static ConfigEntry<bool> InvertHorizontalRotation;
+        public static ConfigEntry<bool> InvertVerticalRotation;
 
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
@@ -50,7 +53,7 @@ namespace LeaveItThere.Helpers
                 10,
                 new ConfigDescription("Number of frames to enable physics before Rigidbody Sleep Threshold checks start happening.", null, new ConfigurationManagerAttributes { IsAdvanced = true })
             );
-            
+
             CostSystemEnabled = config.Bind(
                 "1: Cost System",
                 "Cost System Enabled",
@@ -84,9 +87,27 @@ namespace LeaveItThere.Helpers
             );
             MoveModeCancelsSprinting = config.Bind(
                 "2: Move Mode",
-                "Move Mode Cancels Sprinting",
+                "Sprinting Cancels Move Mode",
                 true,
                 "If true, sprinting will cancel 'MOVE' mode."
+            );
+            RotationSpeed = config.Bind(
+                "2: Move Mode",
+                "Rotation Speed",
+                2f,
+                "Speed items will rotate in rotation mode."
+            );
+            InvertHorizontalRotation = config.Bind(
+                "2: Move Mode",
+                "Invert Horizontal Rotation Direction",
+                false,
+                ""
+            );
+            InvertVerticalRotation = config.Bind(
+                "2: Move Mode",
+                "Invert Vertical Rotation Direction",
+                false,
+                ""
             );
 
             PlacedItemsHaveCollision = config.Bind(

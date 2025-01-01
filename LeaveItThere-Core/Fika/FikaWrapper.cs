@@ -1,14 +1,12 @@
 ﻿using Comfort.Common;
 using EFT.Interactive;
-using EFT.UI;
 using Fika.Core.Coop.Utils;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
 using Fika.Core.Networking;
-using LeaveItThere.Common;
 using LeaveItThere.Components;
-using LeaveItThere.Packets;
 using LeaveItThere.Helpers;
+using LeaveItThere.Packets;
 using LiteNetLib;
 
 namespace LeaveItThere.Fika
@@ -20,15 +18,15 @@ namespace LeaveItThere.Fika
             return Singleton<FikaServer>.Instantiated;
         }
 
-        public static void SendPlacedStateChangedPacket(ItemRemotePair pair)
+        public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool physicsEnableRequested = false)
         {
             PlacedItemStateChangedPacket packet = new PlacedItemStateChangedPacket
             {
-                ItemId = pair.LootItem.ItemId,
-                Position = pair.RemoteInteractable.gameObject.transform.position,
-                Rotation = pair.RemoteInteractable.gameObject.transform.rotation,
-                IsPlaced = pair.Placed,
-                SourceHasImmersivePhysicsEnabled = Settings.ImmersivePhysics.Value
+                ItemId = fakeItem.ItemId,
+                Position = fakeItem.WorldPosition,
+                Rotation = fakeItem.WorldRotation,
+                IsPlaced = fakeItem.Placed,
+                PhysicsEnableRequested = physicsEnableRequested
             };
             if (Singleton<FikaServer>.Instantiated)
             {
@@ -48,49 +46,38 @@ namespace LeaveItThere.Fika
         public static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet, NetPeer peer)
         {
             ObservedLootItem lootItem = ItemHelper.GetLootItem(packet.ItemId) as ObservedLootItem;
-            var session = ModSession.GetSession();
-            var pair = session.GetPairOrNull(lootItem);
 
-            if (packet.IsPlaced)
+            FakeItem fakeItem;
+            if (ModSession.Instance.TryGetFakeItem(packet.ItemId, out FakeItem fakeItemFetch))
             {
-                // re-placing is necessary because if an item is placed, placing it again updates its position
-                ItemPlacer.PlaceItem(lootItem, packet.Position, packet.Rotation);
-
-                // re initialize pair in case it was null before placing
-                pair = session.GetPairOrNull(lootItem);
-
-                // make sure physics behavior is synced with the sender of the packet
-                var moveable = pair.RemoteInteractable.gameObject.GetComponent<MoveableObject>();
-                if (packet.SourceHasImmersivePhysicsEnabled)
-                {
-                    moveable.EnablePhysics();
-                }
-                else
-                {
-                    moveable.DisablePhysics();
-                }
+                fakeItem = fakeItemFetch;
             }
             else
             {
-                if (pair == null)
-                {
-                    string err = "Something is wrong! packet.IsPlaced was false, but the pair couldn't be found. This shouldn't happen!";
-                    ConsoleScreen.LogError(err);
-                    throw new System.Exception(err);
-                }
+                fakeItem = FakeItem.CreateNewRemoteInteractable(lootItem);
+            }
 
-                pair.RemoteInteractable.DemolishItem();
+            // always place to ensure that location is synced, THEN reclaim if needed
+            fakeItem.PlaceAtLocation(packet.Position, packet.Rotation);
+            if (!packet.IsPlaced)
+            {
+                fakeItem.Reclaim();
+            }
+
+            if (packet.PhysicsEnableRequested)
+            {
+                fakeItem.gameObject.GetComponent<MoveableObject>().EnablePhysics();
             }
 
             var mover = ObjectMover.GetMover();
-            if (mover.Enabled && mover.Target == pair.RemoteInteractable.gameObject)
+            if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
             {
                 mover.Disable(false);
             }
 
-            if (Singleton<FikaServer>.Instantiated)
+            if (IAmHost())
             {
-                Singleton<FikaServer>.Instance.SendDataToAll<PlacedItemStateChangedPacket>(ref packet, LiteNetLib.DeliveryMethod.ReliableOrdered);
+                Singleton<FikaServer>.Instance.SendDataToAll(ref packet, LiteNetLib.DeliveryMethod.ReliableOrdered);
             }
         }
 

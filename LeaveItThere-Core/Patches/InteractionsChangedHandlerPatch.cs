@@ -5,18 +5,17 @@ using System.Reflection;
 
 namespace LeaveItThere.Patches
 {
-    internal class GameStartedPatch : ModulePatch
+    internal class InteractionsChangedHandlerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(GameWorld).GetMethod(nameof(GameWorld.OnGameStarted));
+            return typeof(GamePlayerOwner).GetMethod(nameof(GamePlayerOwner.InteractionsChangedHandler));
         }
 
         [PatchPrefix]
-        static void PatchPrefix()
+        static bool PatchPrefix()
         {
-            ObjectMover.CreateNewObjectMover();
-            ModSession.CreateNewModSession();
+            return ModSession.Instance.InteractionsAllowed;
         }
     }
 }

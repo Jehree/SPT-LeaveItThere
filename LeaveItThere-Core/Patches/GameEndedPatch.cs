@@ -1,19 +1,13 @@
 ﻿using EFT;
 using HarmonyLib;
-using Newtonsoft.Json;
-using LeaveItThere.Common;
 using LeaveItThere.Components;
+using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using SPT.Reflection.Patching;
 using SPT.Reflection.Utils;
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using Comfort.Common;
-using EFT.Interactive;
-using System.Collections.Generic;
-using LeaveItThere.Fika;
 
 namespace LeaveItThere.Patches
 {
@@ -37,15 +31,15 @@ namespace LeaveItThere.Patches
         [PatchPrefix]
         static void Prefix(LocalRaidSettings settings, object results, ref object lostInsuredItems, object transferItems)
         {
-            var session = ModSession.GetSession();
+            var session = ModSession.Instance;
             lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems as object[], session.GetPlacedItemInstanceIds());
-
-            session.DestroyAllRemoteObjects();
 
             if (FikaInterface.IAmHost())
             {
-                ItemPlacer.SendPlacedItemDataToServer();
+                session.SendPlacedItemDataToServer();
             }
+
+            session.DestroyAllRemoteObjects();
         }
     }
 }
