@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace InteractableInteractionsAPI.Common
+namespace LeaveItThere.Common
 {
     public class CustomInteraction
     {

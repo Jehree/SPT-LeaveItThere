@@ -18,17 +18,16 @@ namespace LeaveItThere.Helpers
             );
         }
 
-        public static void RefreshPrompt(bool force = false)
+        public static void RefreshPrompt()
         {
-            var session = ModSession.Instance;
-            if (force)
+            var session = LITSession.Instance;
+            session.GamePlayerOwner.ClearInteractionState();
+
+            try
             {
-                session.GamePlayerOwner.AvailableInteractionState.Value = null;
+                session.GamePlayerOwner.InteractionsChangedHandler();
             }
-            else
-            {
-                session.GamePlayerOwner.ClearInteractionState();
-            }
+            catch (System.Exception) { } // sometimes this causes errors, don't really care in those cases so just avoid the exception
         }
 
         public static void NotificationLong(string message)
@@ -42,7 +41,7 @@ namespace LeaveItThere.Helpers
 
         public static void SetCameraRotationLocked(bool enabled)
         {
-            var player = ModSession.Instance.Player;
+            var player = LITSession.Instance.Player;
 
             Vector2 fullYawRange = new Vector2(-360f, 360f);
             Vector2 standingPitchRange = new Vector2(-90f, 90f);

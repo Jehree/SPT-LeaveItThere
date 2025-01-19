@@ -1,10 +1,8 @@
-﻿using Comfort.Common;
-using EFT;
-using InteractableInteractionsAPI.Common;
+﻿using EFT;
+using LeaveItThere.Common;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
 namespace LeaveItThere.Components
@@ -25,14 +23,26 @@ namespace LeaveItThere.Components
         private Quaternion _lockedRotation;
         private Vector3 _lockedPosition;
 
-        public static ObjectMover GetMover()
+        private static ObjectMover _instance = null;
+        public static ObjectMover Instance
         {
-            return ModSession.Instance.Player.gameObject.GetComponent<ObjectMover>();
+            get
+            {
+                if ( _instance == null)
+                {
+                    CreateNewObjectMover();
+                }
+                return _instance;
+            }
+            private set
+            {
+                _instance = value;
+            }
         }
 
         public static void CreateNewObjectMover()
         {
-            ModSession.Instance.Player.gameObject.AddComponent<ObjectMover>();
+            _instance = LITSession.Instance.Player.gameObject.GetOrAddComponent<ObjectMover>();
         }
 
         /// <param name="exitMenuCallback">Called once when move mode is exited.</param>
@@ -50,7 +60,7 @@ namespace LeaveItThere.Components
 
             Target.DisablePhysics();
             Enabled = true;
-            ModSession.Instance.SetInteractionsEnabled(false);
+            LITSession.Instance.SetInteractionsEnabled(false);
         }
 
         public void Disable(bool save)
@@ -60,7 +70,7 @@ namespace LeaveItThere.Components
             SetRotationModeEnabled(false);
             Target.transform.parent = null;
 
-            InteractionHelper.RefreshPrompt(true);
+            InteractionHelper.RefreshPrompt();
             ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, Target.gameObject);
             if (_disabledCallback != null) _disabledCallback(save);
 
@@ -73,11 +83,11 @@ namespace LeaveItThere.Components
                 SetPhysicsModeEnabled(false);
             }
 
-            ModSession.Instance.SetInteractionsEnabled(true);
+            LITSession.Instance.SetInteractionsEnabled(true);
             InteractionHelper.SetCameraRotationLocked(false);
         }
 
-        public void Awake()
+        private void Awake()
         {
             var interactions = new List<ActionsTypesClass>();
             interactions.Add(GetToggleTranslationModeAction().GetActionsTypesClass());
@@ -90,7 +100,7 @@ namespace LeaveItThere.Components
             _moveMenu = new ActionsReturnClass { Actions = interactions };
         }
 
-        public void Update()
+        private void Update()
         {
             if (!Enabled) return;
             if (_enabledUpdateCallback != null) _enabledUpdateCallback();
@@ -105,12 +115,12 @@ namespace LeaveItThere.Components
                 RotationProcess();
             }
 
-            var session = ModSession.Instance;
+            var session = LITSession.Instance;
             if (session.GamePlayerOwner.AvailableInteractionState.Value == _moveMenu) return;
             session.GamePlayerOwner.AvailableInteractionState.Value = _moveMenu;
         }
 
-        public void RotationProcess()
+        private void RotationProcess()
         {
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
@@ -127,7 +137,7 @@ namespace LeaveItThere.Components
             Target.gameObject.transform.Rotate(cameraRotation * Vector3.left, yInversion * mouseY * Settings.RotationSpeed.Value, Space.World);
         }
 
-        public void LockRotation()
+        private void LockRotation()
         {
             Target.gameObject.transform.rotation = _lockedRotation;
         }
@@ -168,7 +178,7 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = ObjectMover.GetMover();
+                    var mover = Instance;
                     mover.Disable(true);
                 }
             );
@@ -181,7 +191,7 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = ObjectMover.GetMover();
+                    var mover = Instance;
                     mover.Disable(false);
                 }
             );
@@ -194,7 +204,7 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = ObjectMover.GetMover();
+                    var mover = Instance;
 
                     mover._translationModeEnabled = false;
                     mover.SetRotationModeEnabled(false);
@@ -212,13 +222,13 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = ObjectMover.GetMover();
+                    var mover = Instance;
 
                     mover.SetPhysicsModeEnabled(false);
                     mover.SetRotationModeEnabled(false);
 
                     var targetTransform = mover.Target.gameObject.transform;
-                    var cameraTransform = ModSession.Instance.Player.CameraContainer.gameObject.transform;
+                    var cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
                     mover._translationModeEnabled = !mover._translationModeEnabled;
                     if (mover._translationModeEnabled)
                     {
@@ -244,13 +254,13 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = ObjectMover.GetMover();
+                    var mover = Instance;
 
                     mover.SetPhysicsModeEnabled(false);
                     mover._translationModeEnabled = false;
 
                     var targetTransform = mover.Target.gameObject.transform;
-                    var cameraTransform = ModSession.Instance.Player.CameraContainer.gameObject.transform;
+                    var cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
                     mover.SetRotationModeEnabled(!mover._rotationModeEnabled);
                     if (mover._rotationModeEnabled)
                     {
@@ -275,8 +285,8 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = ObjectMover.GetMover();
-                    Player player = ModSession.Instance.Player;
+                    var mover = Instance;
+                    Player player = LITSession.Instance.Player;
                     mover.Target.MoveToPlayer();
                     mover.SetPhysicsModeEnabled(false);
                     mover._translationModeEnabled = false;

@@ -14,7 +14,7 @@ namespace LeaveItThere.Helpers
         {
             get
             {
-                Player player = ModSession.Instance.Player;
+                Player player = LITSession.Instance.Player;
                 return player.Transform.Original.position + player.Transform.Original.forward + (player.Transform.Original.up / 2);
             }
         }
@@ -55,26 +55,26 @@ namespace LeaveItThere.Helpers
             return "this shouldn't ever be reached";
         }
 
-        public static void ExecuteAfterSeconds(int seconds, Action<object> callback, object arg = null)
+        public static void ExecuteAfterSeconds(float seconds, Action<object> callback, object arg = null)
         {
             StaticManager.BeginCoroutine(ExecuteAfterSecondsRoutine(seconds, callback, arg));
         }
 
-        public static IEnumerator ExecuteAfterSecondsRoutine(int seconds, Action<object> callback, object arg)
+        public static IEnumerator ExecuteAfterSecondsRoutine(float seconds, Action<object> callback, object arg)
         {
             yield return new WaitForSeconds(seconds);
             callback(arg);
         }
 
-        public static void ExecuteNextFrame(Action callback)
+        public static void ExecuteNextFrame(Action<object> callback, object arg = null)
         {
-            StaticManager.BeginCoroutine(ExecuteNextFrameRoutine(callback));
+            StaticManager.BeginCoroutine(ExecuteNextFrameRoutine(callback, arg));
         }
 
-        public static IEnumerator ExecuteNextFrameRoutine(Action callback)
+        public static IEnumerator ExecuteNextFrameRoutine(Action<object> callback, object arg)
         {
             yield return null;
-            callback();
+            callback(arg);
         }
 
         public static Quaternion ScaleQuaternion(Quaternion rotation, float scale)

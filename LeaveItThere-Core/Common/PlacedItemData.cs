@@ -1,4 +1,8 @@
-﻿using EFT.InventoryLogic;
+﻿using Comfort.Common;
+using EFT;
+using EFT.InventoryLogic;
+using LeaveItThere.Components;
+using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -26,13 +30,15 @@ namespace LeaveItThere.Common
                 return _item;
             }
         }
+        public Dictionary<string, object> AddonData = [];
 
         public PlacedItemData() { }
-        public PlacedItemData(Item item, Vector3 location, Quaternion rotation)
+        public PlacedItemData(FakeItem fakeItem)
         {
-            Location = location;
-            Rotation = rotation;
-            _itemDataBase64 = ItemHelper.ItemToString(item);
+            Location = fakeItem.gameObject.transform.position;
+            Rotation = fakeItem.gameObject.transform.rotation;
+            _itemDataBase64 = ItemHelper.ItemToString(fakeItem.LootItem.Item);
+            AddonData = fakeItem.AddonData;
         }
     }
 
@@ -41,13 +47,24 @@ namespace LeaveItThere.Common
         public string ProfileId;
         public string MapId;
         public List<PlacedItemData> ItemTemplates;
+        public Dictionary<string, object> GlobalAddonData = [];
+
+        [JsonIgnore]
+        public static PlacedItemDataPack Request
+        {
+            get
+            {
+                return new PlacedItemDataPack([]);
+            }
+        }
 
         public PlacedItemDataPack() { }
-        public PlacedItemDataPack(string profileId, string mapId, List<PlacedItemData> itemTemplates = null)
+        public PlacedItemDataPack(Dictionary<string, object> globalAddonData, List<PlacedItemData> itemTemplates = null)
         {
-            ProfileId = profileId;
-            MapId = mapId;
+            ProfileId = FikaInterface.GetRaidId();
+            MapId = Singleton<GameWorld>.Instance.LocationId;
             ItemTemplates = new List<PlacedItemData>();
+            GlobalAddonData = globalAddonData;
             if (itemTemplates != null)
             {
                 ItemTemplates.AddRange(itemTemplates);

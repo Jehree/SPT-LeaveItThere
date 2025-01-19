@@ -14,6 +14,7 @@ namespace LeaveItThere.Patches
     internal class GameEndedPatch : ModulePatch
     {
         private static Type _targetClassType;
+        private static FieldInfo _exitNameInfo;
 
         protected override MethodBase GetTargetMethod()
         {
@@ -24,19 +25,25 @@ namespace LeaveItThere.Patches
                 targetClass.GetMethods().Any(method => method.Name == "ReceiveInsurancePrices")
             );
 
-            return AccessTools.Method(_targetClassType.GetTypeInfo(), "LocalRaidEnded");
+            var targetMethod = AccessTools.Method(_targetClassType.GetTypeInfo(), "LocalRaidEnded");
+
+            _exitNameInfo = targetMethod.GetParameters()[1].ParameterType.GetField("exitName");
+
+            return targetMethod;
         }
 
         // LocalRaidSettings settings, GClass1924 results, GClass1301[] lostInsuredItems, Dictionary<string, GClass1301[]> transferItems
         [PatchPrefix]
         static void Prefix(LocalRaidSettings settings, object results, ref object lostInsuredItems, object transferItems)
         {
-            var session = ModSession.Instance;
+            LeaveItThereStaticEvents.InvokeOnRaidEnd(settings, results, lostInsuredItems, transferItems, _exitNameInfo.GetValue(results) as string);
+
+            var session = LITSession.Instance;
             lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems as object[], session.GetPlacedItemInstanceIds());
 
             if (FikaInterface.IAmHost())
             {
-                session.SendPlacedItemDataToServer();
+                session.SendPlacedItemDataToServer(); 
             }
 
             session.DestroyAllRemoteObjects();

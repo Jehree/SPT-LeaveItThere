@@ -10,15 +10,15 @@ namespace LeaveItThere.Fika
             return FikaWrapper.IAmHost();
         }
 
-        public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool physicsEnableRequested = false)
+        public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool isPlaced, bool physicsEnableRequested = false)
         {
             if (!Plugin.FikaInstalled) return;
-            FikaWrapper.SendPlacedStateChangedPacket(fakeItem, physicsEnableRequested);
+            FikaWrapper.SendPlacedStateChangedPacket(fakeItem, isPlaced, physicsEnableRequested);
         }
 
         public static string GetRaidId()
         {
-            if (!Plugin.FikaInstalled) return ModSession.Instance.Player.ProfileId;
+            if (!Plugin.FikaInstalled) return LITSession.Instance.Player.ProfileId;
             return FikaWrapper.GetRaidId();
         }
 

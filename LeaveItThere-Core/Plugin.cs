@@ -46,7 +46,7 @@ namespace LeaveItThere
             }
 
             Settings.Init(Config);
-            LogSource.LogWarning("Ebu is cute :3");
+            LogSource.LogInfo("Ebu is cute :3");
 
             new GetAvailableActionsPatch().Enable();
             new GameStartedPatch().Enable();
@@ -60,5 +60,8 @@ namespace LeaveItThere
         {
             FikaInterface.InitOnPluginEnabled();
         }
+
+        // TODO: LootExperience getter patch for Item's, add items spawned by mod to a list of items that will have their getter zeroed so they don't give loot exp.
+        // TODO: Remove unplaced FakeItem caching. It is unnecessary and causes bugs.
     }
 }

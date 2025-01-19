@@ -1,7 +1,7 @@
 ﻿using EFT;
 using EFT.Interactive;
 using HarmonyLib;
-using InteractableInteractionsAPI.Common;
+using LeaveItThere.Common;
 using LeaveItThere.Components;
 using LeaveItThere.Helpers;
 using SPT.Reflection.Patching;

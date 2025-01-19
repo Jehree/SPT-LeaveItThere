@@ -102,8 +102,8 @@ export class Routes {
         if (mapId === "factory4_day" || mapId === "factory4_night") {
             mapName = "factory";
         }
-        if (mapId === "sandbox_high") {
-            mapName = "sandbox";
+        if (mapId === "Sandbox_high") {
+            mapName = "Sandbox";
         }
         let profileName: string = profileId;
         if (Config.global_item_data_profile) {

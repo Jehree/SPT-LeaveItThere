@@ -14,13 +14,13 @@ using UnityEngine;
 
 namespace LeaveItThere.Helpers
 {
-    internal static class ItemHelper
+    public static class ItemHelper
     {
         private static FieldInfo _idFieldInfo = null;
 
         public static LootItem GetLootItem(string itemId)
         {
-            foreach (LootItem lootItem in ModSession.Instance.GameWorld.LootItems.GetValuesEnumerator())
+            foreach (LootItem lootItem in LITSession.Instance.GameWorld.LootItems.GetValuesEnumerator())
             {
                 if (lootItem.ItemId == itemId) return lootItem;
             }
@@ -223,18 +223,17 @@ namespace LeaveItThere.Helpers
 
         public static void ForAllItemsUnderCost(int costAmount, Action<FakeItem> callable)
         {
-            foreach (var kvp in ModSession.Instance.FakeItems)
+            foreach (var kvp in LITSession.Instance.FakeItems)
             {
                 FakeItem fakeItem = kvp.Value;
-                if (fakeItem.Placed == false) continue;
-                if (ItemHelper.GetItemCost(fakeItem.LootItem.Item, true) > costAmount) continue;
+                if (GetItemCost(fakeItem.LootItem.Item, true) > costAmount) continue;
                 callable(fakeItem);
             }
         }
 
         public static bool ItemCanBePickedUp(Item item)
         {
-            var session = ModSession.Instance;
+            var session = LITSession.Instance;
             InventoryController playerInventoryController = session.Player.InventoryController;
             InventoryEquipment playerEquipment = playerInventoryController.Inventory.Equipment;
             var pickedUpResult = InteractionsHandlerClass.QuickFindAppropriatePlace(item, playerInventoryController, playerEquipment.ToEnumerable<InventoryEquipment>(), InteractionsHandlerClass.EMoveItemOrder.PickUp, true);

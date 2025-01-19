@@ -2,17 +2,35 @@
 using EFT;
 using EFT.Interactive;
 using EFT.UI;
-using InteractableInteractionsAPI.Common;
+using LeaveItThere.Common;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace LeaveItThere.Components
 {
-    internal class FakeItem : InteractableObject
+    public class AddonFlags
     {
+        public bool MoveModeDisabled = false;
+    }
+
+    public class FakeItem : InteractableObject
+    {
+        public delegate void InitializedHandler();
+        public event InitializedHandler OnInitialized;
+
+        public delegate void SpawnedHandler();
+        public event SpawnedHandler OnSpawned;
+
+        public delegate void PlacedStateChangedHandler(bool isPlaced);
+        public event PlacedStateChangedHandler OnPlacedStateChanged;
+
+        public AddonFlags AddonFlags = new();
+        public Dictionary<string, object> AddonData = [];
+
         private ObservedLootItem _lootItem;
         public ObservedLootItem LootItem
         {
@@ -30,36 +48,7 @@ namespace LeaveItThere.Components
                 _lootItem = value;
             }
         }
-        public Vector3 WorldPosition
-        {
-            get
-            {
-                if (Placed)
-                {
-                    return gameObject.transform.position;
-                }
-                else
-                {
-                    return LootItem.gameObject.transform.position;
-                }
-            }
-        }
-        public Quaternion WorldRotation
-        {
-            get
-            {
-                if (Placed)
-                {
-                    return gameObject.transform.rotation;
-                }
-                else
-                {
-                    return LootItem.gameObject.transform.rotation;
-                }
-            }
-        }
         public string ItemId { get; private set; }
-        public bool Placed { get; set; }
 
         public List<CustomInteraction> Actions = new List<CustomInteraction>();
         public MoveableObject Moveable { get; private set; }
@@ -71,22 +60,23 @@ namespace LeaveItThere.Components
         {
             LootItem = lootItem;
             ItemId = lootItem.ItemId;
-
             AddNavMeshObstacle();
             Moveable = gameObject.AddComponent<MoveableObject>();
-            ModSession.Instance.AddFakeItem(this);
-
+            LITSession.Instance.AddFakeItem(this);
             if (LootItem.Item.IsContainer)
             {
                 Actions.Add(GetSearchContainerAction());
             }
             Actions.Add(GetEnterMoveModeAction());
-            Actions.Add(GetReclaimAction());
-
             SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
+
+            LeaveItThereStaticEvents.InvokeOnFakeItemInitialized(this);
+            OnInitialized?.Invoke();
+            // add this after event invocations to make sure the Reclaim action is always last
+            Actions.Add(GetReclaimAction());
         }
 
-        public static FakeItem CreateNewRemoteInteractable(ObservedLootItem lootItem)
+        internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem, Dictionary<string, object> addonData = null)
         {
             GameObject obj = GameObject.Instantiate(lootItem.gameObject);
             ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, obj.gameObject);
@@ -101,6 +91,10 @@ namespace LeaveItThere.Components
             }
 
             FakeItem fakeItem = obj.AddComponent<FakeItem>();
+            if (addonData != null)
+            {
+                fakeItem.AddonData = addonData;
+            }
             fakeItem.Init(lootItem);
             return fakeItem;
         }
@@ -166,28 +160,30 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    FakeItem fakeItem = ModSession.Instance.GetFakeItemOrNull(itemId);
+                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
+                    FikaInterface.SendPlacedStateChangedPacket(fakeItem, false);
                     fakeItem.Reclaim();
                     fakeItem.ReclaimPlayerFeedback();
-                    FikaInterface.SendPlacedStateChangedPacket(fakeItem);
                 }
             );
         }
 
         public void Reclaim()
         {
-            if (!Placed) return;
-
             LootItem.gameObject.transform.position = gameObject.transform.position;
             LootItem.gameObject.transform.rotation = gameObject.transform.rotation;
-            gameObject.transform.position = new Vector3(0, -9999, 0);
-            Placed = false;
-            ModSession.Instance.RefundPoints(ItemHelper.GetItemCost(LootItem.Item));
+            LITSession.Instance.RefundPoints(ItemHelper.GetItemCost(LootItem.Item));
+            LITSession.Instance.RemoveFakeItem(this);
+
+            LeaveItThereStaticEvents.InvokeOnItemPlacedStateChanged(this, false);
+            OnPlacedStateChanged?.Invoke(false);
+
+            GameObject.Destroy(this.gameObject);
         }
 
         public void ReclaimPlayerFeedback()
         {
-            var session = ModSession.Instance;
+            var session = LITSession.Instance;
             if (Settings.CostSystemEnabled.Value)
             {
                 InteractionHelper.NotificationLong($"Points rufunded: {ItemHelper.GetItemCost(LootItem.Item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
@@ -201,35 +197,28 @@ namespace LeaveItThere.Components
 
             return new CustomInteraction(
             "Place Item",
-            !ModSession.Instance.PlacementIsAllowed(lootItem.Item),
+            !LITSession.Instance.PlacementIsAllowed(lootItem.Item),
             () =>
             {
-                FakeItem fakeItem;
                 var lootItem = ItemHelper.GetLootItem(itemId) as ObservedLootItem;
-                if (ModSession.Instance.TryGetFakeItem(itemId, out FakeItem fakeItemFetch))
-                {
-                    fakeItem = fakeItemFetch;
-                }
-                else
-                {
-                    fakeItem = CreateNewRemoteInteractable(lootItem);
-                }
-
+                FakeItem fakeItem = CreateNewFakeItem(lootItem);
                 fakeItem.PlaceAtLootItem();
                 fakeItem.PlacedPlayerFeedback();
-                FikaInterface.SendPlacedStateChangedPacket(fakeItem);
+                FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
             });
         }
 
         public void PlaceAtLootItem()
         {
-            ModSession.Instance.SpendPoints(ItemHelper.GetItemCost(LootItem.Item));
+            LITSession.Instance.SpendPoints(ItemHelper.GetItemCost(LootItem.Item));
             SetLocation(LootItem.gameObject.transform.position, LootItem.gameObject.transform.rotation);
             LootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
-            Placed = true;
+
+            LeaveItThereStaticEvents.InvokeOnItemPlacedStateChanged(this, true);
+            OnPlacedStateChanged?.Invoke(true);
         }
 
-        public void PlaceAtLocation(Vector3 position, Quaternion rotation)
+        public void PlaceAtPosition(Vector3 position, Quaternion rotation)
         {
             PlaceAtLootItem();
             SetLocation(position, rotation);
@@ -237,7 +226,7 @@ namespace LeaveItThere.Components
 
         public void PlacedPlayerFeedback()
         {
-            var session = ModSession.Instance;
+            var session = LITSession.Instance;
             if (Settings.CostSystemEnabled.Value)
             {
                 InteractionHelper.NotificationLong($"Placement cost: {ItemHelper.GetItemCost(LootItem.Item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
@@ -252,21 +241,21 @@ namespace LeaveItThere.Components
             return new CustomInteraction(
                 () =>
                 {
-                    FakeItem fakeItem = ModSession.Instance.GetFakeItemOrNull(itemId);
-                    if (fakeItem.MoveModeDisallowed())
+                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
+                    if (fakeItem.MoveModeDisallowed(out string reason))
                     {
-                        return "Move: No Space";
+                        return $"Move: {reason}";
                     }
                     else
                     {
                         return "Move";
                     }
                 },
-                ModSession.Instance.GetFakeItemOrNull(itemId).MoveModeDisallowed,
+                LITSession.Instance.GetFakeItemOrNull(itemId).MoveModeDisallowed,
                 () =>
                 {
-                    FakeItem fakeItem = ModSession.Instance.GetFakeItemOrNull(itemId);
-                    var mover = ObjectMover.GetMover();
+                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
+                    var mover = ObjectMover.Instance;
                     mover.Enable(fakeItem.gameObject.GetComponent<MoveableObject>(), fakeItem.OnMoveModeDisabled, fakeItem.OnMoveModeEnabledUpdate);
                     fakeItem._savedPosition = fakeItem.gameObject.transform.position;
                     fakeItem._savedRotation = fakeItem.gameObject.transform.rotation;
@@ -277,32 +266,32 @@ namespace LeaveItThere.Components
 
         private void OnMoveModeEnabledUpdate()
         {
-            var mover = ObjectMover.GetMover();
+            var mover = ObjectMover.Instance;
 
             if (MoveModeDisallowed())
             {
                 mover.Disable(true);
                 ErrorPlayerFeedback("Not enough space in inventory to move item!");
-                FikaInterface.SendPlacedStateChangedPacket(this, Settings.ImmersivePhysics.Value);
+                FikaInterface.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
                 return;
             }
-            if (Settings.MoveModeCancelsSprinting.Value && ModSession.Instance.Player.Physical.Sprinting)
+            if (Settings.MoveModeCancelsSprinting.Value && LITSession.Instance.Player.Physical.Sprinting)
             {
                 mover.Disable(true);
                 ErrorPlayerFeedback("'MOVE' mode cancelled.");
-                FikaInterface.SendPlacedStateChangedPacket(this, Settings.ImmersivePhysics.Value);
+                FikaInterface.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
                 return;
             }
         }
 
         private void OnMoveModeDisabled(bool saved)
         {
-            InteractionHelper.RefreshPrompt(true);
+            InteractionHelper.RefreshPrompt();
 
             if (saved)
             {
-                PlaceAtLocation(gameObject.transform.position, gameObject.transform.rotation);
-                FikaInterface.SendPlacedStateChangedPacket(this, Settings.ImmersivePhysics.Value);
+                PlaceAtPosition(gameObject.transform.position, gameObject.transform.rotation);
+                FikaInterface.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
             }
             else
             {
@@ -312,25 +301,32 @@ namespace LeaveItThere.Components
             SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
         }
 
-        private bool MoveModeDisallowed()
+        public bool MoveModeDisallowed(out string reason)
         {
-            if (!Settings.MoveModeRequiresInventorySpace.Value) return false;
-            if (!ItemHelper.ItemCanBePickedUp(LootItem.Item)) return true;
+            if (AddonFlags.MoveModeDisabled)
+            {
+                reason = "Disabled";
+                return true;
+            }
+            if (Settings.MoveModeRequiresInventorySpace.Value && !ItemHelper.ItemCanBePickedUp(LootItem.Item))
+            {
+                reason = "No Space";
+                return true;
+            }
+
+            reason = "";
             return false;
+        }
+
+        public bool MoveModeDisallowed()
+        {
+            return MoveModeDisallowed(out string _);
         }
 
         private void ResetPosition()
         {
-            if (Placed)
-            {
-                gameObject.transform.position = _savedPosition;
-                gameObject.transform.rotation = _savedRotation;
-            }
-            else
-            {
-                gameObject.transform.position = new Vector3(0, -99999, 0);
-                gameObject.transform.rotation = LootItem.gameObject.transform.rotation;
-            }
+            gameObject.transform.position = _savedPosition;
+            gameObject.transform.rotation = _savedRotation;
         }
 
         private void SetLocation(Vector3 position, Quaternion rotation)
@@ -343,6 +339,28 @@ namespace LeaveItThere.Components
         {
             InteractionHelper.NotificationLongWarning(message);
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.ErrorMessage);
+        }
+
+        public void InvokeOnSpawnedEvent()
+        {
+            OnSpawned?.Invoke();
+        }
+
+        public T GetAddonDataOrNull<T>(string key) where T : class
+        {
+            if (!AddonData.ContainsKey(key)) return null;
+            if (AddonData[key] is not T)
+            {
+                object data = AddonData[key];
+                T typedData = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data));
+                AddonData[key] = typedData;
+            }
+            return (T)AddonData[key];
+        }
+
+        public void PutAddonData<T>(string key, T data) where T : class
+        {
+            AddonData[key] = data;
         }
     }
 }

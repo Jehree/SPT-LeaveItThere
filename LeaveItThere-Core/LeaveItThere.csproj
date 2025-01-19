@@ -126,7 +126,7 @@
     <Compile Include="Common\ItemFilter.cs" />
     <Compile Include="Common\CustomInteraction.cs" />
     <Compile Include="Common\PlacedItemData.cs" />
-    <Compile Include="Components\ModSession.cs" />
+    <Compile Include="Components\LITSession.cs" />
     <Compile Include="Components\ObjectMover.cs" />
     <Compile Include="Components\MoveableObject.cs" />
     <Compile Include="Components\FakeItem.cs" />
@@ -135,6 +135,7 @@
     <Compile Include="Helpers\ConfigurationManagerAttributes.cs" />
     <Compile Include="Helpers\InteractionHelper.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
+    <Compile Include="Helpers\LeaveItThereStaticEvents.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\SPTServerHelper.cs" />
     <Compile Include="Helpers\Utils.cs" />

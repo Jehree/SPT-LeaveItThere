@@ -18,14 +18,14 @@ namespace LeaveItThere.Fika
             return Singleton<FikaServer>.Instantiated;
         }
 
-        public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool physicsEnableRequested = false)
+        public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool isPlaced, bool physicsEnableRequested = false)
         {
             PlacedItemStateChangedPacket packet = new PlacedItemStateChangedPacket
             {
                 ItemId = fakeItem.ItemId,
-                Position = fakeItem.WorldPosition,
-                Rotation = fakeItem.WorldRotation,
-                IsPlaced = fakeItem.Placed,
+                Position = fakeItem.gameObject.transform.position,
+                Rotation = fakeItem.gameObject.transform.rotation,
+                IsPlaced = isPlaced,
                 PhysicsEnableRequested = physicsEnableRequested
             };
             if (Singleton<FikaServer>.Instantiated)
@@ -45,40 +45,61 @@ namespace LeaveItThere.Fika
 
         public static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet, NetPeer peer)
         {
-            ObservedLootItem lootItem = ItemHelper.GetLootItem(packet.ItemId) as ObservedLootItem;
-
-            FakeItem fakeItem;
-            if (ModSession.Instance.TryGetFakeItem(packet.ItemId, out FakeItem fakeItemFetch))
+            if (packet.IsPlaced)
             {
-                fakeItem = fakeItemFetch;
+                PlaceItemPacketReceived(packet);
             }
             else
             {
-                fakeItem = FakeItem.CreateNewRemoteInteractable(lootItem);
-            }
-
-            // always place to ensure that location is synced, THEN reclaim if needed
-            fakeItem.PlaceAtLocation(packet.Position, packet.Rotation);
-            if (!packet.IsPlaced)
-            {
-                fakeItem.Reclaim();
-            }
-
-            if (packet.PhysicsEnableRequested)
-            {
-                fakeItem.gameObject.GetComponent<MoveableObject>().EnablePhysics();
-            }
-
-            var mover = ObjectMover.GetMover();
-            if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
-            {
-                mover.Disable(false);
+                ReclaimItemPackedReceived(packet);
             }
 
             if (IAmHost())
             {
                 Singleton<FikaServer>.Instance.SendDataToAll(ref packet, LiteNetLib.DeliveryMethod.ReliableOrdered);
             }
+        }
+
+        private static void PlaceItemPacketReceived(PlacedItemStateChangedPacket packet)
+        {
+            ObservedLootItem lootItem = ItemHelper.GetLootItem(packet.ItemId) as ObservedLootItem;
+
+            FakeItem fakeItem;
+            if (LITSession.Instance.TryGetFakeItem(packet.ItemId, out FakeItem fakeItemFetch))
+            {
+                fakeItem = fakeItemFetch;
+            }
+            else
+            {
+                fakeItem = FakeItem.CreateNewFakeItem(lootItem);
+            }
+
+            fakeItem.PlaceAtPosition(packet.Position, packet.Rotation);
+
+            if (packet.PhysicsEnableRequested)
+            {
+                fakeItem.gameObject.GetComponent<MoveableObject>().EnablePhysics();
+            }
+
+            var mover = ObjectMover.Instance;
+            if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
+            {
+                mover.Disable(false);
+            }
+        }
+
+        private static void ReclaimItemPackedReceived(PlacedItemStateChangedPacket packet)
+        {
+            FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(packet.ItemId);
+            if (fakeItem == null) return;
+
+            var mover = ObjectMover.Instance;
+            if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
+            {
+                mover.Disable(false);
+            }
+
+            fakeItem.Reclaim();
         }
 
         public static void OnFikaNetManagerCreated(FikaNetworkManagerCreatedEvent managerCreatedEvent)

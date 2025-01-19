@@ -15,7 +15,7 @@ namespace LeaveItThere.Patches
         [PatchPrefix]
         static bool PatchPrefix()
         {
-            return ModSession.Instance.InteractionsAllowed;
+            return LITSession.Instance.InteractionsAllowed;
         }
     }
 }

@@ -3,27 +3,26 @@ using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
 using LeaveItThere.Common;
-using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace LeaveItThere.Components
 {
-    internal class ModSession : MonoBehaviour
+    public class LITSession : MonoBehaviour
     {
         public bool InteractionsAllowed { get; private set; } = true;
-        public bool CameraRotationLocked { get; set; } = false;
 
         public GameWorld GameWorld { get; private set; }
         public Player Player { get; private set; }
         public GamePlayerOwner GamePlayerOwner { get; private set; }
 
-        public Dictionary<string, FakeItem> FakeItems { get; private set; } = new();
+        public Dictionary<string, FakeItem> FakeItems = [];
 
-        private static ModSession _instance = null;
-        public static ModSession Instance
+        private static LITSession _instance = null;
+        public static LITSession Instance
         {
             get
             {
@@ -33,7 +32,7 @@ namespace LeaveItThere.Components
                 }
                 if (_instance == null)
                 {
-                    _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<ModSession>();
+                    _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<LITSession>();
                 }
                 return _instance;
             }
@@ -46,28 +45,33 @@ namespace LeaveItThere.Components
             private set { _pointsSpent = Mathf.Clamp(value, 0, Settings.GetAllottedPoints()); }
         }
 
-        private ModSession() { }
+        public Dictionary<string, object> GlobalAddonData { get; private set; } = [];
 
-        public void Awake()
+        private LITSession() { }
+
+        private void Awake()
         {
             GameWorld = Singleton<GameWorld>.Instance;
             Player = GameWorld.MainPlayer;
             GamePlayerOwner = Player.GetComponent<GamePlayerOwner>();
-            OnRaidStart();
+            SpawnAllPlacedItems();
         }
 
-        public static ModSession CreateNewModSession()
+        public static void CreateNewModSession()
         {
-            _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.AddComponent<ModSession>();
-            return _instance;
+            _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<LITSession>(); 
         }
 
-        public void OnRaidStart()
+        public void SpawnAllPlacedItems()
         {
-            string mapId = Singleton<GameWorld>.Instance.LocationId;
-            PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(Plugin.DataToClientURL, new PlacedItemDataPack(FikaInterface.GetRaidId(), mapId));
-            foreach (var data in dataPack.ItemTemplates)
+            PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(Plugin.DataToClientURL, PlacedItemDataPack.Request);
+            GlobalAddonData = dataPack.GlobalAddonData;
+
+            for (int i = 0; i < dataPack.ItemTemplates.Count; i++)
             {
+                PlacedItemData data = dataPack.ItemTemplates[i];
+                bool isLastIteration = i == dataPack.ItemTemplates.Count - 1;
+
                 ItemHelper.SpawnItem(data.Item, new Vector3(0, -9999, 0), data.Rotation,
                 (LootItem lootItem) =>
                 {
@@ -76,39 +80,35 @@ namespace LeaveItThere.Components
                         ItemHelper.MakeSearchableItemFullySearched(lootItem.Item as SearchableItemItemClass);
                     }
 
-                    FakeItem fakeItem;
-                    if (Instance.TryGetFakeItem(lootItem.ItemId, out FakeItem fakeItemFetch))
-                    {
-                        fakeItem = fakeItemFetch;
-                    }
-                    else
-                    {
-                        fakeItem = FakeItem.CreateNewRemoteInteractable(lootItem as ObservedLootItem);
-                    }
+                    FakeItem fakeItem = FakeItem.CreateNewFakeItem(lootItem as ObservedLootItem, data.AddonData);
+                    fakeItem.PlaceAtPosition(data.Location, data.Rotation);
 
-                    fakeItem.PlaceAtLocation(data.Location, data.Rotation);
+                    LeaveItThereStaticEvents.InvokeOnPlacedItemSpawned(fakeItem);
+                    fakeItem.InvokeOnSpawnedEvent();
+                    if (isLastIteration)
+                    {
+                        LeaveItThereStaticEvents.InvokeOnLastPlacedItemSpawned(fakeItem);
+                    }
                 });
             }
         }
 
-        public void AddFakeItem(FakeItem fakeItem)
+        internal void AddFakeItem(FakeItem fakeItem)
         {
-            if (FakeItems.ContainsKey(fakeItem.ItemId))
-            {
-                throw new Exception("Tried to add FakeItem when one by it's key already existed!");
-            }
+            if (FakeItems.ContainsKey(fakeItem.ItemId)) return;
             FakeItems[fakeItem.ItemId] = fakeItem;
+        }
+
+        internal void RemoveFakeItem(FakeItem fakeItem)
+        {
+            if (!FakeItems.ContainsKey(fakeItem.ItemId)) return;
+            FakeItems.Remove(fakeItem.ItemId);
         }
 
         public FakeItem GetFakeItemOrNull(string itemId)
         {
             if (!FakeItems.ContainsKey(itemId)) return null;
             return FakeItems[itemId];
-        }
-
-        public bool FakeItemExists(string itemId)
-        {
-            return FakeItems.ContainsKey(itemId);
         }
 
         public bool TryGetFakeItem(string itemId, out FakeItem fakeItem)
@@ -129,12 +129,12 @@ namespace LeaveItThere.Components
             }
         }
 
-        public void SpendPoints(int points)
+        internal void SpendPoints(int points)
         {
             PointsSpent += points;
         }
 
-        public void RefundPoints(int points)
+        internal void RefundPoints(int points)
         {
             PointsSpent -= points;
         }
@@ -145,8 +145,6 @@ namespace LeaveItThere.Components
 
             foreach (var kvp in FakeItems)
             {
-                if (kvp.Value.Placed == false) continue;
-
                 ids.Add(kvp.Value.LootItem.Item.Id);
                 ItemHelper.ForAllChildrenInItem(kvp.Value.LootItem.Item,
                     (Item item) =>
@@ -158,7 +156,7 @@ namespace LeaveItThere.Components
             return ids;
         }
 
-        public void DestroyAllRemoteObjects()
+        internal void DestroyAllRemoteObjects()
         {
             foreach (var kvp in FakeItems)
             {
@@ -166,25 +164,42 @@ namespace LeaveItThere.Components
             }
         }
 
-        public void SendPlacedItemDataToServer()
+        internal void SendPlacedItemDataToServer()
         {
             var dataList = new List<PlacedItemData>();
-            string mapId = Singleton<GameWorld>.Instance.LocationId;
             List<string> placedItemInstanceIds = new();
             foreach (var kvp in Instance.FakeItems)
             {
                 FakeItem fakeItem = kvp.Value;
-                if (fakeItem.Placed == false) continue;
-                dataList.Add(new PlacedItemData(fakeItem.LootItem.Item, fakeItem.gameObject.transform.position, fakeItem.gameObject.transform.rotation));
+                dataList.Add(new PlacedItemData(fakeItem));
                 placedItemInstanceIds.Add(fakeItem.ItemId);
             }
-            var dataPack = new PlacedItemDataPack(FikaInterface.GetRaidId(), mapId, dataList);
+            var dataPack = new PlacedItemDataPack(GlobalAddonData, dataList);
             SPTServerHelper.ServerRoute(Plugin.DataToServerURL, dataPack);
         }
 
         public void SetInteractionsEnabled(bool enabled)
         {
             InteractionsAllowed = enabled;
+        }
+
+        public T GetGlobalAddonDataOrNull<T>(string key) where T : class
+        {
+            if (!GlobalAddonData.ContainsKey(key)) return null;
+
+            if (GlobalAddonData[key] is not T)
+            {
+                object data = GlobalAddonData[key];
+                T typedData = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data));
+                GlobalAddonData[key] = typedData;
+            }
+
+            return (T)GlobalAddonData[key];
+        }
+
+        public void PutGlobalAddonData<T>(string key, T data) where T : class
+        {
+            GlobalAddonData[key] = data;
         }
     }
 }

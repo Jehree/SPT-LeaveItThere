@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LeaveItThere.Components
 {
-    internal class MoveableObject : MonoBehaviour
+    public class MoveableObject : MonoBehaviour
     {
         private Rigidbody _rigidbody = null;
 
@@ -29,14 +29,14 @@ namespace LeaveItThere.Components
 
         private int _frameCounter = 0;
 
-        public void Awake()
+        private void Awake()
         {
             _rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
             EFTPhysicsClass.GClass712.SupportRigidbody(Rigidbody);
             DisablePhysics();
         }
 
-        public void Update()
+        private void FixedUpdate()
         {
             PhysicsProcess();
         }
@@ -52,8 +52,8 @@ namespace LeaveItThere.Components
             }
 
             if (
-                Rigidbody.velocity.sqrMagnitude < Settings.RigidbodySleepThreshold.Value * Settings.RigidbodySleepThreshold.Value &&
-                Rigidbody.angularVelocity.sqrMagnitude < Settings.RigidbodySleepThreshold.Value * Settings.RigidbodySleepThreshold.Value
+                Rigidbody.velocity.sqrMagnitude < Settings.RigidbodySleepThreshold.Value &&
+                Rigidbody.angularVelocity.sqrMagnitude < Settings.RigidbodySleepThreshold.Value
             )
             {
                 _frameCounter = 0;
