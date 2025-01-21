@@ -20,6 +20,7 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<bool> PlacedItemsHaveCollision;
         public static ConfigEntry<int> MinimumSizeItemToGetCollision;
         public static ConfigEntry<bool> ImmersivePhysics;
+        public static ConfigEntry<KeyboardShortcut> ToggleImmersivePhysicsHotkey;
         public static ConfigEntry<float> RotationSpeed;
         public static ConfigEntry<bool> InvertHorizontalRotation;
         public static ConfigEntry<bool> InvertVerticalRotation;
@@ -127,6 +128,12 @@ namespace LeaveItThere.Helpers
                 "Immersive Physics (no floating items)",
                 true,
                 "If you want to be able to make items float wherever you want, set to false."
+            );
+            ToggleImmersivePhysicsHotkey = config.Bind(
+                "3: Collision / Physics",
+                "Hotkey That Toggles Immersive Physics",
+                new KeyboardShortcut(KeyCode.Keypad0),
+                "Hotkey that toggles Immersive Physics setting."
             );
 
             CustomsAllottedPoints = config.Bind(

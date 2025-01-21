@@ -15,6 +15,7 @@ namespace LeaveItThere.Components
     public class AddonFlags
     {
         public bool MoveModeDisabled = false;
+        public bool ImmersivePhysicsForceDisabled = false;
     }
 
     public class FakeItem : InteractableObject
@@ -54,7 +55,6 @@ namespace LeaveItThere.Components
         public MoveableObject Moveable { get; private set; }
         private Vector3 _savedPosition;
         private Quaternion _savedRotation;
-
 
         private void Init(ObservedLootItem lootItem)
         {

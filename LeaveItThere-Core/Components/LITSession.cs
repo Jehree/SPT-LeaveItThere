@@ -57,20 +57,40 @@ namespace LeaveItThere.Components
             SpawnAllPlacedItems();
         }
 
+        private void Update()
+        {
+            if (Settings.ToggleImmersivePhysicsHotkey.Value.IsDown())
+            {
+                Settings.ImmersivePhysics.Value = !Settings.ImmersivePhysics.Value;
+                if (Settings.ImmersivePhysics.Value)
+                {
+                    NotificationManagerClass.DisplayMessageNotification("Immersive Physics Enabled!");
+                }
+                else
+                {
+                    NotificationManagerClass.DisplayWarningNotification("Immersive Physics Disabled.");
+                }
+            }
+        }
+
         public static void CreateNewModSession()
         {
             _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<LITSession>(); 
         }
 
-        public void SpawnAllPlacedItems()
+        private static int _itemsSpawned;
+        private static int _itemsToSpawn;
+        public void SpawnAllPlacedItems() 
         {
             PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(Plugin.DataToClientURL, PlacedItemDataPack.Request);
             GlobalAddonData = dataPack.GlobalAddonData;
 
+            _itemsSpawned = 0;
+            _itemsToSpawn = dataPack.ItemTemplates.Count;
+
             for (int i = 0; i < dataPack.ItemTemplates.Count; i++)
             {
                 PlacedItemData data = dataPack.ItemTemplates[i];
-                bool isLastIteration = i == dataPack.ItemTemplates.Count - 1;
 
                 ItemHelper.SpawnItem(data.Item, new Vector3(0, -9999, 0), data.Rotation,
                 (LootItem lootItem) =>
@@ -85,7 +105,7 @@ namespace LeaveItThere.Components
 
                     LeaveItThereStaticEvents.InvokeOnPlacedItemSpawned(fakeItem);
                     fakeItem.InvokeOnSpawnedEvent();
-                    if (isLastIteration)
+                    if (_itemsSpawned >= _itemsToSpawn)
                     {
                         LeaveItThereStaticEvents.InvokeOnLastPlacedItemSpawned(fakeItem);
                     }
@@ -145,6 +165,9 @@ namespace LeaveItThere.Components
 
             foreach (var kvp in FakeItems)
             {
+                // sometimes things are null.. do this to avoid future null ref errors
+                if (kvp.Value == null || kvp.Value.LootItem == null) continue;
+
                 ids.Add(kvp.Value.LootItem.Item.Id);
                 ItemHelper.ForAllChildrenInItem(kvp.Value.LootItem.Item,
                     (Item item) =>
