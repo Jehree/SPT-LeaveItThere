@@ -3,6 +3,7 @@ using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
 using LeaveItThere.Components;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -151,6 +152,16 @@ namespace LeaveItThere.Helpers
             foreach (var grid in compoundParent.Grids)
             {
                 IEnumerable<Item> children = grid.Items;
+
+                foreach (Item child in children)
+                {
+                    callable(child);
+                    ForAllChildrenInItem(child, callable);
+                }
+            }
+            foreach (var slot in compoundParent.Slots)
+            {
+                IEnumerable<Item> children = slot.Items;
 
                 foreach (Item child in children)
                 {

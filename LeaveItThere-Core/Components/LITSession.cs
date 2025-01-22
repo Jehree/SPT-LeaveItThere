@@ -14,6 +14,7 @@ namespace LeaveItThere.Components
     public class LITSession : MonoBehaviour
     {
         public bool InteractionsAllowed { get; private set; } = true;
+        public bool LootExperienceEnabled { get; private set; } = true;
 
         public GameWorld GameWorld { get; private set; }
         public Player Player { get; private set; }
@@ -88,6 +89,11 @@ namespace LeaveItThere.Components
             _itemsSpawned = 0;
             _itemsToSpawn = dataPack.ItemTemplates.Count;
 
+            if (_itemsToSpawn > 0)
+            {
+                LootExperienceEnabled = false;
+            }
+
             for (int i = 0; i < dataPack.ItemTemplates.Count; i++)
             {
                 PlacedItemData data = dataPack.ItemTemplates[i];
@@ -105,8 +111,11 @@ namespace LeaveItThere.Components
 
                     LeaveItThereStaticEvents.InvokeOnPlacedItemSpawned(fakeItem);
                     fakeItem.InvokeOnSpawnedEvent();
+
+                    _itemsSpawned++;
                     if (_itemsSpawned >= _itemsToSpawn)
                     {
+                        Instance.LootExperienceEnabled = true;
                         LeaveItThereStaticEvents.InvokeOnLastPlacedItemSpawned(fakeItem);
                     }
                 });
