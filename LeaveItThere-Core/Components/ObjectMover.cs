@@ -28,7 +28,7 @@ namespace LeaveItThere.Components
         {
             get
             {
-                if ( _instance == null)
+                if (_instance == null)
                 {
                     CreateNewObjectMover();
                 }

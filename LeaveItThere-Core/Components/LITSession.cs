@@ -76,12 +76,12 @@ namespace LeaveItThere.Components
 
         public static void CreateNewModSession()
         {
-            _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<LITSession>(); 
+            _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<LITSession>();
         }
 
         private static int _itemsSpawned;
         private static int _itemsToSpawn;
-        public void SpawnAllPlacedItems() 
+        public void SpawnAllPlacedItems()
         {
             PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(Plugin.DataToClientURL, PlacedItemDataPack.Request);
             GlobalAddonData = dataPack.GlobalAddonData;
@@ -188,7 +188,7 @@ namespace LeaveItThere.Components
             return ids;
         }
 
-        internal void DestroyAllRemoteObjects()
+        internal void DestroyAllFakeItems()
         {
             foreach (var kvp in FakeItems)
             {

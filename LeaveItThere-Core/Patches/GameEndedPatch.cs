@@ -34,7 +34,7 @@ namespace LeaveItThere.Patches
 
         // LocalRaidSettings settings, GClass1924 results, GClass1301[] lostInsuredItems, Dictionary<string, GClass1301[]> transferItems
         [PatchPrefix]
-        static void Prefix(LocalRaidSettings settings, object results, ref object lostInsuredItems, object transferItems) 
+        static void Prefix(LocalRaidSettings settings, object results, ref object lostInsuredItems, object transferItems)
         {
             LeaveItThereStaticEvents.InvokeOnRaidEnd(settings, results, lostInsuredItems, transferItems, _exitNameInfo.GetValue(results) as string);
 
@@ -43,10 +43,10 @@ namespace LeaveItThere.Patches
 
             if (FikaInterface.IAmHost())
             {
-                session.SendPlacedItemDataToServer(); 
+                session.SendPlacedItemDataToServer();
             }
 
-            session.DestroyAllRemoteObjects();
+            session.DestroyAllFakeItems();
         }
     }
 }

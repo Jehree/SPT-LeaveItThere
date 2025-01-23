@@ -15,7 +15,7 @@ namespace LeaveItThere.Components
     public class AddonFlags
     {
         public bool MoveModeDisabled = false;
-        public bool ImmersivePhysicsForceDisabled = false;
+        public bool IsPhysicalRegardlessOfSize = false;
     }
 
     public class FakeItem : InteractableObject
@@ -117,6 +117,13 @@ namespace LeaveItThere.Components
 
         public void SetPlayerAndBotCollisionEnabled(bool enabled)
         {
+            // if we are disabling the collision, always do it regardless of settings
+            if (enabled)
+            {
+                bool itemIsTooSmall = LootItem.Item.Width * LootItem.Item.Height < Settings.MinimumSizeItemToGetCollision.Value;
+                if (!AddonFlags.IsPhysicalRegardlessOfSize && itemIsTooSmall) return;
+            }
+
             gameObject.GetComponent<NavMeshObstacle>().enabled = enabled;
             List<GameObject> descendants = Utils.GetAllDescendants(gameObject);
             foreach (GameObject descendant in descendants)
@@ -126,7 +133,6 @@ namespace LeaveItThere.Components
                     descendant.GetComponent<MeshCollider>() == null
                 ) continue;
 
-                if (LootItem.Item.Width * LootItem.Item.Height < Settings.MinimumSizeItemToGetCollision.Value) continue;
                 if (enabled)
                 {
                     descendant.layer = LayerMask.NameToLayer("Default");

@@ -3,7 +3,6 @@ using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
 using LeaveItThere.Components;
-using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
