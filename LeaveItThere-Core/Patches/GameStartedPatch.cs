@@ -1,4 +1,6 @@
 ﻿using EFT;
+using EFT.UI.Matchmaker;
+using HarmonyLib;
 using LeaveItThere.Components;
 using SPT.Reflection.Patching;
 using System.Reflection;
@@ -12,9 +14,10 @@ namespace LeaveItThere.Patches
             return typeof(GameWorld).GetMethod(nameof(GameWorld.OnGameStarted));
         }
 
-        [PatchPrefix]
+        [PatchPostfix]
         static void PatchPrefix()
         {
+            Plugin.LogSource.LogError("happened"); 
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }

@@ -6,6 +6,7 @@ using LeaveItThere.Common;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -14,14 +15,29 @@ namespace LeaveItThere.Components
 {
     public class AddonFlags
     {
+        /// <summary>
+        /// When true, the Move interaction is disabled.
+        /// </summary>
         public bool MoveModeDisabled = false;
+        /// <summary>
+        /// When true, the Reclaim interaction is disabled.
+        /// </summary>
+        public bool ReclaimInteractionDisabled = false;
+        /// <summary>
+        /// Set to true to make this FakeItem ignore size restrictions and always be have player collision / block bot pathing.
+        /// </summary>
         public bool IsPhysicalRegardlessOfSize = false;
+        /// <summary>
+        /// When true, the root BoxCollider component that is added to LootItems will be removed. Useful for when a custom item has a child object defining a custom collider to be used for interactions.
+        /// </summary>
+        public bool RemoveRootCollider = false;
     }
 
     public class FakeItem : InteractableObject
     {
-        public delegate void InitializedHandler();
-        public event InitializedHandler OnInitialized;
+        // I don't think this is needed, because the FakeItem will be destroyed every time it is reclaimed anyway
+        //public delegate void InitializedHandler();
+        //public event InitializedHandler OnInitialized;
 
         public delegate void SpawnedHandler();
         public event SpawnedHandler OnSpawned;
@@ -31,6 +47,8 @@ namespace LeaveItThere.Components
 
         public AddonFlags AddonFlags = new();
         public Dictionary<string, object> AddonData = [];
+
+        private NavMeshObstacle _obstacle;
 
         private ObservedLootItem _lootItem;
         public ObservedLootItem LootItem
@@ -68,12 +86,18 @@ namespace LeaveItThere.Components
                 Actions.Add(GetSearchContainerAction());
             }
             Actions.Add(GetEnterMoveModeAction());
-            SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
 
             LeaveItThereStaticEvents.InvokeOnFakeItemInitialized(this);
-            OnInitialized?.Invoke();
-            // add this after event invocations to make sure the Reclaim action is always last
+
+            // do this after event invokation to make sure IsPhysicalRegardlessOfSize flag is set correctly
+            SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
+
             Actions.Add(GetReclaimAction());
+            
+            if (AddonFlags.RemoveRootCollider)
+            {
+                GetComponents<BoxCollider>().ExecuteForEach(Destroy);
+            }
         }
 
         internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem, Dictionary<string, object> addonData = null)
@@ -87,7 +111,7 @@ namespace LeaveItThere.Components
             ObservedLootItem componentWhoLivedComeToDie = obj.GetComponent<ObservedLootItem>();
             if (componentWhoLivedComeToDie != null)
             {
-                GameObject.Destroy(componentWhoLivedComeToDie); //hehe
+                Destroy(componentWhoLivedComeToDie); //hehe
             }
 
             FakeItem fakeItem = obj.AddComponent<FakeItem>();
@@ -101,18 +125,14 @@ namespace LeaveItThere.Components
 
         private void AddNavMeshObstacle()
         {
-            NavMeshObstacle obstacle = gameObject.AddComponent<NavMeshObstacle>();
-            if (obstacle == null)
-            {
-                throw new System.Exception("Tried to add a NavMeshObstacle to a FakeItem that already had one!");
-            }
+            _obstacle = gameObject.GetOrAddComponent<NavMeshObstacle>();
 
             BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-            obstacle.shape = NavMeshObstacleShape.Box;
-            obstacle.center = collider.center;
-            obstacle.size = collider.size;
-            obstacle.carving = true;
-            obstacle.carveOnlyStationary = false;
+            _obstacle.shape = NavMeshObstacleShape.Box;
+            _obstacle.center = collider.center;
+            _obstacle.size = collider.size;
+            _obstacle.carving = true;
+            _obstacle.carveOnlyStationary = false;
         }
 
         public void SetPlayerAndBotCollisionEnabled(bool enabled)
@@ -124,24 +144,33 @@ namespace LeaveItThere.Components
                 if (!AddonFlags.IsPhysicalRegardlessOfSize && itemIsTooSmall) return;
             }
 
-            gameObject.GetComponent<NavMeshObstacle>().enabled = enabled;
+            _obstacle.enabled = enabled;
+
             List<GameObject> descendants = Utils.GetAllDescendants(gameObject);
             foreach (GameObject descendant in descendants)
             {
-                if (
-                    descendant.GetComponent<BoxCollider>() == null &&
-                    descendant.GetComponent<MeshCollider>() == null
-                ) continue;
+                if (descendant.GetComponent<Collider>() == null) continue;
+                if (descendant.name.Contains("LITKeepLayer")) continue;
 
                 if (enabled)
                 {
-                    descendant.layer = LayerMask.NameToLayer("Default");
+                    descendant.layer = GetCollisionEnabledLayerNumber(descendant.name);
                 }
                 else
                 {
                     descendant.layer = LayerMask.NameToLayer("Loot");
                 }
             }
+        }
+
+        public static int GetCollisionEnabledLayerNumber(string objectName)
+        {
+            if (!objectName.Contains("LITSetLayer")) return LayerMask.NameToLayer("Default");
+
+            int startIndex = objectName.IndexOf("LITSetLayer") + "LITSetLayer".Length;
+            int layerNumber = int.Parse(objectName.Substring(startIndex, 2));
+
+            return layerNumber;
         }
 
         public CustomInteraction GetSearchContainerAction()
@@ -162,8 +191,24 @@ namespace LeaveItThere.Components
             string itemId = ItemId;
 
             return new CustomInteraction(
-                "Reclaim",
-                false,
+                () =>
+                {
+                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
+
+                    if (fakeItem.AddonFlags.ReclaimInteractionDisabled)
+                    {
+                        return "Reclaim: Disabled";
+                    }
+                    else
+                    {
+                        return "Reclaim";
+                    }
+                },
+                () =>
+                {
+                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
+                    return fakeItem.AddonFlags.ReclaimInteractionDisabled;
+                },
                 () =>
                 {
                     FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
@@ -266,7 +311,8 @@ namespace LeaveItThere.Components
                     fakeItem._savedPosition = fakeItem.gameObject.transform.position;
                     fakeItem._savedRotation = fakeItem.gameObject.transform.rotation;
                     fakeItem.SetPlayerAndBotCollisionEnabled(false);
-                }
+                },
+                LootItem.Name.Localized()
             );
         }
 

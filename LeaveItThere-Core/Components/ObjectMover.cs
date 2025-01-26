@@ -1,4 +1,6 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
+using EFT.UI;
 using LeaveItThere.Common;
 using LeaveItThere.Helpers;
 using System;
@@ -118,6 +120,7 @@ namespace LeaveItThere.Components
             var session = LITSession.Instance;
             if (session.GamePlayerOwner.AvailableInteractionState.Value == _moveMenu) return;
             session.GamePlayerOwner.AvailableInteractionState.Value = _moveMenu;
+            Singleton<CommonUI>.Instance.EftBattleUIScreen.ActionPanel.method_2(false);
         }
 
         private void RotationProcess()

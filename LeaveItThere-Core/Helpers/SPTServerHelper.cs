@@ -6,12 +6,13 @@ namespace LeaveItThere.Helpers
 {
     internal class SPTServerHelper
     {
-        public static T ServerRoute<T>(string url, object data = default(object))
+        public static T ServerRoute<T>(string url, T data = default)
         {
             string json = JsonConvert.SerializeObject(data);
             var req = RequestHandler.PostJson(url, json);
             return JsonConvert.DeserializeObject<T>(req);
         }
+
         public static string ServerRoute(string url, object data = default(object))
         {
             string json;
