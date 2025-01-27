@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\components\\fakeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\spt-leaveitthere\\leaveitthere-core\\common\\custominteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\common\\custominteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\leaveitthere-core\\components\\objectmover.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\components\\objectmover.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -18,11 +22,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "CustomInteraction.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Common\\CustomInteraction.cs",
+              "RelativeDocumentMoniker": "LeaveItThere-Core\\Common\\CustomInteraction.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Common\\CustomInteraction.cs",
+              "RelativeToolTip": "LeaveItThere-Core\\Common\\CustomInteraction.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAABPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T20:28:16.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "ObjectMover.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\ObjectMover.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Components\\ObjectMover.cs",
@@ -40,7 +57,7 @@
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Components\\FakeItem.cs",
               "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\FakeItem.cs",
               "RelativeToolTip": "LeaveItThere-Core\\Components\\FakeItem.cs",
-              "ViewState": "AQIAAG4AAAAAAAAAAAAtwIkAAAAUAAAA",
+              "ViewState": "AQIAAEUAAAAAAAAAAAAowEUAAAAyAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-01-25T23:07:32.464Z",
               "EditorCaption": ""

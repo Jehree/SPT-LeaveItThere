@@ -68,6 +68,7 @@ namespace LeaveItThere.Components
             }
         }
         public string ItemId { get; private set; }
+        public string InteractionTargetName;
 
         public List<CustomInteraction> Actions = new List<CustomInteraction>();
         public MoveableObject Moveable { get; private set; }
@@ -78,8 +79,10 @@ namespace LeaveItThere.Components
         {
             LootItem = lootItem;
             ItemId = lootItem.ItemId;
+            InteractionTargetName = LootItem.Name.Localized();
             AddNavMeshObstacle();
             Moveable = gameObject.AddComponent<MoveableObject>();
+
             LITSession.Instance.AddFakeItem(this); 
             if (LootItem.Item.IsContainer)
             {
@@ -96,8 +99,10 @@ namespace LeaveItThere.Components
             
             if (AddonFlags.RemoveRootCollider)
             {
-                GetComponents<BoxCollider>().ExecuteForEach(Destroy);
+                GetComponents<BoxCollider>().ExecuteForEach(col => col.enabled = false);
             }
+
+            Actions[0].TargetName = InteractionTargetName;
         }
 
         internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem, Dictionary<string, object> addonData = null)
@@ -311,8 +316,7 @@ namespace LeaveItThere.Components
                     fakeItem._savedPosition = fakeItem.gameObject.transform.position;
                     fakeItem._savedRotation = fakeItem.gameObject.transform.rotation;
                     fakeItem.SetPlayerAndBotCollisionEnabled(false);
-                },
-                LootItem.Name.Localized()
+                }                
             );
         }
 
