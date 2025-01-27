@@ -36,7 +36,7 @@ namespace LeaveItThere.Common
                 costAmount,
                 (FakeItem fakeItem) =>
                 {
-                    var session = LITSession.Instance;
+                    LITSession session = LITSession.Instance;
                     fakeItem.PlaceAtPosition(Utils.PlayerFront, session.Player.Transform.rotation);
                     FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
                 }
@@ -47,7 +47,7 @@ namespace LeaveItThere.Common
         public static void TPItemToPlayer([ConsoleArgument(0, "Item number via lit_list_placed_items command")] int itemNum, [ConsoleArgument("", "type 'IAMSURE' to confirm")] string iAmSure)
         {
             if (iAmSure != "IAMSURE") return;
-            var session = LITSession.Instance;
+            LITSession session = LITSession.Instance;
 
             if (itemNum > session.FakeItems.Count - 1)
             {

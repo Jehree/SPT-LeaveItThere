@@ -51,24 +51,21 @@ namespace LeaveItThere.Common
 
         public ActionsTypesClass GetActionsTypesClass()
         {
-            var typesClass = new ActionsTypesClass
+            ActionsTypesClass typesClass = new()
             {
                 Action = Action,
                 Name = GetName(),
                 Disabled = GetDisabled(),
             };
 
-            if (TargetName != null)
-            {
-                typesClass.TargetName = (string)TargetName;
-            }
+            typesClass.TargetName = TargetName;
 
             return typesClass;
         }
 
         public static List<ActionsTypesClass> GetActionsTypesClassList(List<CustomInteraction> CustomInteractionActionList)
         {
-            List<ActionsTypesClass> actionsTypesClassList = new List<ActionsTypesClass>();
+            List<ActionsTypesClass> actionsTypesClassList = [];
 
             foreach (CustomInteraction CustomInteractionAction in CustomInteractionActionList)
             {

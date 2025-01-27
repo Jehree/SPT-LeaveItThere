@@ -21,8 +21,8 @@ namespace LeaveItThere.Patches
         {
             if (interactive is not FakeItem) return true;
 
-            var component = interactive as FakeItem;
-            var newResult = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(component.Actions) };
+            FakeItem fakeItem = interactive as FakeItem;
+            ActionsReturnClass newResult = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(fakeItem.Actions) };
 
             __result = newResult;
             return false;
@@ -35,10 +35,10 @@ namespace LeaveItThere.Patches
             LootItem lootItem = interactive as LootItem;
             if (!LootItemIsTarget(lootItem)) return;
 
-            var placeAction = FakeItem.GetPlaceItemAction(lootItem);
-            if (__result.Error != null)
+            CustomInteraction placeAction = FakeItem.GetPlaceItemAction(lootItem);
+            if (ItemHelper.ItemCanBePickedUp(lootItem.Item) == false)
             {
-                __result.Actions.Insert(0, new CustomInteraction(string.Format("No Space ({0})".Localized(null), lootItem.Name.Localized()), true, null).GetActionsTypesClass());
+                __result.Actions.Insert(0, new CustomInteraction($"No Space ({lootItem.Name.Localized()})".Localized(), true, null).GetActionsTypesClass());
             }
             __result.Actions.Add(placeAction.GetActionsTypesClass());
         }

@@ -91,7 +91,7 @@ namespace LeaveItThere.Components
 
         private void Awake()
         {
-            var interactions = new List<ActionsTypesClass>();
+            List<ActionsTypesClass> interactions = [];
             interactions.Add(GetToggleTranslationModeAction().GetActionsTypesClass());
             interactions.Add(GetToggleRotationModeAction().GetActionsTypesClass());
             interactions.Add(GetTogglePhysicsAction().GetActionsTypesClass());
@@ -117,7 +117,7 @@ namespace LeaveItThere.Components
                 RotationProcess();
             }
 
-            var session = LITSession.Instance;
+            LITSession session = LITSession.Instance;
             if (session.GamePlayerOwner.AvailableInteractionState.Value == _moveMenu) return;
             session.GamePlayerOwner.AvailableInteractionState.Value = _moveMenu;
             Singleton<CommonUI>.Instance.EftBattleUIScreen.ActionPanel.method_2(false);
@@ -181,8 +181,7 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = Instance;
-                    mover.Disable(true);
+                    Instance.Disable(true);
                 }
             );
         }
@@ -194,8 +193,7 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = Instance;
-                    mover.Disable(false);
+                    Instance.Disable(false);
                 }
             );
         }
@@ -207,13 +205,11 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = Instance;
+                    Instance._translationModeEnabled = false;
+                    Instance.SetRotationModeEnabled(false);
+                    Instance.SetPhysicsModeEnabled(!Instance.Target.PhysicsIsEnabled);
 
-                    mover._translationModeEnabled = false;
-                    mover.SetRotationModeEnabled(false);
-                    mover.SetPhysicsModeEnabled(!mover.Target.PhysicsIsEnabled);
-
-                    InteractionHelper.NotificationLong($"Physics enabled: {mover.Target.PhysicsIsEnabled}");
+                    InteractionHelper.NotificationLong($"Physics enabled: {Instance.Target.PhysicsIsEnabled}");
                 }
             );
         }
@@ -225,13 +221,13 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = Instance;
+                    ObjectMover mover = Instance;
 
                     mover.SetPhysicsModeEnabled(false);
                     mover.SetRotationModeEnabled(false);
 
-                    var targetTransform = mover.Target.gameObject.transform;
-                    var cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
+                    Transform targetTransform = mover.Target.gameObject.transform;
+                    Transform cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
                     mover._translationModeEnabled = !mover._translationModeEnabled;
                     if (mover._translationModeEnabled)
                     {
@@ -257,13 +253,13 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = Instance;
+                    ObjectMover mover = Instance;
 
                     mover.SetPhysicsModeEnabled(false);
                     mover._translationModeEnabled = false;
 
-                    var targetTransform = mover.Target.gameObject.transform;
-                    var cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
+                    Transform targetTransform = mover.Target.gameObject.transform;
+                    Transform cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
                     mover.SetRotationModeEnabled(!mover._rotationModeEnabled);
                     if (mover._rotationModeEnabled)
                     {
@@ -288,7 +284,7 @@ namespace LeaveItThere.Components
                 false,
                 () =>
                 {
-                    var mover = Instance;
+                    ObjectMover mover = Instance;
                     Player player = LITSession.Instance.Player;
                     mover.Target.MoveToPlayer();
                     mover.SetPhysicsModeEnabled(false);

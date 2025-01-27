@@ -63,7 +63,7 @@ namespace LeaveItThere.Common
         {
             ProfileId = FikaInterface.GetRaidId();
             MapId = Singleton<GameWorld>.Instance.LocationId;
-            ItemTemplates = new List<PlacedItemData>();
+            ItemTemplates = [];
             GlobalAddonData = globalAddonData;
             if (itemTemplates != null)
             {

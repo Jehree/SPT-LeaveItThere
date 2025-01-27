@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using EFT;
+using HarmonyLib;
 using LeaveItThere.Components;
 using System.Reflection;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace LeaveItThere.Helpers
 
         public static void RefreshPrompt()
         {
-            var session = LITSession.Instance;
+            LITSession session = LITSession.Instance;
             session.GamePlayerOwner.ClearInteractionState();
 
             try
@@ -41,7 +42,7 @@ namespace LeaveItThere.Helpers
 
         public static void SetCameraRotationLocked(bool enabled)
         {
-            var player = LITSession.Instance.Player;
+            Player player = LITSession.Instance.Player;
 
             Vector2 fullYawRange = new Vector2(-360f, 360f);
             Vector2 standingPitchRange = new Vector2(-90f, 90f);

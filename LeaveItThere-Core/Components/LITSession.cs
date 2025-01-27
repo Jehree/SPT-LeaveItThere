@@ -192,21 +192,21 @@ namespace LeaveItThere.Components
         {
             foreach (var kvp in FakeItems)
             {
-                GameObject.Destroy(kvp.Value.gameObject);
+                Destroy(kvp.Value.gameObject);
             }
         }
 
         internal void SendPlacedItemDataToServer()
         {
-            var dataList = new List<PlacedItemData>();
-            List<string> placedItemInstanceIds = new();
+            List<PlacedItemData> dataList = [];
+            List<string> placedItemInstanceIds = [];
             foreach (var kvp in Instance.FakeItems)
             {
                 FakeItem fakeItem = kvp.Value;
                 dataList.Add(new PlacedItemData(fakeItem));
                 placedItemInstanceIds.Add(fakeItem.ItemId);
             }
-            var dataPack = new PlacedItemDataPack(GlobalAddonData, dataList);
+            PlacedItemDataPack dataPack = new(GlobalAddonData, dataList);
             SPTServerHelper.ServerRoute(Plugin.DataToServerURL, dataPack);
         }
 

@@ -86,7 +86,7 @@ namespace LeaveItThere.Helpers
 
         public static List<GameObject> GetAllDescendants(GameObject parent)
         {
-            List<GameObject> descendants = new List<GameObject>();
+            List<GameObject> descendants = [];
 
             foreach (Transform child in parent.transform)
             {

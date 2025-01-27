@@ -35,7 +35,7 @@ namespace LeaveItThere.Helpers
         public static void SpawnItem(string itemTpl, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {
             ItemFactoryClass itemFactory = Singleton<ItemFactoryClass>.Instance;
-            var gameWorld = Singleton<GameWorld>.Instance;
+            GameWorld gameWorld = Singleton<GameWorld>.Instance;
 
             Item item = itemFactory.CreateItem(MongoID.Generate(), itemTpl, null);
 
@@ -50,7 +50,7 @@ namespace LeaveItThere.Helpers
             }
 
             ItemFactoryClass itemFactory = Singleton<ItemFactoryClass>.Instance;
-            var gameWorld = Singleton<GameWorld>.Instance;
+            GameWorld gameWorld = Singleton<GameWorld>.Instance;
 
             List<ResourceKey> collection = GetBundleResourceKeys(item);
 
@@ -128,7 +128,7 @@ namespace LeaveItThere.Helpers
 
         public static void MakeSearchableItemFullySearched(SearchableItemItemClass searchableItem)
         {
-            var controller = Singleton<GameWorld>.Instance.MainPlayer.SearchController;
+            IPlayerSearchController controller = Singleton<GameWorld>.Instance.MainPlayer.SearchController;
             controller.SetItemAsSearched(searchableItem);
 
             ForAllChildrenInItem(
@@ -147,8 +147,8 @@ namespace LeaveItThere.Helpers
         public static void ForAllChildrenInItem(Item parent, Action<Item> callable)
         {
             if (parent is not CompoundItem) return;
-            var compoundParent = parent as CompoundItem;
-            foreach (var grid in compoundParent.Grids)
+            CompoundItem compoundParent = parent as CompoundItem;
+            foreach (StashGridClass grid in compoundParent.Grids)
             {
                 IEnumerable<Item> children = grid.Items;
 
@@ -158,7 +158,7 @@ namespace LeaveItThere.Helpers
                     ForAllChildrenInItem(child, callable);
                 }
             }
-            foreach (var slot in compoundParent.Slots)
+            foreach (Slot slot in compoundParent.Slots)
             {
                 IEnumerable<Item> children = slot.Items;
 
@@ -191,10 +191,10 @@ namespace LeaveItThere.Helpers
 
         public static void SetItemColor(Color color, GameObject gameObject)
         {
-            var renderers = gameObject.GetComponentsInChildren<MeshRenderer>();
-            foreach (var renderer in renderers)
+            MeshRenderer[] renderers = gameObject.GetComponentsInChildren<MeshRenderer>();
+            foreach (Renderer renderer in renderers)
             {
-                var material = renderer.material;
+                Material material = renderer.material;
                 if (!material.HasProperty("_Color")) continue;
                 renderer.material.color = color;
             }
@@ -207,15 +207,15 @@ namespace LeaveItThere.Helpers
             if (item is SearchableItemItemClass)
             {
                 // it happens to be the case that this does NOT include item cases. I'm not fixing it because I think it's cool heh heh
-                var searchableItem = item as SearchableItemItemClass;
-                foreach (var grid in searchableItem.Grids)
+                SearchableItemItemClass searchableItem = item as SearchableItemItemClass;
+                foreach (StashGridClass grid in searchableItem.Grids)
                 {
                     cost += grid.GridWidth * grid.GridHeight;
                 }
             }
             else
             {
-                var cellSizeStruct = item.CalculateCellSize();
+                XYCellSizeStruct cellSizeStruct = item.CalculateCellSize();
                 cost += cellSizeStruct.X * cellSizeStruct.Y;
             }
 
@@ -243,7 +243,7 @@ namespace LeaveItThere.Helpers
 
         public static bool ItemCanBePickedUp(Item item)
         {
-            var session = LITSession.Instance;
+            LITSession session = LITSession.Instance;
             InventoryController playerInventoryController = session.Player.InventoryController;
             InventoryEquipment playerEquipment = playerInventoryController.Inventory.Equipment;
             var pickedUpResult = InteractionsHandlerClass.QuickFindAppropriatePlace(item, playerInventoryController, playerEquipment.ToEnumerable<InventoryEquipment>(), InteractionsHandlerClass.EMoveItemOrder.PickUp, true);

@@ -25,7 +25,7 @@ namespace LeaveItThere.Patches
                 targetClass.GetMethods().Any(method => method.Name == "ReceiveInsurancePrices")
             );
 
-            var targetMethod = AccessTools.Method(_targetClassType.GetTypeInfo(), "LocalRaidEnded");
+            MethodInfo targetMethod = AccessTools.Method(_targetClassType.GetTypeInfo(), "LocalRaidEnded");
 
             _exitNameInfo = targetMethod.GetParameters()[1].ParameterType.GetField("exitName");
 
@@ -38,7 +38,7 @@ namespace LeaveItThere.Patches
         {
             LeaveItThereStaticEvents.InvokeOnRaidEnd(settings, results, lostInsuredItems, transferItems, _exitNameInfo.GetValue(results) as string);
 
-            var session = LITSession.Instance;
+            LITSession session = LITSession.Instance;
             lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems as object[], session.GetPlacedItemInstanceIds());
 
             if (FikaInterface.IAmHost())

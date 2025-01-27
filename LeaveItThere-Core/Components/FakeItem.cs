@@ -70,7 +70,7 @@ namespace LeaveItThere.Components
         public string ItemId { get; private set; }
         public string InteractionTargetName;
 
-        public List<CustomInteraction> Actions = new List<CustomInteraction>();
+        public List<CustomInteraction> Actions = [];
         public MoveableObject Moveable { get; private set; }
         private Vector3 _savedPosition;
         private Quaternion _savedRotation;
@@ -239,7 +239,7 @@ namespace LeaveItThere.Components
 
         public void ReclaimPlayerFeedback()
         {
-            var session = LITSession.Instance;
+            LITSession session = LITSession.Instance;
             if (Settings.CostSystemEnabled.Value)
             {
                 InteractionHelper.NotificationLong($"Points rufunded: {ItemHelper.GetItemCost(LootItem.Item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
@@ -256,7 +256,7 @@ namespace LeaveItThere.Components
             !LITSession.Instance.PlacementIsAllowed(lootItem.Item),
             () =>
             {
-                var lootItem = ItemHelper.GetLootItem(itemId) as ObservedLootItem;
+                ObservedLootItem lootItem = ItemHelper.GetLootItem(itemId) as ObservedLootItem;
                 FakeItem fakeItem = CreateNewFakeItem(lootItem);
                 fakeItem.PlaceAtLootItem();
                 fakeItem.PlacedPlayerFeedback();
@@ -282,7 +282,7 @@ namespace LeaveItThere.Components
 
         public void PlacedPlayerFeedback()
         {
-            var session = LITSession.Instance;
+            LITSession session = LITSession.Instance;
             if (Settings.CostSystemEnabled.Value)
             {
                 InteractionHelper.NotificationLong($"Placement cost: {ItemHelper.GetItemCost(LootItem.Item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
@@ -311,7 +311,7 @@ namespace LeaveItThere.Components
                 () =>
                 {
                     FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
-                    var mover = ObjectMover.Instance;
+                    ObjectMover mover = ObjectMover.Instance;
                     mover.Enable(fakeItem.gameObject.GetComponent<MoveableObject>(), fakeItem.OnMoveModeDisabled, fakeItem.OnMoveModeEnabledUpdate);
                     fakeItem._savedPosition = fakeItem.gameObject.transform.position;
                     fakeItem._savedRotation = fakeItem.gameObject.transform.rotation;
@@ -322,7 +322,7 @@ namespace LeaveItThere.Components
 
         private void OnMoveModeEnabledUpdate()
         {
-            var mover = ObjectMover.Instance;
+            ObjectMover mover = ObjectMover.Instance;
 
             if (MoveModeDisallowed())
             {

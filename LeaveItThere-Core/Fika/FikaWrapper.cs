@@ -81,7 +81,7 @@ namespace LeaveItThere.Fika
                 fakeItem.gameObject.GetComponent<MoveableObject>().EnablePhysics();
             }
 
-            var mover = ObjectMover.Instance;
+            ObjectMover mover = ObjectMover.Instance;
             if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
             {
                 mover.Disable(false);
@@ -93,7 +93,7 @@ namespace LeaveItThere.Fika
             FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(packet.ItemId);
             if (fakeItem == null) return;
 
-            var mover = ObjectMover.Instance;
+            ObjectMover mover = ObjectMover.Instance;
             if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
             {
                 mover.Disable(false);
