@@ -98,6 +98,7 @@ namespace LeaveItThere.Components
             {
                 PlacedItemData data = dataPack.ItemTemplates[i];
 
+                Plugin.LogSource.LogError("spawning initiated");
                 ItemHelper.SpawnItem(data.Item, new Vector3(0, -9999, 0), data.Rotation,
                 (LootItem lootItem) =>
                 {
@@ -118,6 +119,7 @@ namespace LeaveItThere.Components
                         Instance.LootExperienceEnabled = true;
                         LeaveItThereStaticEvents.InvokeOnLastPlacedItemSpawned(fakeItem);
                     }
+                    Plugin.LogSource.LogError("spawning complete");
                 });
             }
         }

@@ -107,7 +107,7 @@ namespace LeaveItThere.Components
 
         internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem, Dictionary<string, object> addonData = null)
         {
-            GameObject obj = GameObject.Instantiate(lootItem.gameObject);
+            GameObject obj = Instantiate(lootItem.gameObject);
             ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, obj.gameObject);
             obj.transform.position = lootItem.gameObject.transform.position;
             obj.transform.rotation = lootItem.gameObject.transform.rotation;

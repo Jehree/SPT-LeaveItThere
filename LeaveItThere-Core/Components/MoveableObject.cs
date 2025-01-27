@@ -32,8 +32,8 @@ namespace LeaveItThere.Components
         private void Awake()
         {
             _rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
-            EFTPhysicsClass.GClass712.SupportRigidbody(Rigidbody);
             DisablePhysics();
+            EFTPhysicsClass.GClass712.SupportRigidbody(Rigidbody);
         }
 
         private void FixedUpdate()
@@ -80,6 +80,7 @@ namespace LeaveItThere.Components
         {
             _frameCounter = 0;
             Rigidbody.isKinematic = false;
+            Rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
         }
 
         /// <summary>
@@ -87,6 +88,7 @@ namespace LeaveItThere.Components
         /// </summary>
         public void DisablePhysics()
         {
+            Rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             Rigidbody.isKinematic = true;
         }
 

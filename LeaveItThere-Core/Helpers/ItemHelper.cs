@@ -61,7 +61,8 @@ namespace LeaveItThere.Helpers
                 yield return new WaitForEndOfFrame();
             }
 
-            LootItem lootItem = gameWorld.SetupItem(item, gameWorld.MainPlayer, position, rotation);
+            LootItem lootItem = SetupItem(item, new Vector3(-99999, -99999, -99999), Quaternion.identity);
+
             if (callback != null)
             {
                 callback(lootItem);
@@ -248,6 +249,28 @@ namespace LeaveItThere.Helpers
             InventoryEquipment playerEquipment = playerInventoryController.Inventory.Equipment;
             var pickedUpResult = InteractionsHandlerClass.QuickFindAppropriatePlace(item, playerInventoryController, playerEquipment.ToEnumerable<InventoryEquipment>(), InteractionsHandlerClass.EMoveItemOrder.PickUp, true);
             return pickedUpResult.Succeeded;
+        }
+
+        /// <summary>
+        /// Reimplementation of GameWorld.SetupItem that makes sure collisionDetectionMode is set correctly before rb is made to be kinematic to avoid unity warning spam.
+        /// </summary>
+        public static LootItem SetupItem(Item item, Vector3 position, Quaternion rotation)
+        {
+            new TraderControllerClass(item, item.Id, item.ShortName, true, EOwnerType.Profile);
+
+            GameObject gameObject = Singleton<PoolManager>.Instance.CreateLootPrefab(item, Player.GetVisibleToCamera(LITSession.Instance.Player), null);
+            gameObject.SetActive(true);
+
+            LootItem newLootItem = LITSession.Instance.GameWorld.CreateLootWithRigidbody(gameObject, item, item.ShortName, false, null, out BoxCollider boxCollider, true, true, 0f);
+
+            Rigidbody rb = newLootItem.GetComponent<Rigidbody>();
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            rb.isKinematic = true;
+
+            newLootItem.transform.SetPositionAndRotation(position, rotation);
+            //newLootItem.LastOwner = LITSession.Instance.Player;
+
+            return newLootItem;
         }
     }
 }
