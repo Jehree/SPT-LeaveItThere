@@ -80,7 +80,7 @@ namespace LeaveItThere.Components
             ItemId = lootItem.ItemId;
             AddNavMeshObstacle();
             Moveable = gameObject.AddComponent<MoveableObject>();
-            LITSession.Instance.AddFakeItem(this);
+            LITSession.Instance.AddFakeItem(this); 
             if (LootItem.Item.IsContainer)
             {
                 Actions.Add(GetSearchContainerAction());
