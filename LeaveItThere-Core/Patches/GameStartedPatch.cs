@@ -11,7 +11,7 @@ namespace LeaveItThere.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(GameWorld).GetMethod(nameof(GameWorld.OnGameStarted));
+            return AccessTools.Method(typeof(BotsController), nameof(BotsController.SetSettings));
         }
 
         [PatchPostfix]

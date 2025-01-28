@@ -1,4 +1,5 @@
 ﻿using LeaveItThere.Components;
+using SPT.Reflection.Utils;
 
 namespace LeaveItThere.Fika
 {
@@ -18,7 +19,7 @@ namespace LeaveItThere.Fika
 
         public static string GetRaidId()
         {
-            if (!Plugin.FikaInstalled) return LITSession.Instance.Player.ProfileId;
+            if (!Plugin.FikaInstalled) return ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId;
             return FikaWrapper.GetRaidId();
         }
 

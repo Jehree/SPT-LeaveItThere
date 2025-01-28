@@ -256,12 +256,12 @@ namespace LeaveItThere.Helpers
         /// </summary>
         public static LootItem SetupItem(Item item, Vector3 position, Quaternion rotation)
         {
-            new TraderControllerClass(item, item.Id, item.ShortName, true, EOwnerType.Profile);
+            new TraderControllerClass(item, item.Id, item.ShortName);
 
-            GameObject gameObject = Singleton<PoolManager>.Instance.CreateLootPrefab(item, Player.GetVisibleToCamera(LITSession.Instance.Player), null);
+            GameObject gameObject = Singleton<PoolManager>.Instance.CreateLootPrefab(item, Player.GetVisibleToCamera(LITSession.Instance.Player));
             gameObject.SetActive(true);
 
-            LootItem newLootItem = LITSession.Instance.GameWorld.CreateLootWithRigidbody(gameObject, item, item.ShortName, false, null, out BoxCollider boxCollider, true, true, 0f);
+            LootItem newLootItem = LITSession.Instance.GameWorld.CreateLootWithRigidbody(gameObject, item, item.ShortName, false, null, out BoxCollider boxCollider, true);
 
             Rigidbody rb = newLootItem.GetComponent<Rigidbody>();
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;

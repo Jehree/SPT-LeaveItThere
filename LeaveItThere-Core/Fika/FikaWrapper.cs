@@ -8,6 +8,7 @@ using LeaveItThere.Components;
 using LeaveItThere.Helpers;
 using LeaveItThere.Packets;
 using LiteNetLib;
+using SPT.Reflection.Utils;
 
 namespace LeaveItThere.Fika
 {
@@ -40,6 +41,9 @@ namespace LeaveItThere.Fika
 
         public static string GetRaidId()
         {
+            Plugin.LogSource.LogError($"GroupId: {FikaBackendUtils.GroupId}");
+            Plugin.LogSource.LogError($"Main Player Id: {LITSession.Instance.Player.ProfileId}");
+            Plugin.LogSource.LogError($"Session Id: {ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId}");
             return FikaBackendUtils.GroupId;
         }
 
