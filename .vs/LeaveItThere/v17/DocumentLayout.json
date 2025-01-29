@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\spt-leaveitthere\\leaveitthere-core\\common\\interaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\common\\interaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|c:\\sp tarkov\\spt3.10.x\\dev\\spt-leaveitthere\\leaveitthere-core\\patches\\gamestartedpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\patches\\gamestartedpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -34,11 +38,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
+              "Title": "Interaction.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Common\\Interaction.cs",
+              "RelativeDocumentMoniker": "LeaveItThere-Core\\Common\\Interaction.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Common\\Interaction.cs",
+              "RelativeToolTip": "LeaveItThere-Core\\Common\\Interaction.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAH0AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-29T19:26:01.356Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "GameEndedPatch.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Patches\\GameEndedPatch.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Patches\\GameEndedPatch.cs",
@@ -50,7 +67,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "GameStartedPatch.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Patches\\GameStartedPatch.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Patches\\GameStartedPatch.cs",
@@ -63,7 +80,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "LITSession.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\LITSession.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Components\\LITSession.cs",
@@ -71,12 +88,11 @@
               "RelativeToolTip": "LeaveItThere-Core\\Components\\LITSession.cs",
               "ViewState": "AQIAADcAAAAAAAAAAAArwEwAAAAbAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-27T23:26:26.355Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-27T23:26:26.355Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "PlacedItemData.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Common\\PlacedItemData.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Common\\PlacedItemData.cs",
@@ -88,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "FikaInterface.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Fika\\FikaInterface.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Fika\\FikaInterface.cs",
@@ -100,7 +116,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "FikaWrapper.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.10.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Fika\\FikaWrapper.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Fika\\FikaWrapper.cs",

@@ -123,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ConsoleCommands.cs" />
+    <Compile Include="Common\Interaction.cs" />
     <Compile Include="Common\ItemFilter.cs" />
     <Compile Include="Common\CustomInteraction.cs" />
     <Compile Include="Common\PlacedItemData.cs" />
