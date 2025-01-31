@@ -7,6 +7,7 @@ using LeaveItThere.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -43,10 +44,20 @@ namespace LeaveItThere.Helpers
             }
         }
 
+        public static bool ContainerHasSpaceForItem(CompoundItem container, Item item)
+        {
+            foreach (StashGridClass grid in container.Grids)
+            {
+                if (grid.FindFreeSpace(item) != null) return true;
+            }
+
+            return false;
+        }
+
         public static void SpawnItemInContainer(CompoundItem container, Item item, Action<LootItem> callback = null)
         {
             List<object> args = [item, container];
-            ItemHelper.SpawnItem(
+            SpawnItem(
                 item,
                 default, default,
                 callback,

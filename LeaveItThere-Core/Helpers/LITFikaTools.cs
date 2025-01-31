@@ -39,14 +39,18 @@ namespace LeaveItThere.Helpers
         }
 
         /// <summary>
-        /// Spawns an item inside a container and syncs it with all clients. If you explicitly DON'T want syncing, use ItemHelper.SpawnItemInContainer instead
+        /// Spawns an item inside a container and syncs it with all clients. Returns whether the sender's container had space for the item. If you explicitly DON'T want syncing, use ItemHelper.SpawnItemInContainer instead.
         /// </summary>
         /// <param name="item">Item to spawn, create one via ItemFactory</param>
         /// <param name="senderCallback">Gets called once item is finished spawning. ONLY CALLED BY THE SENDER.</param>
-        public static void SpawnItemInContainer(CompoundItem container, Item item, Action<LootItem> senderCallback)
+        public static bool TrySpawnItemInContainer(CompoundItem container, Item item, Action<LootItem> senderCallback)
         {
+            if (!ItemHelper.ContainerHasSpaceForItem(container, item)) return false;
+
             if (!Plugin.FikaInstalled) ItemHelper.SpawnItemInContainer(container, item, senderCallback);
             FikaWrapper.SendSpawnItemInContainerPacket(container, item, senderCallback);
+
+            return true;
         }
 
         /// <summary>
