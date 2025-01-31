@@ -27,19 +27,39 @@ namespace LeaveItThere.Helpers
             return null;
         }
 
-        public static void SpawnItem(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
+        public static void SpawnItem(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null, object genericCallbackArg = null, Action<object> genericCallback = null)
         {
-            StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback));
+            StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback, genericCallbackArg, genericCallback));
         }
 
-        public static void SpawnItem(string itemTpl, string itemId, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
+        public static void MoveItemToContainer(CompoundItem container, Item item)
         {
-            ItemFactoryClass itemFactory = Singleton<ItemFactoryClass>.Instance;
-            GameWorld gameWorld = Singleton<GameWorld>.Instance;
+            foreach (StashGridClass grid in container.Grids)
+            {
+                LocationInGrid freeSpace = grid.FindFreeSpace(item);
+                if (freeSpace == null) continue;
 
-            Item item = itemFactory.CreateItem(itemId, itemTpl, null);
+                grid.Add(item, freeSpace, false);
+            }
+        }
 
-            StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback));
+        public static void SpawnItemInContainer(CompoundItem container, Item item, Action<LootItem> callback = null)
+        {
+            List<object> args = [item, container];
+            ItemHelper.SpawnItem(
+                item,
+                default, default,
+                callback,
+                args,
+                (object arg) =>
+                {
+                    List<object> args = arg as List<object>;
+                    Item item = args[0] as Item;
+                    CompoundItem container = args[1] as CompoundItem;
+
+                    MoveItemToContainer(container, item);
+                }
+            );
         }
 
         public static bool RemoveItemFromContainer(CompoundItem container, Item itemToRemove)
@@ -52,7 +72,7 @@ namespace LeaveItThere.Helpers
             return false;
         }
 
-        public static IEnumerator SpawnItemRoutine(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
+        public static IEnumerator SpawnItemRoutine(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null, object genericCallbackArg = null, Action<object> genericCallback = null)
         {
             if (!Singleton<GameWorld>.Instantiated)
             {
@@ -72,6 +92,11 @@ namespace LeaveItThere.Helpers
             }
 
             LootItem lootItem = SetupItem(item, new Vector3(-99999, -99999, -99999), Quaternion.identity);
+
+            if (genericCallback != null)
+            {
+                genericCallback(genericCallbackArg);
+            }
 
             if (callback != null)
             {

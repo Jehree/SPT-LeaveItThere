@@ -69,4 +69,21 @@ namespace LeaveItThere.Packets
             writer.PutItem(ItemToRemove);
         }
     }
+
+    public struct LITSpawnItemInContainerPacket : INetSerializable
+    {
+        public Item Container;
+        public Item Item;
+        public void Deserialize(NetDataReader reader)
+        {
+            Container = reader.GetItem();
+            Item = reader.GetItem();
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.PutItem(Container);
+            writer.PutItem(Item);
+        }
+    }
 }

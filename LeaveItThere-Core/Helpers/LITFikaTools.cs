@@ -28,20 +28,31 @@ namespace LeaveItThere.Helpers
         }
 
         /// <summary>
-        /// Spawns an item and syncs it with all clients. If you explicitly DON'T need syncing, use ItemHelper.SpawnItem instead.
+        /// Spawns an item and syncs it with all clients. If you explicitly DON'T want syncing, use ItemHelper.SpawnItem instead.
         /// </summary>
         /// <param name="item">Item to spawn, create one via ItemFactory.</param>
-        /// <param name="callback">Gets called once item is finished spawning.</param>
-        public static void SpawnItem(Item item, Vector3 position = default, Quaternion rotation = default, Action<LootItem> callback = null)
+        /// <param name="senderCallback">Gets called once item is finished spawning. ONLY CALLED BY THE SENDER.</param>
+        public static void SpawnItem(Item item, Vector3 position = default, Quaternion rotation = default, Action<LootItem> senderCallback = null)
         {
-            if (!Plugin.FikaInstalled) ItemHelper.SpawnItem(item, position, rotation, callback);
-            FikaWrapper.SendSpawnItemPacket(item, position, rotation, callback);
+            if (!Plugin.FikaInstalled) ItemHelper.SpawnItem(item, position, rotation, senderCallback);
+            FikaWrapper.SendSpawnItemPacket(item, position, rotation, senderCallback);
         }
 
         /// <summary>
-        /// Removes an Item from CompoundItem' grids. Returns 'Succeeded' property. If you explicitly DON'T need syncing, use ItemHelper.RemoveItemFromGrid instead
+        /// Spawns an item inside a container and syncs it with all clients. If you explicitly DON'T want syncing, use ItemHelper.SpawnItemInContainer instead
         /// </summary>
-        public static bool RemoveItemFromGrid(CompoundItem container, Item itemToRemove)
+        /// <param name="item">Item to spawn, create one via ItemFactory</param>
+        /// <param name="senderCallback">Gets called once item is finished spawning. ONLY CALLED BY THE SENDER.</param>
+        public static void SpawnItemInContainer(CompoundItem container, Item item, Action<LootItem> senderCallback)
+        {
+            if (!Plugin.FikaInstalled) ItemHelper.SpawnItemInContainer(container, item, senderCallback);
+            FikaWrapper.SendSpawnItemInContainerPacket(container, item, senderCallback);
+        }
+
+        /// <summary>
+        /// Removes an Item from CompoundItem' grids. Returns 'Succeeded' property. If you explicitly DON'T want syncing, use ItemHelper.RemoveItemFromContainer instead
+        /// </summary>
+        public static bool RemoveItemFromContainer(CompoundItem container, Item itemToRemove)
         {
             if (!Plugin.FikaInstalled) return ItemHelper.RemoveItemFromContainer(container, itemToRemove);
             return FikaWrapper.SendRemoveItemFromContainerPacket(container, itemToRemove);
