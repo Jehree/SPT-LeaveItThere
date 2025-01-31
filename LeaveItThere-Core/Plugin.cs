@@ -13,7 +13,7 @@ using System.Reflection;
 namespace LeaveItThere
 {
     [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.5.0")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.5.0.6")]
     public class Plugin : BaseUnityPlugin
     {
         public const string DataToServerURL = "/jehree/pip/data_to_server";
