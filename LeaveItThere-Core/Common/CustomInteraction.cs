@@ -32,7 +32,7 @@ namespace LeaveItThere.Common
         public virtual string TargetName { get => null; }
 
         /// <summary>
-        /// If returns true, interaction prompt will be greyed out and not selectable.
+        /// If returns false, interaction prompt will be greyed out and not selectable.
         /// </summary>
         public virtual bool Enabled { get => true; }
 

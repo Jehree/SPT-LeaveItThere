@@ -101,6 +101,7 @@ namespace LeaveItThere.Components
             for (int i = 0; i < dataPack.ItemTemplates.Count; i++)
             {
                 PlacedItemData data = dataPack.ItemTemplates[i];
+                if (data.Item == null) continue; // issue spawning item, error handling done by BytesToItem
 
                 ItemHelper.SpawnItem(data.Item, new Vector3(0, -9999, 0), data.Rotation,
                 (LootItem lootItem) =>
