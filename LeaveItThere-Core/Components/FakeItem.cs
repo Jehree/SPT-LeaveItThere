@@ -6,7 +6,6 @@ using LeaveItThere.Common;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -88,20 +87,20 @@ namespace LeaveItThere.Components
             AddNavMeshObstacle();
             Moveable = gameObject.AddComponent<MoveableObject>();
 
-            LITSession.Instance.AddFakeItem(this); 
+            LITSession.Instance.AddFakeItem(this);
             if (LootItem.Item.IsContainer)
             {
                 Actions.Add(new SearchInteraction(this));
             }
             Actions.Add(new EnterMoveModeInteraction(this));
 
-            LeaveItThereStaticEvents.InvokeOnFakeItemInitialized(this);
+            LITStaticEvents.InvokeOnFakeItemInitialized(this);
 
             // do this after event invokation to make sure IsPhysicalRegardlessOfSize flag is set correctly
             SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
 
             Actions.Add(new ReclaimInteraction(this));
-            
+
             if (Flags.RemoveRootCollider)
             {
                 GetComponents<BoxCollider>().ExecuteForEach(col => col.enabled = false);
@@ -181,14 +180,14 @@ namespace LeaveItThere.Components
             return layerNumber;
         }
 
-       public void Reclaim()
+        public void Reclaim()
         {
             LootItem.gameObject.transform.position = gameObject.transform.position;
             LootItem.gameObject.transform.rotation = gameObject.transform.rotation;
             LITSession.Instance.RefundPoints(ItemHelper.GetItemCost(LootItem.Item));
             LITSession.Instance.RemoveFakeItem(this);
 
-            LeaveItThereStaticEvents.InvokeOnItemPlacedStateChanged(this, false);
+            LITStaticEvents.InvokeOnItemPlacedStateChanged(this, false);
             OnPlacedStateChanged?.Invoke(false);
 
             GameObject.Destroy(this.gameObject);
@@ -210,7 +209,7 @@ namespace LeaveItThere.Components
             SetLocation(LootItem.gameObject.transform.position, LootItem.gameObject.transform.rotation);
             LootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
 
-            LeaveItThereStaticEvents.InvokeOnItemPlacedStateChanged(this, true);
+            LITStaticEvents.InvokeOnItemPlacedStateChanged(this, true);
             OnPlacedStateChanged?.Invoke(true);
         }
 

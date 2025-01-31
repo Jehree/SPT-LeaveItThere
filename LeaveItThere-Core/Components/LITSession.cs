@@ -114,14 +114,14 @@ namespace LeaveItThere.Components
                     FakeItem fakeItem = FakeItem.CreateNewFakeItem(lootItem as ObservedLootItem, data.AddonData);
                     fakeItem.PlaceAtPosition(data.Location, data.Rotation);
 
-                    LeaveItThereStaticEvents.InvokeOnPlacedItemSpawned(fakeItem);
+                    LITStaticEvents.InvokeOnPlacedItemSpawned(fakeItem);
                     fakeItem.InvokeOnFakeItemSpawned();
 
                     _itemsSpawned++;
                     if (_itemsSpawned >= _itemsToSpawn)
                     {
                         Instance.LootExperienceEnabled = true;
-                        LeaveItThereStaticEvents.InvokeOnLastPlacedItemSpawned(fakeItem);
+                        LITStaticEvents.InvokeOnLastPlacedItemSpawned(fakeItem);
                     }
                 });
             }

@@ -132,10 +132,11 @@
     <Compile Include="Components\FakeItem.cs" />
     <Compile Include="Fika\FikaInterface.cs" />
     <Compile Include="Fika\FikaWrapper.cs" />
+    <Compile Include="Helpers\LITFikaTools.cs" />
     <Compile Include="Helpers\ConfigurationManagerAttributes.cs" />
     <Compile Include="Helpers\InteractionHelper.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
-    <Compile Include="Helpers\LeaveItThereStaticEvents.cs" />
+    <Compile Include="Helpers\LITStaticEvents.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\LITUtils.cs" />
     <Compile Include="Patches\GameEndedPatch.cs" />

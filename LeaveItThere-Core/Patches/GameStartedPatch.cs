@@ -1,5 +1,4 @@
 ﻿using EFT;
-using EFT.UI.Matchmaker;
 using HarmonyLib;
 using LeaveItThere.Components;
 using SPT.Reflection.Patching;
@@ -17,7 +16,7 @@ namespace LeaveItThere.Patches
         [PatchPostfix]
         static void PatchPrefix()
         {
-            Plugin.DebugLog("happened"); 
+            Plugin.DebugLog("happened");
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }

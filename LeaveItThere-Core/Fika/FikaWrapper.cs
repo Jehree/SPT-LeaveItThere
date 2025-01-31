@@ -1,5 +1,6 @@
 ﻿using Comfort.Common;
 using EFT.Interactive;
+using EFT.InventoryLogic;
 using Fika.Core.Coop.Utils;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
@@ -9,6 +10,8 @@ using LeaveItThere.Helpers;
 using LeaveItThere.Packets;
 using LiteNetLib;
 using SPT.Reflection.Utils;
+using System;
+using UnityEngine;
 
 namespace LeaveItThere.Fika
 {
@@ -41,9 +44,6 @@ namespace LeaveItThere.Fika
 
         public static string GetRaidId()
         {
-            Plugin.DebugLog($"GroupId: {FikaBackendUtils.GroupId}");
-            Plugin.DebugLog($"Main Player Id: {LITSession.Instance.Player.ProfileId}");
-            Plugin.DebugLog($"Session Id: {ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId}");
             return FikaBackendUtils.GroupId;
         }
 
@@ -109,11 +109,99 @@ namespace LeaveItThere.Fika
         public static void OnFikaNetManagerCreated(FikaNetworkManagerCreatedEvent managerCreatedEvent)
         {
             managerCreatedEvent.Manager.RegisterPacket<PlacedItemStateChangedPacket, NetPeer>(OnPlacedItemStateChangedPacketReceived);
+            managerCreatedEvent.Manager.RegisterPacket<LITSpawnItemPacket, NetPeer>(SpawnItemPacketReceived);
+            managerCreatedEvent.Manager.RegisterPacket<LITRemoveItemFromContainerPacket, NetPeer>(RemoveItemFromContainerReceived);
         }
 
         public static void InitOnPluginEnabled()
         {
             FikaEventDispatcher.SubscribeEvent<FikaNetworkManagerCreatedEvent>(OnFikaNetManagerCreated);
+        }
+
+        public static void SendSpawnItemPacket(Item item, Vector3 position, Quaternion rotation, Action<LootItem> callback)
+        {
+            // sender always spawns the item themselves, so that they can pass the callback into the helper
+            ItemHelper.SpawnItem(item, position, rotation, callback);
+
+            LITSpawnItemPacket packet = new LITSpawnItemPacket
+            {
+                Item = item,
+                Position = position,
+                Rotation = rotation
+            };
+
+            if (IAmHost())
+            {
+                // if the host is spawning the item, all peers need to told to do the same
+                Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
+            }
+            else
+            {
+                // if a client is spawning the item, the host needs to be told about it
+                // the host will not return a packet to the sender
+                Singleton<FikaClient>.Instance.SendData(ref packet, DeliveryMethod.ReliableOrdered);
+            }
+        }
+
+        private static void SpawnItemPacketReceived(LITSpawnItemPacket packet, NetPeer peer)
+        {
+            ItemHelper.SpawnItem(packet.Item, packet.Position, packet.Rotation);
+
+            if (!IAmHost()) return;
+
+            FikaServer fikaServer = Singleton<FikaServer>.Instance;
+            NetManager netServer = fikaServer.NetServer;
+
+            foreach (NetPeer p in netServer.ConnectedPeerList)
+            {
+                // do not return a packet to the sender, they already spawned the item locally
+                if (p == peer) continue;
+
+                fikaServer.SendDataToPeer(p, ref packet, DeliveryMethod.ReliableOrdered);
+            }
+        }
+
+        public static bool SendRemoveItemFromContainerPacket(Item container, Item itemToRemove)
+        {
+            LITRemoveItemFromContainerPacket packet = new LITRemoveItemFromContainerPacket
+            {
+                Container = container,
+                ItemToRemove = itemToRemove
+            };
+
+            bool success = ItemHelper.RemoveItemFromContainer(container as CompoundItem, itemToRemove);
+
+            if (IAmHost())
+            {
+                // if the host is removing the item, all peers need to told to do the same
+                Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
+            }
+            else
+            {
+                // if a client is removing the item, the host needs to be told about it
+                // the host will not return a packet to the sender
+                Singleton<FikaClient>.Instance.SendData(ref packet, DeliveryMethod.ReliableOrdered);
+            }
+
+            return success;
+        }
+
+        private static void RemoveItemFromContainerReceived(LITRemoveItemFromContainerPacket packet, NetPeer peer)
+        {
+            ItemHelper.RemoveItemFromContainer(packet.Container as CompoundItem, packet.ItemToRemove);
+
+            if (!IAmHost()) return;
+
+            FikaServer fikaServer = Singleton<FikaServer>.Instance;
+            NetManager netServer = fikaServer.NetServer;
+
+            foreach (NetPeer p in netServer.ConnectedPeerList)
+            {
+                // do not return a packet to the sender, they already removed the item locally
+                if (p == peer) continue;
+
+                fikaServer.SendDataToPeer(p, ref packet, DeliveryMethod.ReliableOrdered);
+            }
         }
     }
 }

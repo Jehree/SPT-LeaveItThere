@@ -6,7 +6,7 @@ namespace LeaveItThere.Helpers
     /// <summary>
     /// All these events are static! Make sure to clean up subscriptions if needed!
     /// </summary>
-    public static class LeaveItThereStaticEvents
+    public static class LITStaticEvents
     {
         public delegate void ItemPlacedStateChangedHandler(FakeItem fakeItem, bool isPlaced);
         /// <summary>

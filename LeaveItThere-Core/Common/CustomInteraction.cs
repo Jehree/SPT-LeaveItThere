@@ -1,14 +1,8 @@
-﻿using EFT.Interactive;
-using JetBrains.Annotations;
-using LeaveItThere.Components;
-using LeaveItThere.Fika;
+﻿using LeaveItThere.Components;
 using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LeaveItThere.Common.InteractionExamples;
 
 namespace LeaveItThere.Common
 {
@@ -66,7 +60,7 @@ namespace LeaveItThere.Common
 
             return typesClass;
         }
-        
+
         public static List<ActionsTypesClass> GetActionsTypesClassList(List<CustomInteraction> interactions)
         {
             List<ActionsTypesClass> actionsTypesClassList = [];
@@ -180,7 +174,7 @@ namespace LeaveItThere.Common
         {
             private void PluginAwakeFunctionOrSimilar()
             {
-                LeaveItThereStaticEvents.OnFakeItemInitialized += OnFakeItemInitialized;
+                LITStaticEvents.OnFakeItemInitialized += OnFakeItemInitialized;
             }
 
             public void OnFakeItemInitialized(FakeItem fakeItem)

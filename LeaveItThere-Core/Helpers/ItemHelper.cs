@@ -7,7 +7,6 @@ using LeaveItThere.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -33,14 +32,24 @@ namespace LeaveItThere.Helpers
             StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback));
         }
 
-        public static void SpawnItem(string itemTpl, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
+        public static void SpawnItem(string itemTpl, string itemId, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)
         {
             ItemFactoryClass itemFactory = Singleton<ItemFactoryClass>.Instance;
             GameWorld gameWorld = Singleton<GameWorld>.Instance;
 
-            Item item = itemFactory.CreateItem(MongoID.Generate(), itemTpl, null);
+            Item item = itemFactory.CreateItem(itemId, itemTpl, null);
 
             StaticManager.BeginCoroutine(SpawnItemRoutine(item, position, rotation, callback));
+        }
+
+        public static bool RemoveItemFromContainer(CompoundItem container, Item itemToRemove)
+        {
+            foreach (StashGridClass grid in container.Grids)
+            {
+                if (!grid.Items.Contains(itemToRemove)) continue;
+                return grid.Remove(itemToRemove, false).Succeeded;
+            }
+            return false;
         }
 
         public static IEnumerator SpawnItemRoutine(Item item, Vector3 position, Quaternion rotation = default(Quaternion), Action<LootItem> callback = null)

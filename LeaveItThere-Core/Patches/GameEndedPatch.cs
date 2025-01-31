@@ -36,7 +36,7 @@ namespace LeaveItThere.Patches
         [PatchPrefix]
         static void Prefix(LocalRaidSettings settings, object results, ref object lostInsuredItems, object transferItems)
         {
-            LeaveItThereStaticEvents.InvokeOnRaidEnd(settings, results, lostInsuredItems, transferItems, _exitNameInfo.GetValue(results) as string);
+            LITStaticEvents.InvokeOnRaidEnd(settings, results, lostInsuredItems, transferItems, _exitNameInfo.GetValue(results) as string);
 
             LITSession session = LITSession.Instance;
             lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems as object[], session.GetPlacedItemInstanceIds());
