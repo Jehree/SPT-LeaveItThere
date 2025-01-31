@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace LeaveItThere.Common
 {
-    internal class ConsoleCommands
+    public class ConsoleCommands
     {
         [ConsoleCommand("lit_unplace_all_items_below_cost", "", null, "Un-Place all items on the map below a cost amount. If you run this command in error somehow, ALT F4 to avoid the changes being saved.")]
         public static void ClearPlacedItemsUnderCost([ConsoleArgument(0, "Cost Amount")] int costAmount, [ConsoleArgument("", "type 'IAMSURE' to confirm")] string iAmSure)
@@ -37,7 +37,7 @@ namespace LeaveItThere.Common
                 (FakeItem fakeItem) =>
                 {
                     LITSession session = LITSession.Instance;
-                    fakeItem.PlaceAtPosition(Utils.PlayerFront, session.Player.Transform.rotation);
+                    fakeItem.PlaceAtPosition(LITUtils.PlayerFront, session.Player.Transform.rotation);
                     FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
                 }
             );
@@ -58,7 +58,7 @@ namespace LeaveItThere.Common
             FakeItem fakeItem = session.FakeItems.Values.ToList()[itemNum];
 
             ConsoleScreen.Log("Teleporting item!");
-            fakeItem.PlaceAtPosition(Utils.PlayerFront, session.Player.Transform.rotation);
+            fakeItem.PlaceAtPosition(LITUtils.PlayerFront, session.Player.Transform.rotation);
             FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
         }
 
@@ -73,7 +73,7 @@ namespace LeaveItThere.Common
                 FakeItem fakeItem = kvp.Value;
                 Vector3 playerPosition = Singleton<GameWorld>.Instance.MainPlayer.Transform.position;
                 string itemName = string.Format("({0})".Localized(null), fakeItem.LootItem.Name.Localized(null));
-                string direction = Utils.GetCardinalDirection(playerPosition, fakeItem.gameObject.transform.position);
+                string direction = LITUtils.GetCardinalDirection(playerPosition, fakeItem.gameObject.transform.position);
                 string distance = Vector3.Distance(playerPosition, fakeItem.gameObject.transform.position).ToString();
                 ConsoleScreen.Log($"{itemName} (item number: {index}) placed {distance} units away from player ({direction})");
 

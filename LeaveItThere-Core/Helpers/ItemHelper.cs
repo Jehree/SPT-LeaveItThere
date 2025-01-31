@@ -203,6 +203,11 @@ namespace LeaveItThere.Helpers
 
         public static int GetItemCost(Item item, bool ignoreMinimumCostSetting = false)
         {
+            if (LITSession.CostOverrides.ContainsKey(item.TemplateId))
+            {
+                return LITSession.CostOverrides[item.TemplateId];
+            }
+
             int cost = 0;
 
             if (item is SearchableItemItemClass)

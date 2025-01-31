@@ -41,9 +41,9 @@ namespace LeaveItThere.Fika
 
         public static string GetRaidId()
         {
-            Plugin.LogSource.LogError($"GroupId: {FikaBackendUtils.GroupId}");
-            Plugin.LogSource.LogError($"Main Player Id: {LITSession.Instance.Player.ProfileId}");
-            Plugin.LogSource.LogError($"Session Id: {ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId}");
+            Plugin.DebugLog($"GroupId: {FikaBackendUtils.GroupId}");
+            Plugin.DebugLog($"Main Player Id: {LITSession.Instance.Player.ProfileId}");
+            Plugin.DebugLog($"Session Id: {ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId}");
             return FikaBackendUtils.GroupId;
         }
 

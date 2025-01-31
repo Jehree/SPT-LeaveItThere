@@ -94,7 +94,7 @@ namespace LeaveItThere.Components
 
         public void MoveToPlayer()
         {
-            gameObject.transform.position = Utils.PlayerFront;
+            gameObject.transform.position = LITUtils.PlayerFront;
         }
     }
 }

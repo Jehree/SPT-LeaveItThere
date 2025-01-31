@@ -13,40 +13,45 @@ using UnityEngine.AI;
 
 namespace LeaveItThere.Components
 {
-    public class AddonFlags
-    {
-        /// <summary>
-        /// When true, the Move interaction is disabled.
-        /// </summary>
-        public bool MoveModeDisabled = false;
-        /// <summary>
-        /// When true, the Reclaim interaction is disabled.
-        /// </summary>
-        public bool ReclaimInteractionDisabled = false;
-        /// <summary>
-        /// Set to true to make this FakeItem ignore size restrictions and always be have player collision / block bot pathing.
-        /// </summary>
-        public bool IsPhysicalRegardlessOfSize = false;
-        /// <summary>
-        /// When true, the root BoxCollider component that is added to LootItems will be removed. Useful for when a custom item has a child object defining a custom collider to be used for interactions.
-        /// </summary>
-        public bool RemoveRootCollider = false;
-    }
+
 
     public class FakeItem : InteractableObject
     {
-        // I don't think this is needed, because the FakeItem will be destroyed every time it is reclaimed anyway
-        //public delegate void InitializedHandler();
-        //public event InitializedHandler OnInitialized;
+        public class AddonFlags
+        {
+            /// <summary>
+            /// When true, the Move interaction is disabled.
+            /// </summary>
+            public bool MoveModeDisabled = false;
+            /// <summary>
+            /// When true, the Reclaim interaction is disabled.
+            /// </summary>
+            public bool ReclaimInteractionDisabled = false;
+            /// <summary>
+            /// Set to true to make this FakeItem ignore size restrictions and always be have player collision / block bot pathing.
+            /// </summary>
+            public bool IsPhysicalRegardlessOfSize = false;
+            /// <summary>
+            /// When true, the root BoxCollider component that is added to LootItems will be removed. Useful for when a custom item has a child object defining a custom collider to be used for interactions.
+            /// </summary>
+            public bool RemoveRootCollider = false;
+        }
 
         public delegate void SpawnedHandler();
+        /// <summary>
+        /// Invoked if this FakeItem was just spawned by LITSession at start of raid
+        /// </summary>
         public event SpawnedHandler OnSpawned;
+        internal void InvokeOnFakeItemSpawned() => OnSpawned?.Invoke();
 
         public delegate void PlacedStateChangedHandler(bool isPlaced);
+        /// <summary>
+        /// Invoked any time the placed state of the FakeItem is changed. Unike OnFakeItemInitialized, it will be invoked when item is moved.
+        /// </summary>
         public event PlacedStateChangedHandler OnPlacedStateChanged;
 
-        public AddonFlags AddonFlags = new();
-        public Dictionary<string, object> AddonData = [];
+        public AddonFlags Flags { get; private set; } = new();
+        public Dictionary<string, object> AddonData { get; private set; } = [];
 
         private NavMeshObstacle _obstacle;
 
@@ -68,7 +73,7 @@ namespace LeaveItThere.Components
             }
         }
         public string ItemId { get; private set; }
-        public string InteractionTargetName;
+        public string TemplateId { get; private set; }
 
         public List<CustomInteraction> Actions = [];
         public MoveableObject Moveable { get; private set; }
@@ -79,30 +84,28 @@ namespace LeaveItThere.Components
         {
             LootItem = lootItem;
             ItemId = lootItem.ItemId;
-            InteractionTargetName = LootItem.Name.Localized();
+            TemplateId = lootItem.TemplateId;
             AddNavMeshObstacle();
             Moveable = gameObject.AddComponent<MoveableObject>();
 
             LITSession.Instance.AddFakeItem(this); 
             if (LootItem.Item.IsContainer)
             {
-                Actions.Add(GetSearchContainerAction());
+                Actions.Add(new SearchInteraction(this));
             }
-            Actions.Add(GetEnterMoveModeAction());
+            Actions.Add(new EnterMoveModeInteraction(this));
 
             LeaveItThereStaticEvents.InvokeOnFakeItemInitialized(this);
 
             // do this after event invokation to make sure IsPhysicalRegardlessOfSize flag is set correctly
             SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
 
-            Actions.Add(GetReclaimAction());
+            Actions.Add(new ReclaimInteraction(this));
             
-            if (AddonFlags.RemoveRootCollider)
+            if (Flags.RemoveRootCollider)
             {
                 GetComponents<BoxCollider>().ExecuteForEach(col => col.enabled = false);
             }
-
-            Actions[0].TargetName = InteractionTargetName;
         }
 
         internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem, Dictionary<string, object> addonData = null)
@@ -146,12 +149,12 @@ namespace LeaveItThere.Components
             if (enabled)
             {
                 bool itemIsTooSmall = LootItem.Item.Width * LootItem.Item.Height < Settings.MinimumSizeItemToGetCollision.Value;
-                if (!AddonFlags.IsPhysicalRegardlessOfSize && itemIsTooSmall) return;
+                if (!Flags.IsPhysicalRegardlessOfSize && itemIsTooSmall) return;
             }
 
             _obstacle.enabled = enabled;
 
-            List<GameObject> descendants = Utils.GetAllDescendants(gameObject);
+            List<GameObject> descendants = LITUtils.GetAllDescendants(gameObject);
             foreach (GameObject descendant in descendants)
             {
                 if (descendant.GetComponent<Collider>() == null) continue;
@@ -178,53 +181,7 @@ namespace LeaveItThere.Components
             return layerNumber;
         }
 
-        public CustomInteraction GetSearchContainerAction()
-        {
-            GetActionsClass.Class1612 @class = new GetActionsClass.Class1612();
-            @class.rootItem = LootItem.Item;
-            @class.owner = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetComponent<GamePlayerOwner>();
-            @class.lootItemLastOwner = LootItem.LastOwner;
-            @class.lootItemOwner = LootItem.ItemOwner;
-            @class.controller = @class.owner.Player.InventoryController;
-
-            return new CustomInteraction("Search", false, @class.method_3);
-        }
-
-        public CustomInteraction GetReclaimAction()
-        {
-            // itemId is captured and passed into lambda
-            string itemId = ItemId;
-
-            return new CustomInteraction(
-                () =>
-                {
-                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
-
-                    if (fakeItem.AddonFlags.ReclaimInteractionDisabled)
-                    {
-                        return "Reclaim: Disabled";
-                    }
-                    else
-                    {
-                        return "Reclaim";
-                    }
-                },
-                () =>
-                {
-                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
-                    return fakeItem.AddonFlags.ReclaimInteractionDisabled;
-                },
-                () =>
-                {
-                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
-                    FikaInterface.SendPlacedStateChangedPacket(fakeItem, false);
-                    fakeItem.Reclaim();
-                    fakeItem.ReclaimPlayerFeedback();
-                }
-            );
-        }
-
-        public void Reclaim()
+       public void Reclaim()
         {
             LootItem.gameObject.transform.position = gameObject.transform.position;
             LootItem.gameObject.transform.rotation = gameObject.transform.rotation;
@@ -245,23 +202,6 @@ namespace LeaveItThere.Components
                 InteractionHelper.NotificationLong($"Points rufunded: {ItemHelper.GetItemCost(LootItem.Item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
             }
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponDisassemble);
-        }
-
-        public static CustomInteraction GetPlaceItemAction(LootItem lootItem)
-        {
-            string itemId = lootItem.ItemId;
-
-            return new CustomInteraction(
-            "Place Item",
-            !LITSession.Instance.PlacementIsAllowed(lootItem.Item),
-            () =>
-            {
-                ObservedLootItem lootItem = ItemHelper.GetLootItem(itemId) as ObservedLootItem;
-                FakeItem fakeItem = CreateNewFakeItem(lootItem);
-                fakeItem.PlaceAtLootItem();
-                fakeItem.PlacedPlayerFeedback();
-                FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
-            });
         }
 
         public void PlaceAtLootItem()
@@ -288,36 +228,6 @@ namespace LeaveItThere.Components
                 InteractionHelper.NotificationLong($"Placement cost: {ItemHelper.GetItemCost(LootItem.Item)}, {Settings.GetAllottedPoints() - session.PointsSpent} out of {Settings.GetAllottedPoints()} points remaining");
             }
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponAssemble);
-        }
-
-        public CustomInteraction GetEnterMoveModeAction()
-        {
-            // itemId is captured and passed into lambdas to avoid a closure of 'this'
-            string itemId = ItemId;
-            return new CustomInteraction(
-                () =>
-                {
-                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
-                    if (fakeItem.MoveModeDisallowed(out string reason))
-                    {
-                        return $"Move: {reason}";
-                    }
-                    else
-                    {
-                        return "Move";
-                    }
-                },
-                LITSession.Instance.GetFakeItemOrNull(itemId).MoveModeDisallowed,
-                () =>
-                {
-                    FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(itemId);
-                    ObjectMover mover = ObjectMover.Instance;
-                    mover.Enable(fakeItem.gameObject.GetComponent<MoveableObject>(), fakeItem.OnMoveModeDisabled, fakeItem.OnMoveModeEnabledUpdate);
-                    fakeItem._savedPosition = fakeItem.gameObject.transform.position;
-                    fakeItem._savedRotation = fakeItem.gameObject.transform.rotation;
-                    fakeItem.SetPlayerAndBotCollisionEnabled(false);
-                }                
-            );
         }
 
         private void OnMoveModeEnabledUpdate()
@@ -359,7 +269,7 @@ namespace LeaveItThere.Components
 
         public bool MoveModeDisallowed(out string reason)
         {
-            if (AddonFlags.MoveModeDisabled)
+            if (Flags.MoveModeDisabled)
             {
                 reason = "Disabled";
                 return true;
@@ -397,11 +307,6 @@ namespace LeaveItThere.Components
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.ErrorMessage);
         }
 
-        public void InvokeOnSpawnedEvent()
-        {
-            OnSpawned?.Invoke();
-        }
-
         public T GetAddonDataOrNull<T>(string key) where T : class
         {
             if (!AddonData.ContainsKey(key)) return null;
@@ -417,6 +322,84 @@ namespace LeaveItThere.Components
         public void PutAddonData<T>(string key, T data) where T : class
         {
             AddonData[key] = data;
+        }
+
+        public class SearchInteraction : CustomInteraction
+        {
+            private GetActionsClass.Class1612 _searchClass;
+
+            public SearchInteraction(FakeItem fakeItem) : base(fakeItem)
+            {
+                _searchClass = new();
+                _searchClass.rootItem = FakeItem.LootItem.Item;
+                _searchClass.owner = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetComponent<GamePlayerOwner>();
+                _searchClass.lootItemLastOwner = FakeItem.LootItem.LastOwner;
+                _searchClass.lootItemOwner = FakeItem.LootItem.ItemOwner;
+                _searchClass.controller = _searchClass.owner.Player.InventoryController;
+            }
+
+            public override string Name => "Search";
+            public override void OnInteract() => _searchClass.method_3();
+        }
+
+        public class PlaceItemInteraction(LootItem lootItem) : CustomInteraction
+        {
+            private LootItem _lootItem = lootItem;
+            public override string Name => "Place Item";
+            public override bool Enabled => LITSession.Instance.PlacementIsAllowed(_lootItem.Item);
+
+            public override void OnInteract()
+            {
+                FakeItem fakeItem = CreateNewFakeItem(_lootItem as ObservedLootItem);
+                fakeItem.PlaceAtLootItem();
+                fakeItem.PlacedPlayerFeedback();
+                FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
+            }
+        }
+
+        public class EnterMoveModeInteraction(FakeItem fakeItem) : CustomInteraction(fakeItem)
+        {
+            public override string Name
+            {
+                get
+                {
+                    if (FakeItem.MoveModeDisallowed(out string reason))
+                    {
+                        return $"Move: {reason}";
+                    }
+                    else
+                    {
+                        return "Move";
+                    }
+                }
+            }
+
+            public override bool Enabled => !FakeItem.MoveModeDisallowed();
+
+            public override void OnInteract()
+            {
+                ObjectMover mover = ObjectMover.Instance;
+                mover.Enable(FakeItem.gameObject.GetComponent<MoveableObject>(), FakeItem.OnMoveModeDisabled, FakeItem.OnMoveModeEnabledUpdate);
+                FakeItem._savedPosition = FakeItem.gameObject.transform.position;
+                FakeItem._savedRotation = FakeItem.gameObject.transform.rotation;
+                FakeItem.SetPlayerAndBotCollisionEnabled(false);
+            }
+        }
+
+        public class ReclaimInteraction(FakeItem fakeItem) : CustomInteraction(fakeItem)
+        {
+            public override string Name => FakeItem.Flags.ReclaimInteractionDisabled
+                                                                    ? "Reclaim: Disabled"
+                                                                    : "Reclaim";
+            public override string TargetName => FakeItem.LootItem.Name.Localized();
+            public override bool Enabled => !FakeItem.Flags.ReclaimInteractionDisabled;
+
+            public override void OnInteract()
+            {
+                FikaInterface.SendPlacedStateChangedPacket(FakeItem, false);
+                FakeItem.Reclaim();
+                FakeItem.ReclaimPlayerFeedback();
+            }
         }
     }
 }

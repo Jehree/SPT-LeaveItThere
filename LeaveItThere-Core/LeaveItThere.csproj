@@ -123,10 +123,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ConsoleCommands.cs" />
-    <Compile Include="Common\Interaction.cs" />
-    <Compile Include="Common\InteractionBaseTest.cs" />
-    <Compile Include="Common\ItemFilter.cs" />
     <Compile Include="Common\CustomInteraction.cs" />
+    <Compile Include="Common\ItemFilter.cs" />
     <Compile Include="Common\PlacedItemData.cs" />
     <Compile Include="Components\LITSession.cs" />
     <Compile Include="Components\ObjectMover.cs" />
@@ -139,8 +137,7 @@
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\LeaveItThereStaticEvents.cs" />
     <Compile Include="Helpers\Settings.cs" />
-    <Compile Include="Helpers\SPTServerHelper.cs" />
-    <Compile Include="Helpers\Utils.cs" />
+    <Compile Include="Helpers\LITUtils.cs" />
     <Compile Include="Patches\GameEndedPatch.cs" />
     <Compile Include="Patches\GameStartedPatch.cs" />
     <Compile Include="Patches\GetAvailableActionsPatch.cs" />

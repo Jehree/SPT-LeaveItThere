@@ -35,10 +35,11 @@ namespace LeaveItThere.Patches
             LootItem lootItem = interactive as LootItem;
             if (!LootItemIsTarget(lootItem)) return;
 
-            CustomInteraction placeAction = FakeItem.GetPlaceItemAction(lootItem);
+            CustomInteraction placeAction = new FakeItem.PlaceItemInteraction(lootItem as ObservedLootItem);
             if (ItemHelper.ItemCanBePickedUp(lootItem.Item) == false)
             {
-                __result.Actions.Insert(0, new CustomInteraction($"No Space ({lootItem.Name.Localized()})".Localized(), true, null).GetActionsTypesClass());
+                string interactionName = $"No Space ({lootItem.Name.Localized()})".Localized();
+                __result.Actions.Insert(0, new CustomInteraction.DisabledInteraction(interactionName).GetActionsTypesClass());
             }
             __result.Actions.Add(placeAction.GetActionsTypesClass());
         }
@@ -56,3 +57,4 @@ namespace LeaveItThere.Patches
         }
     }
 }
+ 

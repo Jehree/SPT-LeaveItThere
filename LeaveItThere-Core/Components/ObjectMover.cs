@@ -42,7 +42,7 @@ namespace LeaveItThere.Components
             }
         }
 
-        public static void CreateNewObjectMover()
+        internal static void CreateNewObjectMover()
         {
             _instance = LITSession.Instance.Player.gameObject.GetOrAddComponent<ObjectMover>();
         }
@@ -92,12 +92,12 @@ namespace LeaveItThere.Components
         private void Awake()
         {
             List<ActionsTypesClass> interactions = [];
-            interactions.Add(GetToggleTranslationModeAction().GetActionsTypesClass());
-            interactions.Add(GetToggleRotationModeAction().GetActionsTypesClass());
-            interactions.Add(GetTogglePhysicsAction().GetActionsTypesClass());
-            interactions.Add(GetMoveToPlayerAction().GetActionsTypesClass());
-            interactions.Add(GetSaveAndExitMoveModeAction().GetActionsTypesClass());
-            interactions.Add(GetCancelAndExitMoveModeAction().GetActionsTypesClass());
+            interactions.Add(new ToggleTranslationInteraction().GetActionsTypesClass());
+            interactions.Add(new ToggleRotationInteraction().GetActionsTypesClass());
+            interactions.Add(new TogglePhysicsInteraction().GetActionsTypesClass());
+            interactions.Add(new MoveToPlayerInteraction().GetActionsTypesClass());
+            interactions.Add(new SaveAndExitMoveModeInteraction().GetActionsTypesClass());
+            interactions.Add(new CancelMoveModeInteraction().GetActionsTypesClass());
 
             _moveMenu = new ActionsReturnClass { Actions = interactions };
         }
@@ -174,126 +174,106 @@ namespace LeaveItThere.Components
             InteractionHelper.SetCameraRotationLocked(enabled);
         }
 
-        public static CustomInteraction GetSaveAndExitMoveModeAction()
+        public class SaveAndExitMoveModeInteraction : CustomInteraction
         {
-            return new CustomInteraction(
-                "Save",
-                false,
-                () =>
-                {
-                    Instance.Disable(true);
-                }
-            );
+            public override string Name => "Save";
+            public override bool AutoPromptRefresh => true;
+            public override void OnInteract() => Instance.Disable(true);
         }
 
-        public static CustomInteraction GetCancelAndExitMoveModeAction()
+        public class CancelMoveModeInteraction : CustomInteraction
         {
-            return new CustomInteraction(
-                "Cancel",
-                false,
-                () =>
-                {
-                    Instance.Disable(false);
-                }
-            );
+            public override string Name => "Cancel";
+            public override bool AutoPromptRefresh => true;
+            public override void OnInteract() => Instance.Disable(false);
         }
 
-        public static CustomInteraction GetTogglePhysicsAction()
+        public class TogglePhysicsInteraction : CustomInteraction
         {
-            return new CustomInteraction(
-                "Toggle Physics",
-                false,
-                () =>
-                {
-                    Instance._translationModeEnabled = false;
-                    Instance.SetRotationModeEnabled(false);
-                    Instance.SetPhysicsModeEnabled(!Instance.Target.PhysicsIsEnabled);
+            public override string Name => "Toggle Physics";
+            public override void OnInteract()
+            {
+                Instance._translationModeEnabled = false;
+                Instance.SetRotationModeEnabled(false);
+                Instance.SetPhysicsModeEnabled(!Instance.Target.PhysicsIsEnabled);
 
-                    InteractionHelper.NotificationLong($"Physics enabled: {Instance.Target.PhysicsIsEnabled}");
-                }
-            );
+                InteractionHelper.NotificationLong($"Physics enabled: {Instance.Target.PhysicsIsEnabled}");
+            }
         }
 
-        public static CustomInteraction GetToggleTranslationModeAction()
+        public class ToggleTranslationInteraction : CustomInteraction
         {
-            return new CustomInteraction(
-                "Toggle Translation Mode",
-                false,
-                () =>
+            public override string Name => "Toggle Translation Mode";
+            public override void OnInteract()
+            {
+                ObjectMover mover = Instance;
+
+                mover.SetPhysicsModeEnabled(false);
+                mover.SetRotationModeEnabled(false);
+
+                Transform targetTransform = mover.Target.gameObject.transform;
+                Transform cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
+                mover._translationModeEnabled = !mover._translationModeEnabled;
+                if (mover._translationModeEnabled)
                 {
-                    ObjectMover mover = Instance;
-
-                    mover.SetPhysicsModeEnabled(false);
-                    mover.SetRotationModeEnabled(false);
-
-                    Transform targetTransform = mover.Target.gameObject.transform;
-                    Transform cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
-                    mover._translationModeEnabled = !mover._translationModeEnabled;
-                    if (mover._translationModeEnabled)
-                    {
-                        mover._lockedRotation = mover.Target.gameObject.transform.rotation;
-                        targetTransform.parent = cameraTransform;
-                        ItemHelper.SetItemColor(Color.green, mover.Target.gameObject);
-                    }
-                    else
-                    {
-                        targetTransform.parent = null;
-                        ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
-                    }
-
-                    InteractionHelper.NotificationLong($"Translation mode enabled: {mover._translationModeEnabled}");
+                    mover._lockedRotation = mover.Target.gameObject.transform.rotation;
+                    targetTransform.parent = cameraTransform;
+                    ItemHelper.SetItemColor(Color.green, mover.Target.gameObject);
                 }
-            );
+                else
+                {
+                    targetTransform.parent = null;
+                    ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
+                }
+
+                InteractionHelper.NotificationLong($"Translation mode enabled: {mover._translationModeEnabled}");
+            }
         }
 
-        public static CustomInteraction GetToggleRotationModeAction()
+        public class ToggleRotationInteraction : CustomInteraction
         {
-            return new CustomInteraction(
-                "Toggle Rotation Mode",
-                false,
-                () =>
+            public override string Name => "Toggle Rotation Mode";
+            public override void OnInteract()
+            {
+                ObjectMover mover = Instance;
+
+                mover.SetPhysicsModeEnabled(false);
+                mover._translationModeEnabled = false;
+
+                Transform targetTransform = mover.Target.gameObject.transform;
+                Transform cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
+                mover.SetRotationModeEnabled(!mover._rotationModeEnabled);
+                if (mover._rotationModeEnabled)
                 {
-                    ObjectMover mover = Instance;
-
-                    mover.SetPhysicsModeEnabled(false);
-                    mover._translationModeEnabled = false;
-
-                    Transform targetTransform = mover.Target.gameObject.transform;
-                    Transform cameraTransform = LITSession.Instance.Player.CameraContainer.gameObject.transform;
-                    mover.SetRotationModeEnabled(!mover._rotationModeEnabled);
-                    if (mover._rotationModeEnabled)
-                    {
-                        mover._lockedPosition = mover.Target.gameObject.transform.position;
-                        targetTransform.parent = cameraTransform;
-                        ItemHelper.SetItemColor(Color.red, mover.Target.gameObject);
-                    }
-                    else
-                    {
-                        targetTransform.parent = null;
-                        ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
-                    }
-                    InteractionHelper.NotificationLong($"Rotation mode enabled: {mover._rotationModeEnabled}");
+                    mover._lockedPosition = mover.Target.gameObject.transform.position;
+                    targetTransform.parent = cameraTransform;
+                    ItemHelper.SetItemColor(Color.red, mover.Target.gameObject);
                 }
-            );
+                else
+                {
+                    targetTransform.parent = null;
+                    ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, mover.Target.gameObject);
+                }
+
+                InteractionHelper.NotificationLong($"Rotation mode enabled: {mover._rotationModeEnabled}");
+            }
+
         }
 
-        public static CustomInteraction GetMoveToPlayerAction()
+        public class MoveToPlayerInteraction : CustomInteraction
         {
-            return new CustomInteraction(
-                "Move To Player",
-                false,
-                () =>
-                {
-                    ObjectMover mover = Instance;
-                    Player player = LITSession.Instance.Player;
-                    mover.Target.MoveToPlayer();
-                    mover.SetPhysicsModeEnabled(false);
-                    mover._translationModeEnabled = false;
-                    mover.SetRotationModeEnabled(false);
+            public override string Name => "Move To Player";
+            public override void OnInteract()
+            {
+                ObjectMover mover = Instance;
+                Player player = LITSession.Instance.Player;
+                mover.Target.MoveToPlayer();
+                mover.SetPhysicsModeEnabled(false);
+                mover._translationModeEnabled = false;
+                mover.SetRotationModeEnabled(false);
 
-                    InteractionHelper.NotificationLong("Moved item to player");
-                }
-            );
+                InteractionHelper.NotificationLong("Moved item to player");
+            }
         }
     }
 }

@@ -13,13 +13,17 @@ namespace LeaveItThere.Components
 {
     public class LITSession : MonoBehaviour
     {
+        /// <summary>
+        /// Key = item template id, Value = the desired cost
+        /// </summary>
+        public static Dictionary<string, int> CostOverrides = [];
+
         public bool InteractionsAllowed { get; private set; } = true;
         public bool LootExperienceEnabled { get; private set; } = true;
 
         public GameWorld GameWorld { get; private set; }
         public Player Player { get; private set; }
         public GamePlayerOwner GamePlayerOwner { get; private set; }
-
         public Dictionary<string, FakeItem> FakeItems = [];
 
         private static LITSession _instance = null;
@@ -74,16 +78,16 @@ namespace LeaveItThere.Components
             }
         }
 
-        public static void CreateNewModSession()
+        internal static void CreateNewModSession()
         {
             _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<LITSession>();
         }
 
         private static int _itemsSpawned;
         private static int _itemsToSpawn;
-        public void SpawnAllPlacedItems()
+        private void SpawnAllPlacedItems()
         {
-            PlacedItemDataPack dataPack = SPTServerHelper.ServerRoute<PlacedItemDataPack>(Plugin.DataToClientURL, PlacedItemDataPack.Request);
+            PlacedItemDataPack dataPack = LITUtils.ServerRoute<PlacedItemDataPack>(Plugin.DataToClientURL, PlacedItemDataPack.Request);
             GlobalAddonData = dataPack.GlobalAddonData;
 
             _itemsSpawned = 0;
@@ -98,7 +102,6 @@ namespace LeaveItThere.Components
             {
                 PlacedItemData data = dataPack.ItemTemplates[i];
 
-                Plugin.LogSource.LogError("spawning initiated");
                 ItemHelper.SpawnItem(data.Item, new Vector3(0, -9999, 0), data.Rotation,
                 (LootItem lootItem) =>
                 {
@@ -111,7 +114,7 @@ namespace LeaveItThere.Components
                     fakeItem.PlaceAtPosition(data.Location, data.Rotation);
 
                     LeaveItThereStaticEvents.InvokeOnPlacedItemSpawned(fakeItem);
-                    fakeItem.InvokeOnSpawnedEvent();
+                    fakeItem.InvokeOnFakeItemSpawned();
 
                     _itemsSpawned++;
                     if (_itemsSpawned >= _itemsToSpawn)
@@ -119,7 +122,6 @@ namespace LeaveItThere.Components
                         Instance.LootExperienceEnabled = true;
                         LeaveItThereStaticEvents.InvokeOnLastPlacedItemSpawned(fakeItem);
                     }
-                    Plugin.LogSource.LogError("spawning complete");
                 });
             }
         }
@@ -209,7 +211,7 @@ namespace LeaveItThere.Components
                 placedItemInstanceIds.Add(fakeItem.ItemId);
             }
             PlacedItemDataPack dataPack = new(GlobalAddonData, dataList);
-            SPTServerHelper.ServerRoute(Plugin.DataToServerURL, dataPack);
+            LITUtils.ServerRoute(Plugin.DataToServerURL, dataPack);
         }
 
         public void SetInteractionsEnabled(bool enabled)

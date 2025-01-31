@@ -61,5 +61,12 @@ namespace LeaveItThere
         {
             FikaInterface.InitOnPluginEnabled();
         }
+
+        public static void DebugLog(string message)
+        {
+#if DEBUG
+            LogSource.LogError($"[Debug Log]: {message}");
+#endif
+        }
     }
 }

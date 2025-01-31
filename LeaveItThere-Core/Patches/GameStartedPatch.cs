@@ -17,7 +17,7 @@ namespace LeaveItThere.Patches
         [PatchPostfix]
         static void PatchPrefix()
         {
-            Plugin.LogSource.LogError("happened"); 
+            Plugin.DebugLog("happened"); 
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }

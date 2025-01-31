@@ -6,7 +6,7 @@ namespace LeaveItThere.Common
     {
         public bool WhitelistEnabled = false;
         public bool BlacklistEnabled = false;
-        public List<string> Whitelist = new();
-        public List<string> Blacklist = new();
+        public List<string> Whitelist = [];
+        public List<string> Blacklist = [];
     }
 }
