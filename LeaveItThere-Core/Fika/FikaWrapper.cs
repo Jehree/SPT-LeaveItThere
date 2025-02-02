@@ -230,6 +230,7 @@ namespace LeaveItThere.Fika
         private static void RemoveItemFromContainerReceived(LITRemoveItemFromContainerPacket packet, NetPeer peer)
         {
             ItemHelper.RemoveItemFromContainer(packet.Container as CompoundItem, packet.ItemToRemove);
+            Plugin.DebugLog("RemoveItemFromContainerReceived");
 
             if (!IAmHost()) return;
 

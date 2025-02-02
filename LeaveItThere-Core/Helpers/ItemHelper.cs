@@ -68,6 +68,7 @@ namespace LeaveItThere.Helpers
                     Item item = args[0] as Item;
                     CompoundItem container = args[1] as CompoundItem;
 
+                    item.CurrentAddress = null;
                     MoveItemToContainer(container, item);
                 }
             );

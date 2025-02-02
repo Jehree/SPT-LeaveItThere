@@ -5,7 +5,6 @@ namespace LeaveItThere.Fika
 {
     internal class FikaInterface
     {
-
         internal static void InitOnPluginEnabled()
         {
             if (!Plugin.FikaInstalled) return;
