@@ -1,7 +1,7 @@
 ﻿using EFT;
 using LeaveItThere.Components;
 
-namespace LeaveItThere.Helpers
+namespace LeaveItThere.Addon
 {
     /// <summary>
     /// All these events are static! Make sure to clean up subscriptions if needed!

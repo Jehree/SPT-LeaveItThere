@@ -10,6 +10,7 @@
     <RootNamespace>LeaveItThere_Packets</RootNamespace>
     <AssemblyName>LeaveItThere-Packets</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
@@ -115,6 +116,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GenericPackets.cs" />
     <Compile Include="Packets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

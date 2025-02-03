@@ -122,6 +122,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addon\LITPacketRegistration.cs" />
+    <Compile Include="Addon\LITPacketTools.cs" />
+    <Compile Include="Addon\LITPacketToolsWrapper.cs" />
     <Compile Include="Common\ConsoleCommands.cs" />
     <Compile Include="Common\CustomInteraction.cs" />
     <Compile Include="Common\ItemFilter.cs" />
@@ -132,11 +135,11 @@
     <Compile Include="Components\FakeItem.cs" />
     <Compile Include="Fika\FikaInterface.cs" />
     <Compile Include="Fika\FikaWrapper.cs" />
-    <Compile Include="Helpers\LITFikaTools.cs" />
+    <Compile Include="Addon\LITFikaTools.cs" />
     <Compile Include="Helpers\ConfigurationManagerAttributes.cs" />
     <Compile Include="Helpers\InteractionHelper.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
-    <Compile Include="Helpers\LITStaticEvents.cs" />
+    <Compile Include="Addon\LITStaticEvents.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\LITUtils.cs" />
     <Compile Include="Patches\GameEndedPatch.cs" />

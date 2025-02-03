@@ -1,5 +1,6 @@
 ﻿using EFT;
 using HarmonyLib;
+using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
