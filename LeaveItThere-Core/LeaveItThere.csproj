@@ -13,6 +13,10 @@
     <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\LeaveItThere.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -158,6 +163,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>
+      copy "$(TargetPath)" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\$(TargetFileName)"
+      copy "$(TargetDir)LeaveItThere.xml" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\LeaveItThere.xml"
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

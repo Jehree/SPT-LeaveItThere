@@ -34,15 +34,24 @@ namespace LeaveItThere.Addon
 
         public static LITPacketRegistration.Packet GetAbstractedPacket(LITGenericPacket packet)
         {
-            return new LITPacketRegistration.Packet
+            LITPacketRegistration.Packet abstractedPacket = new()
             {
                 PacketGUID = packet.PacketGUID,
                 SenderProfileId = packet.SenderProfileId,
                 Destination = (EPacketDestination)packet.Destination,
-                StringData = packet.StringData,
-                BoolData = (bool)packet.BoolData,
-                ByteArrayData = packet.ByteArrayData,
+                BoolData = packet.BoolData,
             };
+
+            if (packet.StringDataIncluded)
+            {
+                abstractedPacket.StringData = packet.StringData;
+            }
+            if (packet.ByteArrayDataIncluded)
+            {
+                abstractedPacket.ByteArrayData = packet.ByteArrayData;
+            }
+
+            return abstractedPacket;
         }
 
         public static void SendPacket(LITPacketRegistration.Packet abstractedPacket)
@@ -56,22 +65,41 @@ namespace LeaveItThere.Addon
                 throw new Exception(msg);
             }
 
+            if (FikaWrapper.IAmHost() && abstractedPacket.Destination == EPacketDestination.HostOnly) return;
+
             Plugin.LogSource.LogError("send1");
+
             LITGenericPacket packet = new()
             {
                 PacketGUID = abstractedPacket.PacketGUID,
                 SenderProfileId = abstractedPacket.SenderProfileId,
                 Destination = (int)abstractedPacket.Destination,
-                StringData = abstractedPacket.StringData,
                 BoolData = abstractedPacket.BoolData,
-                ByteArrayData = abstractedPacket.ByteArrayData,
             };
+            if (abstractedPacket.StringData != null)
+            {
+                packet.StringDataIncluded = true;
+                packet.StringData = abstractedPacket.StringData;
+            }
+            else
+            {
+                packet.StringDataIncluded = false;
+            }
+            if (abstractedPacket.ByteArrayData != null && abstractedPacket.ByteArrayData.Length > 0)
+            {
+                packet.ByteArrayDataIncluded = true;
+                packet.ByteArrayData = abstractedPacket.ByteArrayData;
+            }
+            else
+            {
+                packet.ByteArrayDataIncluded = false;
+            }
+
+
             Plugin.LogSource.LogError("send2");
             if (FikaWrapper.IAmHost())
             {
                 Plugin.LogSource.LogError("send3");
-                if (abstractedPacket.Destination == EPacketDestination.HostOnly) return;
-                Plugin.LogSource.LogError("send4");
                 // if we are the host, we won't get a return packet anyway so we don't care if Destination is Everyone or EveryoneExceptSender
                 Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
                 Plugin.LogSource.LogError("send5");

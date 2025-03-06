@@ -2,6 +2,7 @@
 using SPT.Reflection.Utils;
 using System.Collections.Generic;
 using System;
+using Newtonsoft.Json;
 
 namespace LeaveItThere.Addon
 {
@@ -19,12 +20,18 @@ namespace LeaveItThere.Addon
     }
 
     /// <summary>
-    /// Derivatives are singletons. Get them with LITPacketRegistration.Get<T>(). Do not instantiate them.
+    /// Derivatives are singletons. Get them with LITPacketRegistration.Get&lt;T&gt;(). Do not instantiate them.
+    /// <para>To use, create your own class for your packet and inherit the base: MyCustomPacket : LITPacketRegistration.</para>
+    /// <para>Register it in your plugin's Awake() function with LITPacketRegistration.Get&lt;MyCustomPacket&gt;().Register();</para>
+    /// <para>Send it with  LITPacketRegistration.Get&lt;MyCustomPacket&gt;().SendBool(), .SendString(), .SentStringAndBool(), or .SendByteArray()</para>
+    /// <para>Make sure that your derived class is in a defined namespace to avoid potential ambiguous GUID generations</para>
     /// </summary>
     public abstract class LITPacketRegistration
     {
-        public class Packet
+        public struct Packet
         {
+            public Packet() { }
+
             // both of these values are set by, and gettable from, the registration itself.
             internal string PacketGUID;
             internal EPacketDestination Destination;
@@ -39,30 +46,40 @@ namespace LeaveItThere.Addon
         }
 
         // all derivatives must be singletons
-        private static readonly Dictionary<Type, LITPacketRegistration> _instances = new();
+        private static Dictionary<Type, LITPacketRegistration> _instances = [];
 
         protected LITPacketRegistration()
         {
+            Plugin.DebugLog("1");
             var type = GetType();
+            Plugin.DebugLog("2");
             if (_instances.ContainsKey(type))
             {
+                Plugin.DebugLog("3");
                 throw new InvalidOperationException($"{type.Name} is a singleton and an instance already exists! Do not instantiate LITPacketRegistration derivatives. Get them with LITPacketRegistration.Get<T>().");
             }
+            Plugin.DebugLog("4");
             _instances[type] = this;
+            Plugin.DebugLog("5");
         }
 
         /// <summary>
         /// Gets the singleton instance of a packet registration.
         /// </summary>
-        /// <typeparam name="T">The type of your derived class. IAmTheTType : LITPacketRegistration.</typeparam>
+        /// <typeparam name="T">The type of your derived class. MyCustomPacket : LITPacketRegistration.</typeparam>
         /// <returns></returns>
         public static T Get<T>() where T : LITPacketRegistration, new()
         {
             var type = typeof(T);
+            Plugin.DebugLog($"Get<{type.Name}> called.");
+            Plugin.DebugLog("11");
             if (!_instances.ContainsKey(type))
             {
+                Plugin.DebugLog("22");
                 _instances[type] = new T();
             }
+            Plugin.DebugLog("33");
+            
             return (T)_instances[type];
         }
 
@@ -94,8 +111,6 @@ namespace LeaveItThere.Addon
         /// </summary>
         public virtual void OnPacketSent(Packet packet) { }
 
-        public string SenderProfileId { get; } = ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId;
-
         /// <summary>
         /// Registers packet. Highly recommended to register packet in plugin's Awake() function.
         /// </summary>
@@ -109,9 +124,12 @@ namespace LeaveItThere.Addon
             LITPacketTools.UnregisterPacket(PacketGUID);
         }
 
+        /// <summary>
+        /// Sends a packet via LITPacketRegistration. Consider using SendBool(), SendString(), SendStringAndBool(), or SendByteArray() instead for simplicity.
+        /// </summary>
         public void Send(Packet packet)
         {
-            packet.SenderProfileId = SenderProfileId;
+            packet.SenderProfileId = ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId;
             packet.PacketGUID = PacketGUID;
             packet.Destination = Destination;
             packet.StringData = packet.StringData.IsNullOrEmpty() ? DefaultStringData : packet.StringData;
@@ -121,6 +139,19 @@ namespace LeaveItThere.Addon
             LITPacketTools.SendPacket(packet);
         }
 
+        /// <param name="str">StringData</param>
+        /// <param name="bl">BoolData</param>
+        public void SendStringAndBool(string str, bool bl)
+        {
+            Packet packet = new Packet()
+            {
+                StringData = str,
+                BoolData = bl
+            };
+            Send(packet);
+        }
+
+        /// <param name="value">BoolData</param>
         public void SendBool(bool value)
         {
             Packet packet = new()
@@ -130,6 +161,7 @@ namespace LeaveItThere.Addon
             Send(packet);
         }
 
+        /// <param name="value">StringData</param>
         public void SendString(string value)
         {
             Packet packet = new()
@@ -139,6 +171,7 @@ namespace LeaveItThere.Addon
             Send(packet);
         }
 
+        /// <param name="value">ByteArrayData</param>
         public void SendByteArray(byte[] value)
         {
             Packet packet = new()
