@@ -305,6 +305,11 @@ namespace LeaveItThere.Components
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.ErrorMessage);
         }
 
+        /// <summary>
+        /// Fetches Addon Data on this FakeItem by it's key, returns null if none is found. T must be a class.
+        /// </summary>
+        /// <typeparam name="T">Must be a class. After Addon Data is fetched once, it can usually be modified directly without needing to use PutAddonData again since classes are stored by reference.</typeparam>
+        /// <param name="key">Key that Addon Data was saved under.</param>
         public T GetAddonDataOrNull<T>(string key) where T : class
         {
             if (!AddonData.ContainsKey(key)) return null;
@@ -317,6 +322,12 @@ namespace LeaveItThere.Components
             return (T)AddonData[key];
         }
 
+        /// <summary>
+        /// Saves Addon Data by a given key. Data will be saved to user/profiles/LeaveItThere-ItemData under the FakeItem that the data is added to.
+        /// </summary>
+        /// <typeparam name="T">Must be a class.</typeparam>
+        /// <param name="key">Key used to fetch the data later.</param>
+        /// <param name="data"></param>
         public void PutAddonData<T>(string key, T data) where T : class
         {
             AddonData[key] = data;

@@ -221,6 +221,11 @@ namespace LeaveItThere.Components
             InteractionsAllowed = enabled;
         }
 
+        /// <summary>
+        /// Fetches Global Addon Data by it's key, returns null if none is found. T must be a class.
+        /// </summary>
+        /// <typeparam name="T">Must be a class. After Addon Data is fetched once, it can usually be modified directly without needing to use PutGlobalAddonData again since classes are stored by reference.</typeparam>
+        /// <param name="key">Key that Addon Data was saved under.</param>
         public T GetGlobalAddonDataOrNull<T>(string key) where T : class
         {
             if (!GlobalAddonData.ContainsKey(key)) return null;
@@ -235,6 +240,12 @@ namespace LeaveItThere.Components
             return (T)GlobalAddonData[key];
         }
 
+        /// <summary>
+        /// Saves Global Addon Data by a given key. Data will be saved to user/profiles/LeaveItThere-ItemData. Will be globally accessible when fetched, data is not associated with any specific item.
+        /// </summary>
+        /// <typeparam name="T">Must be a class.</typeparam>
+        /// <param name="key">Key used to fetch the data later.</param>
+        /// <param name="data"></param>
         public void PutGlobalAddonData<T>(string key, T data) where T : class
         {
             GlobalAddonData[key] = data;
