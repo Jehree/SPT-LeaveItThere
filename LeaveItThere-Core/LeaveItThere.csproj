@@ -125,6 +125,9 @@
     <Reference Include="UnityEngine.AIModule">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\UnityEngine.AIModule.dll</HintPath>
     </Reference>
+    <Reference Include="SimpleZlib">
+      <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\bsg.componentace.compression.libs.zlib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addon\LITPacketRegistration.cs" />

@@ -39,10 +39,12 @@ namespace LeaveItThere.Addon
             // should be gettable so that receivers can know who sent the packet, but is internally set.
             public string SenderProfileId { get; internal set; }
 
-            // all data fields can be set as desired.
-            public string StringData = "";
-            public bool BoolData = false;
-            public byte[] ByteArrayData = [0];
+            public string JsonData;
+
+            public T GetData<T>()
+            {
+                return JsonConvert.DeserializeObject<T>(JsonData);
+            }
         }
 
         // all derivatives must be singletons
@@ -50,36 +52,26 @@ namespace LeaveItThere.Addon
 
         protected LITPacketRegistration()
         {
-            Plugin.DebugLog("1");
             var type = GetType();
-            Plugin.DebugLog("2");
             if (_instances.ContainsKey(type))
             {
-                Plugin.DebugLog("3");
                 throw new InvalidOperationException($"{type.Name} is a singleton and an instance already exists! Do not instantiate LITPacketRegistration derivatives. Get them with LITPacketRegistration.Get<T>().");
             }
-            Plugin.DebugLog("4");
             _instances[type] = this;
-            Plugin.DebugLog("5");
         }
 
         /// <summary>
-        /// Gets the singleton instance of a packet registration.
+        /// Gets or creates the singleton instance of a packet registration.
         /// </summary>
         /// <typeparam name="T">The type of your derived class. MyCustomPacket : LITPacketRegistration.</typeparam>
         /// <returns></returns>
         public static T Get<T>() where T : LITPacketRegistration, new()
         {
             var type = typeof(T);
-            Plugin.DebugLog($"Get<{type.Name}> called.");
-            Plugin.DebugLog("11");
             if (!_instances.ContainsKey(type))
             {
-                Plugin.DebugLog("22");
                 _instances[type] = new T();
             }
-            Plugin.DebugLog("33");
-            
             return (T)_instances[type];
         }
 
@@ -97,19 +89,9 @@ namespace LeaveItThere.Addon
         public virtual EPacketDestination Destination { get => EPacketDestination.Everyone; }
 
         /// <summary>
-        /// StringData in packets sent will = this value if not otherwise set.
-        /// </summary>
-        public virtual string DefaultStringData { get => ""; }
-
-        /// <summary>
-        /// ByteArrayData in packets sent will = this value if not otherwise set.
-        /// </summary>
-        public virtual byte[] DefaultByteArrayData { get => [0]; }
-
-        /// <summary>
         /// Invoked on the sender client every time the packet is sent. NOTE: This is STILL called even if Fika is not installed.
         /// </summary>
-        public virtual void OnPacketSent(Packet packet) { }
+        protected virtual void OnPacketSent(Packet packet) { }
 
         /// <summary>
         /// Registers packet. Highly recommended to register packet in plugin's Awake() function.
@@ -125,60 +107,29 @@ namespace LeaveItThere.Addon
         }
 
         /// <summary>
-        /// Sends a packet via LITPacketRegistration. Consider using SendBool(), SendString(), SendStringAndBool(), or SendByteArray() instead for simplicity.
+        /// Sends a packet via LITPacketRegistration. Consider using SendData() instead for simplicity.
         /// </summary>
-        public void Send(Packet packet)
+        internal void SendPacket(Packet packet)
         {
             packet.SenderProfileId = ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId;
             packet.PacketGUID = PacketGUID;
             packet.Destination = Destination;
-            packet.StringData = packet.StringData.IsNullOrEmpty() ? DefaultStringData : packet.StringData;
-            packet.ByteArrayData = packet.ByteArrayData.IsNullOrEmpty() ? DefaultByteArrayData : packet.ByteArrayData;
 
             OnPacketSent(packet);
             LITPacketTools.SendPacket(packet);
         }
 
-        /// <param name="str">StringData</param>
-        /// <param name="bl">BoolData</param>
-        public void SendStringAndBool(string str, bool bl)
-        {
-            Packet packet = new Packet()
-            {
-                StringData = str,
-                BoolData = bl
-            };
-            Send(packet);
-        }
-
-        /// <param name="value">BoolData</param>
-        public void SendBool(bool value)
+        /// <summary>
+        /// Sends a packet containing data given.
+        /// </summary>
+        /// <param name="data">Data to send</param>
+        public void SendData(object data)
         {
             Packet packet = new()
             {
-                BoolData = value
+                JsonData = JsonConvert.SerializeObject(data),
             };
-            Send(packet);
-        }
-
-        /// <param name="value">StringData</param>
-        public void SendString(string value)
-        {
-            Packet packet = new()
-            {
-                StringData = value
-            };
-            Send(packet);
-        }
-
-        /// <param name="value">ByteArrayData</param>
-        public void SendByteArray(byte[] value)
-        {
-            Packet packet = new()
-            {
-                ByteArrayData = value
-            };
-            Send(packet);
+            SendPacket(packet);
         }
     }
 }

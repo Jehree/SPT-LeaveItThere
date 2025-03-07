@@ -1,6 +1,7 @@
 ﻿using EFT;
 using HarmonyLib;
 using LeaveItThere.Components;
+using LeaveItThere.Fika;
 using SPT.Reflection.Patching;
 using System.Reflection;
 
