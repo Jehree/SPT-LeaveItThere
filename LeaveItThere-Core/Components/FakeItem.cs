@@ -13,8 +13,6 @@ using UnityEngine.AI;
 
 namespace LeaveItThere.Components
 {
-
-
     public class FakeItem : InteractableObject
     {
         public class AddonFlags
@@ -75,7 +73,7 @@ namespace LeaveItThere.Components
         public string ItemId { get; private set; }
         public string TemplateId { get; private set; }
 
-        public List<CustomInteraction> Actions = [];
+        public List<CustomInteraction> Interactions = [];
         public MoveableObject Moveable { get; private set; }
         private Vector3 _savedPosition;
         private Quaternion _savedRotation;
@@ -91,16 +89,16 @@ namespace LeaveItThere.Components
             LITSession.Instance.AddFakeItem(this);
             if (LootItem.Item.IsContainer)
             {
-                Actions.Add(new SearchInteraction(this));
+                Interactions.Add(new SearchInteraction(this));
             }
-            Actions.Add(new EnterMoveModeInteraction(this));
+            Interactions.Add(new EnterMoveModeInteraction(this));
 
             LITStaticEvents.InvokeOnFakeItemInitialized(this);
 
             // do this after event invokation to make sure IsPhysicalRegardlessOfSize flag is set correctly
             SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
 
-            Actions.Add(new ReclaimInteraction(this));
+            Interactions.Add(new ReclaimInteraction(this));
 
             if (Flags.RemoveRootCollider)
             {

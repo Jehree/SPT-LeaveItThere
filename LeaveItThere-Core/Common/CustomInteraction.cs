@@ -183,9 +183,9 @@ namespace LeaveItThere.Common
                 // without a check like this, ALL placed items will get the new interactions
                 if (fakeItem.TemplateId != "the item id I am targeting") return;
 
-                fakeItem.Actions.Add(new SuperSimpleExample(fakeItem));
-                fakeItem.Actions.Add(new ExampleThatRunsCodeOnceWhenCreated(fakeItem));
-                fakeItem.Actions.Add(new AllTheOtherThingsExample());
+                fakeItem.Interactions.Add(new SuperSimpleExample(fakeItem));
+                fakeItem.Interactions.Add(new ExampleThatRunsCodeOnceWhenCreated(fakeItem));
+                fakeItem.Interactions.Add(new AllTheOtherThingsExample());
             }
         }
     }
