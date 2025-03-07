@@ -13,5 +13,7 @@ See links below for more info!
 * [GameObject Layer Setting](https://github.com/Jehree/SPT-LeaveItThere/wiki/Addon-Tools-%7C-6.-GameObject-Layer-Setting)
 * [Packet Tools](https://github.com/Jehree/SPT-LeaveItThere/wiki/Addon-Tools-%7C-7.-Packet-Tools)
 
+Please note that while they are mostly finished, these tools are subject to change.
+
 Also see this page for info about Fika compatibility
 * [Fika Compatibility](https://github.com/Jehree/SPT-LeaveItThere/wiki/Fika-Compatibility)
