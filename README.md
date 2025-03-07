@@ -4,6 +4,7 @@ The tools below have been created so that mod authors can make addons for Leave 
 
 See links below for more info!
 
+* Getting Started
 * Events
 * Collision, Layer Setting
 * Generic Packet sending for Fika
