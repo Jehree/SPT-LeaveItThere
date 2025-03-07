@@ -48,8 +48,15 @@ namespace LeaveItThere
             Settings.Init(Config);
             LogSource.LogInfo("Ebu is cute :3");
 
+            if (FikaInstalled)
+            {
+                new EarlyGameStartedPatchFika().Enable();
+            }
+            else
+            {
+                new EarlyGameStartedPatch().Enable();
+            }
             new GetAvailableActionsPatch().Enable();
-            new GameStartedPatch().Enable();
             new GameEndedPatch().Enable();
             new InteractionsChangedHandlerPatch().Enable();
             new LootExperiencePatch().Enable();

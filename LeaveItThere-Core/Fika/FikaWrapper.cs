@@ -5,9 +5,11 @@ using Fika.Core.Coop.Utils;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
 using Fika.Core.Networking;
+using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Helpers;
 using LeaveItThere.Packets;
+using LeaveItThere_Packets;
 using LiteNetLib;
 using System;
 using UnityEngine;
@@ -111,6 +113,7 @@ namespace LeaveItThere.Fika
             managerCreatedEvent.Manager.RegisterPacket<LITSpawnItemPacket, NetPeer>(SpawnItemPacketReceived);
             managerCreatedEvent.Manager.RegisterPacket<LITSpawnItemInContainerPacket, NetPeer>(SpawnItemInContainerPacketReceived);
             managerCreatedEvent.Manager.RegisterPacket<LITRemoveItemFromContainerPacket, NetPeer>(RemoveItemFromContainerReceived);
+            managerCreatedEvent.Manager.RegisterPacket<LITGenericPacket, NetPeer>(LITPacketToolsWrapper.OnGenericPacketReceived);
         }
 
         public static void InitOnPluginEnabled()

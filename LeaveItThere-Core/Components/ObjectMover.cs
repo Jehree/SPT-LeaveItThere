@@ -47,8 +47,6 @@ namespace LeaveItThere.Components
             _instance = LITSession.Instance.Player.gameObject.GetOrAddComponent<ObjectMover>();
         }
 
-        /// <param name="exitMenuCallback">Called once when move mode is exited.</param>
-        /// <param name="moveModeActiveUpdateCallback">Called every frame that move mode is active, return false to force exit move mode.</param>
         public void Enable(MoveableObject target, Action<bool> disabledCallback, Action enabledUpdateCallback)
         {
             if (Enabled)

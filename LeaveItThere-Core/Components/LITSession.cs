@@ -2,6 +2,7 @@
 using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
+using LeaveItThere.Addon;
 using LeaveItThere.Common;
 using LeaveItThere.Helpers;
 using Newtonsoft.Json;

@@ -1,10 +1,11 @@
 ﻿using EFT.Interactive;
 using EFT.InventoryLogic;
 using LeaveItThere.Fika;
+using LeaveItThere.Helpers;
 using System;
 using UnityEngine;
 
-namespace LeaveItThere.Helpers
+namespace LeaveItThere.Addon
 {
     /// <summary>
     /// Exposed external tools to be used primarily by Leave It There addons

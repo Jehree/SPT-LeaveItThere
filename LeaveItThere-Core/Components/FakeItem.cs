@@ -2,6 +2,7 @@
 using EFT;
 using EFT.Interactive;
 using EFT.UI;
+using LeaveItThere.Addon;
 using LeaveItThere.Common;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
