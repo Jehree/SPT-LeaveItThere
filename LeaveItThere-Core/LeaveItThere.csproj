@@ -130,6 +130,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addon\AddonToolsExamples.cs" />
     <Compile Include="Addon\LITPacketRegistration.cs" />
     <Compile Include="Addon\LITPacketTools.cs" />
     <Compile Include="Addon\LITPacketToolsWrapper.cs" />

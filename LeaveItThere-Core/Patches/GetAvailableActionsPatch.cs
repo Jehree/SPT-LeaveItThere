@@ -22,7 +22,7 @@ namespace LeaveItThere.Patches
             if (interactive is not FakeItem) return true;
 
             FakeItem fakeItem = interactive as FakeItem;
-            ActionsReturnClass newResult = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(fakeItem.Actions) };
+            ActionsReturnClass newResult = new ActionsReturnClass { Actions = CustomInteraction.GetActionsTypesClassList(fakeItem.Interactions) };
 
             __result = newResult;
             return false;
