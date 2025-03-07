@@ -29,7 +29,7 @@ namespace LeaveItThere.Addon
         }
 
         /// <summary>
-        /// Spawns an item and syncs it with all clients. If you explicitly DON'T want syncing, use ItemHelper.SpawnItem instead.
+        /// [WORK IN PROCESS, NOT FULLY WORKING!] Spawns an item and syncs it with all clients. If you explicitly DON'T want syncing, use ItemHelper.SpawnItem instead.
         /// </summary>
         /// <param name="item">Item to spawn, create one via ItemFactory.</param>
         /// <param name="senderCallback">Gets called once item is finished spawning. ONLY CALLED BY THE SENDER.</param>
@@ -40,7 +40,7 @@ namespace LeaveItThere.Addon
         }
 
         /// <summary>
-        /// Spawns an item inside a container and syncs it with all clients. Returns whether the sender's container had space for the item. If you explicitly DON'T want syncing, use ItemHelper.SpawnItemInContainer instead.
+        /// [WORK IN PROCESS, NOT FULLY WORKING!] Spawns an item inside a container and syncs it with all clients. Returns whether the sender's container had space for the item. If you explicitly DON'T want syncing, use ItemHelper.SpawnItemInContainer instead.
         /// </summary>
         /// <param name="item">Item to spawn, create one via ItemFactory</param>
         /// <param name="senderCallback">Gets called once item is finished spawning. ONLY CALLED BY THE SENDER.</param>
@@ -55,7 +55,7 @@ namespace LeaveItThere.Addon
         }
 
         /// <summary>
-        /// Removes an Item from CompoundItem' grids. Returns 'Succeeded' property. If you explicitly DON'T want syncing, use ItemHelper.RemoveItemFromContainer instead
+        /// [WORK IN PROCESS, NOT FULLY WORKING!] Removes an Item from CompoundItem' grids. Returns 'Succeeded' property. If you explicitly DON'T want syncing, use ItemHelper.RemoveItemFromContainer instead
         /// </summary>
         public static bool RemoveItemFromContainer(CompoundItem container, Item itemToRemove)
         {
