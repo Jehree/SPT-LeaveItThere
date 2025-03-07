@@ -16,6 +16,11 @@ namespace LeaveItThere.Addon
         internal static void InvokeOnItemPlacedStateChanged(FakeItem fakeItem, bool isPlaced)
         {
             OnItemPlacedStateChanged?.Invoke(fakeItem, isPlaced);
+
+            if (!isPlaced)
+            {
+                InvokeOnFakeItemReclaimed(fakeItem);
+            }
         }
 
         public delegate void FakeItemInitializedHandler(FakeItem fakeItem);
@@ -26,6 +31,16 @@ namespace LeaveItThere.Addon
         internal static void InvokeOnFakeItemInitialized(FakeItem fakeItem)
         {
             OnFakeItemInitialized?.Invoke(fakeItem);
+        }
+
+        public delegate void FakeItemReclaimedHandler(FakeItem fakeItem);
+        /// <summary>
+        /// Invoked when an item is reclaimed. Will not be invoked if item is moved.
+        /// </summary>
+        public static event FakeItemReclaimedHandler OnFakeItemReclaimed;
+        internal static void InvokeOnFakeItemReclaimed(FakeItem fakeItem)
+        {
+            OnFakeItemReclaimed?.Invoke(fakeItem);
         }
 
         public delegate void PlacedItemSpawnedHandler(FakeItem fakeItem);
