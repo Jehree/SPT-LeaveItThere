@@ -151,7 +151,7 @@
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\LITUtils.cs" />
     <Compile Include="Patches\GameEndedPatch.cs" />
-    <Compile Include="Patches\GameStartedPatch.cs" />
+    <Compile Include="Patches\EarlyGameStartedPatch.cs" />
     <Compile Include="Patches\GetAvailableActionsPatch.cs" />
     <Compile Include="Patches\InteractionsChangedHandlerPatch.cs" />
     <Compile Include="Patches\LootExperiencePatch.cs" />
