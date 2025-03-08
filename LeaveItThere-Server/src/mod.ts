@@ -3,14 +3,9 @@ import { IPreSptLoadMod } from "@spt/models/external/IPreSptLoadMod";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { FileUtils, InitStage, ModHelper } from "./mod_helper";
 import * as fs from "fs";
-import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 import Config from "../config.json";
 import { BaseClasses } from "@spt/models/enums/BaseClasses";
-import { HealthHelper } from "@spt/helpers/HealthHelper";
 import path from "path";
-import { config } from "process";
-import { convertTypeAcquisitionFromJson } from "typescript";
-import { error } from "console";
 
 class Mod implements IPreSptLoadMod, IPostDBLoadMod {
     public Helper = new ModHelper();
