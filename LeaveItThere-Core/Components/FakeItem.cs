@@ -402,6 +402,7 @@ namespace LeaveItThere.Components
                                                                     : "Reclaim";
             public override string TargetName => FakeItem.LootItem.Name.Localized();
             public override bool Enabled => !FakeItem.Flags.ReclaimInteractionDisabled;
+            public override bool AutoPromptRefresh => true;
 
             public override void OnInteract()
             {

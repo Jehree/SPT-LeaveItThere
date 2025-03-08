@@ -25,7 +25,7 @@ namespace LeaveItThere.Addon
 
             public override void OnInteract()
             {
-                NotificationManagerClass.DisplayMessageNotification("My Simple Interction selected!");
+                NotificationManagerClass.DisplayMessageNotification("My Simple Interaction selected!");
             }
         }
     }

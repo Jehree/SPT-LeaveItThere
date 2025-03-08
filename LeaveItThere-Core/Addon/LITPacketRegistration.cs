@@ -3,6 +3,7 @@ using SPT.Reflection.Utils;
 using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
+using LeaveItThere.Fika;
 
 namespace LeaveItThere.Addon
 {
@@ -125,6 +126,9 @@ namespace LeaveItThere.Addon
         /// <param name="data">Data to send</param>
         public void SendData(object data)
         {
+            if (!Plugin.FikaInstalled) return;
+            if (FikaInterface.IAmHost() && Destination == EPacketDestination.HostOnly) return;
+
             Packet packet = new()
             {
                 JsonData = JsonConvert.SerializeObject(data),
