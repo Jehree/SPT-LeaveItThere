@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
 using HarmonyLib;
 using LeaveItThere.Components;
 using LeaveItThere.Fika;
@@ -16,9 +17,10 @@ namespace LeaveItThere.Patches
         }
 
         [PatchPostfix]
-        static void PatchPrefix()
+        static void PatchPrefix(GameWorld __instance)
         {
-            Plugin.DebugLog("happened");
+            if (__instance is HideoutGameWorld) return;
+
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }
@@ -35,7 +37,6 @@ namespace LeaveItThere.Patches
         [PatchPostfix]
         static void PatchPrefix()
         {
-            Plugin.DebugLog("happened");
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }
