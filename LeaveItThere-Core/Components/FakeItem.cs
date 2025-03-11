@@ -204,6 +204,7 @@ namespace LeaveItThere.Components
 
         public void PlaceAtLootItem()
         {
+            LootItem.StopPhysics();
             LITSession.Instance.SpendPoints(ItemHelper.GetItemCost(LootItem.Item));
             SetLocation(LootItem.gameObject.transform.position, LootItem.gameObject.transform.rotation);
             LootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
