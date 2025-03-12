@@ -28,6 +28,8 @@ namespace LeaveItThere.Addon
             return FikaInterface.GetRaidId();
         }
 
+
+        // METHODS BELOW NEED TO BE ADAPTED TO USE AN INTERFACE CLASS INSTEAD OF FikaWrapper DIRECTLY
         /// <summary>
         /// [WORK IN PROCESS, NOT FULLY WORKING!] Spawns an item and syncs it with all clients. If you explicitly DON'T want syncing, use ItemHelper.SpawnItem instead.
         /// </summary>

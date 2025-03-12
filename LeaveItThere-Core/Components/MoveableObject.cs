@@ -33,7 +33,7 @@ namespace LeaveItThere.Components
         {
             _rigidbody = gameObject.GetOrAddComponent<Rigidbody>();
             DisablePhysics();
-            EFTPhysicsClass.GClass712.SupportRigidbody(Rigidbody);
+            EFTPhysicsClass.GClass723.SupportRigidbody(Rigidbody);
         }
 
         private void FixedUpdate()

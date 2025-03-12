@@ -25,8 +25,8 @@ namespace LeaveItThere.Packets
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(ItemId);
-            writer.Put(Position);
-            writer.Put(Rotation);
+            //writer.Put(Position);
+            //writer.Put(Rotation);
             writer.Put(IsPlaced);
             writer.Put(PhysicsEnableRequested);
         }
@@ -48,8 +48,8 @@ namespace LeaveItThere.Packets
         public void Serialize(NetDataWriter writer)
         {
             writer.PutItem(Item);
-            writer.Put(Position);
-            writer.Put(Rotation);
+            //writer.Put(Position);
+            //writer.Put(Rotation);
         }
     }
 

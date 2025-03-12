@@ -34,6 +34,7 @@ namespace LeaveItThere
 
             LogSource = Logger;
 
+            /*
             if (File.Exists(_itemFilterPath))
             {
                 PlaceableItemFilter = JsonConvert.DeserializeObject<ItemFilter>(File.ReadAllText(_itemFilterPath));
@@ -62,11 +63,13 @@ namespace LeaveItThere
             new LootExperiencePatch().Enable();
 
             ConsoleScreen.Processor.RegisterCommandGroup<ConsoleCommands>();
+            */
         }
 
         private void OnEnable()
         {
-            FikaInterface.InitOnPluginEnabled();
+            DebugLog(FikaInstalled.ToString());
+            //FikaInterface.InitOnPluginEnabled();
         }
 
         public static void DebugLog(string message)
