@@ -17,7 +17,7 @@ namespace LeaveItThere
 #else
     [BepInIncompatibility("com.fika.core")]
 #endif
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.5.1")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.6.0")]
     public class Plugin : BaseUnityPlugin
     {
         public const string DataToServerURL = "/jehree/pip/data_to_server";
