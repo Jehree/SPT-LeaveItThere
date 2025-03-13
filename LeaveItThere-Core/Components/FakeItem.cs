@@ -336,7 +336,7 @@ namespace LeaveItThere.Components
 
         public class SearchInteraction : CustomInteraction
         {
-            private GetActionsClass.Class1612 _searchClass;
+            private GetActionsClass.Class1622 _searchClass;
 
             public SearchInteraction(FakeItem fakeItem) : base(fakeItem)
             {

@@ -18,7 +18,7 @@ import { ItemHelper } from "@spt/helpers/ItemHelper";
 import { ITemplateItem } from "@spt/models/eft/common/tables/ITemplateItem";
 import { IQuest } from "@spt/models/eft/common/tables/IQuest";
 import { ILocaleBase } from "@spt/models/spt/server/ILocaleBase";
-import { VFS } from "@spt/utils/VFS";
+import { FileSystem } from "@spt/utils/FileSystem";
 import { BotGeneratorHelper } from "@spt/helpers/BotGeneratorHelper";
 import { HashUtil } from "@spt/utils/HashUtil";
 import { ITrader } from "@spt/models/eft/common/tables/ITrader";
@@ -155,7 +155,7 @@ export class ModHelper {
     public itemHelper: ItemHelper;
     public logger: ILogger;
     public staticRouter: StaticRouterModService;
-    public vfs: VFS;
+    public fileSystem: FileSystem;
     public hashUtil: HashUtil;
     public inventoryHelper: InventoryHelper;
     public lootGenerator: LootGenerator;
@@ -187,7 +187,7 @@ export class ModHelper {
             this.itemHelper = container.resolve<ItemHelper>("ItemHelper");
             this.logger = container.resolve<ILogger>("WinstonLogger");
             this.staticRouter = container.resolve<StaticRouterModService>("StaticRouterModService");
-            this.vfs = container.resolve<VFS>("VFS");
+            this.fileSystem = container.resolve<FileSystem>("FileSystem");
             this.hashUtil = container.resolve<HashUtil>("HashUtil");
             this.itemHelper = container.resolve<ItemHelper>("ItemHelper");
             this.inventoryHelper = container.resolve<InventoryHelper>("InventoryHelper");

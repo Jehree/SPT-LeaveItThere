@@ -56,7 +56,7 @@ namespace LeaveItThere.Addon
             var type = GetType();
             if (_instances.ContainsKey(type))
             {
-                throw new InvalidOperationException($"{type.Name} is a singleton and an instance already exists! Do not instantiate LITPacketRegistration derivatives. Get them with LITPacketRegistration.Get<T>().");
+                throw new InvalidOperationException($"{type.Name} is a singleton and an instance already exists! Do not instantiate LITPacketRegistration derivatives. Get them with LITPacketRegistration.Get<YourPacketClassName>().");
             }
             _instances[type] = this;
         }
@@ -79,7 +79,7 @@ namespace LeaveItThere.Addon
         internal string PacketGUID { get => $"{GetType().Namespace}.{GetType().Name}"; }
 
         /// <summary>
-        /// Invoked when the packet is received. NOTE: This will NEVER be called if Fika is not installed.
+        /// Invoked when the packet is received. NOTE: This is NEVER called unless if Fika is installed.
         /// </summary>
         /// <param name="packet">Get needed data from packet with: packet.BoolData, packet.StringData, or packet.ByteArrayData</param>
         public abstract void OnPacketReceived(Packet packet);
@@ -90,7 +90,7 @@ namespace LeaveItThere.Addon
         public virtual EPacketDestination Destination { get => EPacketDestination.Everyone; }
 
         /// <summary>
-        /// Invoked on the sender client every time the packet is sent. NOTE: This is STILL called even if Fika is not installed.
+        /// Invoked on the sender client every time the packet is sent. NOTE: This is never called unless Fika is installed.
         /// </summary>
         protected virtual void OnPacketSent(Packet packet) { }
 
@@ -107,9 +107,6 @@ namespace LeaveItThere.Addon
             LITPacketTools.UnregisterPacket(PacketGUID);
         }
 
-        /// <summary>
-        /// Sends a packet via LITPacketRegistration. Consider using SendData() instead for simplicity.
-        /// </summary>
         internal void SendPacket(Packet packet)
         {
             packet.SenderProfileId = ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId;
@@ -121,12 +118,12 @@ namespace LeaveItThere.Addon
         }
 
         /// <summary>
-        /// Sends a packet containing data given.
+        /// Sends a packet containing data given. This function does nothing if Fika is not installed.
         /// </summary>
         /// <param name="data">Data to send</param>
         public void SendData(object data)
         {
-            if (!Plugin.FikaInstalled) return;
+#if FIKA_COMPATIBLE
             if (FikaInterface.IAmHost() && Destination == EPacketDestination.HostOnly) return;
 
             Packet packet = new()
@@ -134,6 +131,7 @@ namespace LeaveItThere.Addon
                 JsonData = JsonConvert.SerializeObject(data),
             };
             SendPacket(packet);
+#endif
         }
     }
 }

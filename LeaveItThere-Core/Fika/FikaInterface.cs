@@ -7,26 +7,34 @@ namespace LeaveItThere.Fika
     {
         internal static void InitOnPluginEnabled()
         {
-            if (!Plugin.FikaInstalled) return;
+#if FIKA_COMPATIBLE
             FikaWrapper.InitOnPluginEnabled();
+#endif
         }
 
         internal static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool isPlaced, bool physicsEnableRequested = false)
         {
-            if (!Plugin.FikaInstalled) return;
+#if FIKA_COMPATIBLE
             FikaWrapper.SendPlacedStateChangedPacket(fakeItem, isPlaced, physicsEnableRequested);
+#endif
         }
 
         public static bool IAmHost()
         {
-            if (!Plugin.FikaInstalled) return true;
+#if FIKA_COMPATIBLE
             return FikaWrapper.IAmHost();
+#else
+            return true;
+#endif
         }
 
         public static string GetRaidId()
         {
-            if (!Plugin.FikaInstalled) return ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId;
+#if FIKA_COMPATIBLE
             return FikaWrapper.GetRaidId();
+#else
+            return ClientAppUtils.GetMainApp().GetClientBackEndSession().Profile.ProfileId;
+#endif
         }
     }
 }

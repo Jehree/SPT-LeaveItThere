@@ -1,4 +1,5 @@
-﻿using Comfort.Common;
+﻿#if FIKA_COMPATIBLE
+using Comfort.Common;
 using ComponentAce.Compression.Libs.zlib;
 using EFT.UI;
 using Fika.Core.Networking;
@@ -117,3 +118,4 @@ namespace LeaveItThere.Addon
         }
     }
 }
+#endif

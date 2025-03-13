@@ -1,4 +1,5 @@
-﻿using Comfort.Common;
+﻿#if FIKA_COMPATIBLE
+using Comfort.Common;
 using EFT.Interactive;
 using EFT.InventoryLogic;
 using Fika.Core.Coop.Utils;
@@ -250,3 +251,4 @@ namespace LeaveItThere.Fika
         }
     }
 }
+#endif

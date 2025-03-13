@@ -96,7 +96,7 @@ namespace LeaveItThere.Helpers
             List<ResourceKey> collection = GetBundleResourceKeys(item);
 
             // this loads le bundles
-            Task loadTask = Singleton<PoolManager>.Instance.LoadBundlesAndCreatePools(PoolManager.PoolsCategory.Raid, PoolManager.AssemblyType.Online, [.. collection], JobPriority.Immediate, null, default);
+            Task loadTask = Singleton<PoolManagerClass>.Instance.LoadBundlesAndCreatePools(PoolManagerClass.PoolsCategory.Raid, PoolManagerClass.AssemblyType.Online, [.. collection], JobPriorityClass.Immediate, null, default);
             while (!loadTask.IsCompleted)
             {
                 yield return new WaitForEndOfFrame();
@@ -132,8 +132,8 @@ namespace LeaveItThere.Helpers
 
         public static byte[] ItemToBytes(Item item)
         {
-            GClass1198 eftWriter = new();
-            GClass1659 descriptor = GClass1685.SerializeItem(item, Singleton<GameWorld>.Instance.MainPlayer.SearchController);
+            EFTWriterClass eftWriter = new();
+            var descriptor = EFTItemSerializerClass.SerializeItem(item, Singleton<GameWorld>.Instance.MainPlayer.SearchController);
             eftWriter.WriteEFTItemDescriptor(descriptor);
             return eftWriter.ToArray();
         }
@@ -148,8 +148,8 @@ namespace LeaveItThere.Helpers
         {
             try
             {
-                GClass1193 eftReader = new(bytes);
-                return GClass1685.DeserializeItem(eftReader.ReadEFTItemDescriptor(), Singleton<ItemFactoryClass>.Instance, []);
+                EFTReaderClass eftReader = new(new ArraySegment<byte>(bytes));
+                return EFTItemSerializerClass.DeserializeItem(eftReader.ReadEFTItemDescriptor(), Singleton<ItemFactoryClass>.Instance, []);
             }
             catch (Exception e)
             {
@@ -189,7 +189,7 @@ namespace LeaveItThere.Helpers
                 searchableItem,
                 (Item item) =>
                 {
-                    controller.SetItemAsKnown(item);
+                    controller.SetItemAsKnown(item, false);
                     if (item is SearchableItemItemClass)
                     {
                         controller.SetItemAsSearched(item as SearchableItemItemClass);
@@ -316,7 +316,7 @@ namespace LeaveItThere.Helpers
         {
             new TraderControllerClass(item, item.Id, item.ShortName);
 
-            GameObject gameObject = Singleton<PoolManager>.Instance.CreateLootPrefab(item, Player.GetVisibleToCamera(LITSession.Instance.Player));
+            GameObject gameObject = Singleton<PoolManagerClass>.Instance.CreateLootPrefab(item, Player.GetVisibleToCamera(LITSession.Instance.Player));
             gameObject.SetActive(true);
 
             LootItem newLootItem = LITSession.Instance.GameWorld.CreateLootWithRigidbody(gameObject, item, item.ShortName, false, null, out BoxCollider boxCollider, true);

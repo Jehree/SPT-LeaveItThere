@@ -23,7 +23,7 @@ namespace LeaveItThere.Patches
                 !targetClass.IsInterface &&
                 !targetClass.IsNested &&
                 targetClass.GetMethods().Any(method => method.Name == "LocalRaidEnded") &&
-                targetClass.GetMethods().Any(method => method.Name == "ReceiveInsurancePrices")
+                targetClass.GetMethods().Any(method => method.Name == "LocalRaidStarted")
             );
 
             MethodInfo targetMethod = AccessTools.Method(_targetClassType.GetTypeInfo(), "LocalRaidEnded");
