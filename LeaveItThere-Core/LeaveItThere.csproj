@@ -173,9 +173,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-      copy "$(TargetPath)" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\$(TargetFileName)"
-      copy "$(TargetDir)LeaveItThere.xml" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\LeaveItThere.xml"
-    </PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\$(TargetFileName)"
+copy "$(TargetDir)LeaveItThere.xml" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\LeaveItThere.xml"</PostBuildEvent>
   </PropertyGroup>
 </Project>
