@@ -8,9 +8,9 @@ using System.Reflection;
 
 namespace LeaveItThere.Patches
 {
-    // This patch is only enabled when Fika is installed
-    internal class EarlyGameStartedPatchFika : ModulePatch
+    internal class EarlyGameStartedPatch : ModulePatch
     {
+#if FIKA_COMPATIBLE
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(GameWorld), nameof(GameWorld.RegisterRestrictableZones));
@@ -24,11 +24,7 @@ namespace LeaveItThere.Patches
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }
-    }
-
-    // This patch is only enabled when Fika is NOT installed
-    internal class EarlyGameStartedPatch : ModulePatch
-    {
+#else
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotsController), nameof(BotsController.SetSettings));
@@ -40,5 +36,6 @@ namespace LeaveItThere.Patches
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }
+#endif
     }
 }

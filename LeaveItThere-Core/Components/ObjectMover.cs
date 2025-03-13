@@ -20,7 +20,6 @@ namespace LeaveItThere.Components
 
         private bool _translationModeEnabled = false;
         private bool _rotationModeEnabled = false;
-        private bool _physicsEnabled = false;
 
         private Quaternion _lockedRotation;
         private Vector3 _lockedPosition;

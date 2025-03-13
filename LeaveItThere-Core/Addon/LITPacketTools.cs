@@ -10,8 +10,9 @@ namespace LeaveItThere.Addon
         /// </summary>
         public static void RegisterPacket(LITPacketRegistration registration)
         {
-            if (!Plugin.FikaInstalled) return;
+#if FIKA_COMPATIBLE
             LITPacketToolsWrapper.RegisterPacket(registration);
+#endif
         }
 
         /// <summary>
@@ -19,14 +20,16 @@ namespace LeaveItThere.Addon
         /// </summary>
         public static void UnregisterPacket(string packetGUID)
         {
-            if (!Plugin.FikaInstalled) return;
+#if FIKA_COMPATIBLE
             LITPacketToolsWrapper.UnregisterPacket(packetGUID);
+#endif
         }
 
         internal static void SendPacket(LITPacketRegistration.Packet packet)
         {
-            if (!Plugin.FikaInstalled) return;
+#if FIKA_COMPATIBLE
             LITPacketToolsWrapper.SendPacket(packet);
+#endif
         }
     }
 }
