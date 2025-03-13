@@ -100,7 +100,7 @@ namespace LeaveItThere.Components
 
             Interactions.Add(new ReclaimInteraction(this));
 
-            if (Flags.RemoveRootCollider)
+            if (Flags.RemoveRootCollider || gameObject.name.Contains("LITRemoveRootCollider"))
             {
                 GetComponents<BoxCollider>().ExecuteForEach(col => col.enabled = false);
             }
