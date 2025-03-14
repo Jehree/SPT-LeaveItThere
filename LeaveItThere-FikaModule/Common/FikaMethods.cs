@@ -36,7 +36,7 @@ namespace LeaveItThere.FikaModule.Common
             }
         }
 
-        private static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet, NetPeer peer)
+        private static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet)
         {
             if (packet.IsPlaced)
             {
@@ -97,7 +97,7 @@ namespace LeaveItThere.FikaModule.Common
 
         public static void OnFikaNetManagerCreated(FikaNetworkManagerCreatedEvent managerCreatedEvent)
         {
-            managerCreatedEvent.Manager.RegisterPacket<PlacedItemStateChangedPacket, NetPeer>(OnPlacedItemStateChangedPacketReceived);
+            managerCreatedEvent.Manager.RegisterPacket<PlacedItemStateChangedPacket>(OnPlacedItemStateChangedPacketReceived);
             managerCreatedEvent.Manager.RegisterPacket<LITSpawnItemPacket, NetPeer>(SpawnItemPacketReceived);
             managerCreatedEvent.Manager.RegisterPacket<LITGenericPacket, NetPeer>(GenericPacketTools.OnGenericPacketReceived);
         }

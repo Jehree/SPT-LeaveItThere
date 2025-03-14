@@ -23,25 +23,16 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;FIKA_COMPATIBLE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\LeaveItThere.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'FikaCompatible|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;FIKA_COMPATIBLE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\LeaveItThere.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SinglePlayerOnly|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SINGLE_PLAYER_ONLY</DefineConstants>
+    <DefineConstants>TRACE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\LeaveItThere.xml</DocumentationFile>
@@ -129,9 +120,6 @@
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\bsg.console.core.dll</HintPath>
     </Reference>
     <Reference Include="DissonanceVoip" HintPath="..\..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll" Private="false" />
-    <Reference Include="Fika.Core">
-      <HintPath>..\..\..\BepInEx\plugins\Fika.Core.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\UnityEngine.AIModule.dll</HintPath>
     </Reference>

@@ -73,9 +73,8 @@ namespace LeaveItThere
         {
             if (!FikaInstalled) return;
 
-            string assemblyPath = Path.Combine(AssemblyFolderPath, "LeaveItThere-FikaModule.dll");
-            Assembly fikaAssembly = Assembly.LoadFrom(assemblyPath);
-            Type main = fikaAssembly.GetType("LeaveItThere.FikaModule.Main");
+            Assembly fikaModuleAssembly = Assembly.Load("LeaveItThere-FikaModule");
+            Type main = fikaModuleAssembly.GetType("LeaveItThere.FikaModule.Main");
             MethodInfo init = main.GetMethod("Init");
 
             init.Invoke(main, null);
