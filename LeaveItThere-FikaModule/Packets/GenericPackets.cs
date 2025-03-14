@@ -1,8 +1,7 @@
-﻿#if FIKA_COMPATIBLE
-using Fika.Core.Networking;
+﻿using Fika.Core.Networking;
 using LiteNetLib.Utils;
 
-namespace LeaveItThere_Packets
+namespace LeaveItThere.FikaModule.Packets
 {
     public struct LITGenericPacket : INetSerializable
     {
@@ -28,4 +27,3 @@ namespace LeaveItThere_Packets
         }
     }
 }
-#endif

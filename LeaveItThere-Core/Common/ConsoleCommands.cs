@@ -21,7 +21,7 @@ namespace LeaveItThere.Common
                 costAmount,
                 (FakeItem fakeItem) =>
                 {
-                    FikaInterface.SendPlacedStateChangedPacket(fakeItem, false);
+                    FikaBridge.SendPlacedStateChangedPacket(fakeItem, false);
                     fakeItem.Reclaim();
                 }
             );
@@ -38,7 +38,7 @@ namespace LeaveItThere.Common
                 {
                     LITSession session = LITSession.Instance;
                     fakeItem.PlaceAtPosition(LITUtils.PlayerFront, session.Player.Transform.rotation);
-                    FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
+                    FikaBridge.SendPlacedStateChangedPacket(fakeItem, true);
                 }
             );
         }
@@ -59,7 +59,7 @@ namespace LeaveItThere.Common
 
             ConsoleScreen.Log("Teleporting item!");
             fakeItem.PlaceAtPosition(LITUtils.PlayerFront, session.Player.Transform.rotation);
-            FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
+            FikaBridge.SendPlacedStateChangedPacket(fakeItem, true);
         }
 
         [ConsoleCommand("lit_list_placed_items", "", null, "List information about all placed items on the map.")]

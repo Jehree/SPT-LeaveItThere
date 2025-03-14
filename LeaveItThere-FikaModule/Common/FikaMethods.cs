@@ -1,29 +1,21 @@
-﻿#if FIKA_COMPATIBLE
-using Comfort.Common;
+﻿using Comfort.Common;
 using EFT.Interactive;
 using EFT.InventoryLogic;
-using Fika.Core.Coop.Utils;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
 using Fika.Core.Networking;
 using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Helpers;
-using LeaveItThere.Packets;
-using LeaveItThere_Packets;
 using LiteNetLib;
 using System;
 using UnityEngine;
+using LeaveItThere.FikaModule.Packets;
 
-namespace LeaveItThere.Fika
+namespace LeaveItThere.FikaModule.Common
 {
-    internal class FikaWrapper
+    internal class FikaMethods
     {
-        public static bool IAmHost()
-        {
-            return Singleton<FikaServer>.Instantiated;
-        }
-
         public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool isPlaced, bool physicsEnableRequested = false)
         {
             PlacedItemStateChangedPacket packet = new PlacedItemStateChangedPacket
@@ -36,20 +28,15 @@ namespace LeaveItThere.Fika
             };
             if (Singleton<FikaServer>.Instantiated)
             {
-                Singleton<FikaServer>.Instance.SendDataToAll<PlacedItemStateChangedPacket>(ref packet, DeliveryMethod.ReliableOrdered);
+                Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
             }
             if (Singleton<FikaClient>.Instantiated)
             {
-                Singleton<FikaClient>.Instance.SendData<PlacedItemStateChangedPacket>(ref packet, DeliveryMethod.ReliableOrdered);
+                Singleton<FikaClient>.Instance.SendData(ref packet, DeliveryMethod.ReliableOrdered);
             }
         }
 
-        public static string GetRaidId()
-        {
-            return FikaBackendUtils.GroupId;
-        }
-
-        public static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet, NetPeer peer)
+        private static void OnPlacedItemStateChangedPacketReceived(PlacedItemStateChangedPacket packet)
         {
             if (packet.IsPlaced)
             {
@@ -60,7 +47,7 @@ namespace LeaveItThere.Fika
                 ReclaimItemPackedReceived(packet);
             }
 
-            if (IAmHost())
+            if (Main.IAmHost())
             {
                 Singleton<FikaServer>.Instance.SendDataToAll(ref packet, LiteNetLib.DeliveryMethod.ReliableOrdered);
             }
@@ -110,11 +97,9 @@ namespace LeaveItThere.Fika
 
         public static void OnFikaNetManagerCreated(FikaNetworkManagerCreatedEvent managerCreatedEvent)
         {
-            managerCreatedEvent.Manager.RegisterPacket<PlacedItemStateChangedPacket, NetPeer>(OnPlacedItemStateChangedPacketReceived);
+            managerCreatedEvent.Manager.RegisterPacket<PlacedItemStateChangedPacket>(OnPlacedItemStateChangedPacketReceived);
             managerCreatedEvent.Manager.RegisterPacket<LITSpawnItemPacket, NetPeer>(SpawnItemPacketReceived);
-            managerCreatedEvent.Manager.RegisterPacket<LITSpawnItemInContainerPacket, NetPeer>(SpawnItemInContainerPacketReceived);
-            managerCreatedEvent.Manager.RegisterPacket<LITRemoveItemFromContainerPacket, NetPeer>(RemoveItemFromContainerReceived);
-            managerCreatedEvent.Manager.RegisterPacket<LITGenericPacket, NetPeer>(LITPacketToolsWrapper.OnGenericPacketReceived);
+            managerCreatedEvent.Manager.RegisterPacket<LITGenericPacket, NetPeer>(GenericPacketTools.OnGenericPacketReceived);
         }
 
         public static void InitOnPluginEnabled()
@@ -134,7 +119,7 @@ namespace LeaveItThere.Fika
                 Rotation = rotation
             };
 
-            if (IAmHost())
+            if (Main.IAmHost())
             {
                 // if the host is spawning the item, all peers need to told to do the same
                 Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
@@ -151,7 +136,7 @@ namespace LeaveItThere.Fika
         {
             ItemHelper.SpawnItem(packet.Item, packet.Position, packet.Rotation);
 
-            if (!IAmHost()) return;
+            if (!Main.IAmHost()) return;
 
             FikaServer fikaServer = Singleton<FikaServer>.Instance;
             NetManager netServer = fikaServer.NetServer;
@@ -159,91 +144,6 @@ namespace LeaveItThere.Fika
             foreach (NetPeer p in netServer.ConnectedPeerList)
             {
                 // do not return a packet to the sender, they already spawned the item locally
-                if (p == peer) continue;
-
-                fikaServer.SendDataToPeer(p, ref packet, DeliveryMethod.ReliableOrdered);
-            }
-        }
-
-        public static void SendSpawnItemInContainerPacket(Item container, Item item, Action<LootItem> senderCallback)
-        {
-            LITSpawnItemInContainerPacket packet = new()
-            {
-                Container = container,
-                Item = item
-            };
-
-            ItemHelper.SpawnItemInContainer(container as CompoundItem, item, senderCallback);
-
-            if (IAmHost())
-            {
-                // if the host is spawning the item, all peers need to told to do the same
-                Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
-            }
-            else
-            {
-                // if a client is spawning the item, the host needs to be told about it
-                // the host will not return a packet to the sender
-                Singleton<FikaClient>.Instance.SendData(ref packet, DeliveryMethod.ReliableOrdered);
-            }
-        }
-
-        public static void SpawnItemInContainerPacketReceived(LITSpawnItemInContainerPacket packet, NetPeer peer)
-        {
-            ItemHelper.SpawnItemInContainer(packet.Container as CompoundItem, packet.Item);
-
-            if (!IAmHost()) return;
-
-            FikaServer fikaServer = Singleton<FikaServer>.Instance;
-            NetManager netServer = fikaServer.NetServer;
-
-            foreach (NetPeer p in netServer.ConnectedPeerList)
-            {
-                // do not return a packet to the sender, they already spawned the item locally
-                if (p == peer) continue;
-
-                fikaServer.SendDataToPeer(p, ref packet, DeliveryMethod.ReliableOrdered);
-            }
-        }
-
-        public static bool SendRemoveItemFromContainerPacket(Item container, Item itemToRemove)
-        {
-            LITRemoveItemFromContainerPacket packet = new()
-            {
-                Container = container,
-                ItemToRemove = itemToRemove
-            };
-
-            bool success = ItemHelper.RemoveItemFromContainer(container as CompoundItem, itemToRemove);
-
-            if (IAmHost())
-            {
-                // if the host is removing the item, all peers need to told to do the same
-                Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
-            }
-            else
-            {
-                // if a client is removing the item, the host needs to be told about it
-                // the host will not return a packet to the sender
-                Singleton<FikaClient>.Instance.SendData(ref packet, DeliveryMethod.ReliableOrdered);
-            }
-
-            return success;
-        }
-
-        private static void RemoveItemFromContainerReceived(LITRemoveItemFromContainerPacket packet, NetPeer peer)
-        {
-            ItemHelper.RemoveItemFromContainer(packet.Container as CompoundItem, packet.ItemToRemove);
-            Plugin.DebugLog("RemoveItemFromContainerReceived");
-
-            if (!IAmHost()) return;
-
-            FikaServer fikaServer = Singleton<FikaServer>.Instance;
-            NetManager netServer = fikaServer.NetServer;
-
-            foreach (NetPeer p in netServer.ConnectedPeerList)
-            {
-                // do not return a packet to the sender, they already removed the item locally
                 if (p == peer) continue;
 
                 fikaServer.SendDataToPeer(p, ref packet, DeliveryMethod.ReliableOrdered);
@@ -251,4 +151,3 @@ namespace LeaveItThere.Fika
         }
     }
 }
-#endif

@@ -17,7 +17,7 @@ namespace LeaveItThere.Addon
         /// </summary>
         public static bool IAmHost()
         {
-            return FikaInterface.IAmHost();
+            return FikaBridge.IAmHost();
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace LeaveItThere.Addon
         /// </summary>
         public static string GetRaidId()
         {
-            return FikaInterface.GetRaidId();
+            return FikaBridge.GetRaidId();
         }
     }
 }

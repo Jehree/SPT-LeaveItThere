@@ -10,7 +10,21 @@ namespace LeaveItThere.Patches
 {
     internal class EarlyGameStartedPatch : ModulePatch
     {
-#if FIKA_COMPATIBLE
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotsController), nameof(BotsController.SetSettings));
+        }
+
+        [PatchPostfix]
+        static void PatchPrefix()
+        {
+            LITSession.CreateNewModSession();
+            ObjectMover.CreateNewObjectMover();
+        }
+    }
+
+    internal class EarlyGameStartedPatchFika : ModulePatch
+    {
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(GameWorld), nameof(GameWorld.RegisterRestrictableZones));
@@ -24,18 +38,5 @@ namespace LeaveItThere.Patches
             LITSession.CreateNewModSession();
             ObjectMover.CreateNewObjectMover();
         }
-#else
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsController), nameof(BotsController.SetSettings));
-        }
-
-        [PatchPostfix]
-        static void PatchPrefix()
-        {
-            LITSession.CreateNewModSession();
-            ObjectMover.CreateNewObjectMover();
-        }
-#endif
     }
 }

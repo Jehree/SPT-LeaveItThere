@@ -61,7 +61,7 @@ namespace LeaveItThere.Common
         public PlacedItemDataPack() { }
         public PlacedItemDataPack(Dictionary<string, object> globalAddonData, List<PlacedItemData> itemTemplates = null)
         {
-            ProfileId = FikaInterface.GetRaidId();
+            ProfileId = FikaBridge.GetRaidId();
             MapId = Singleton<GameWorld>.Instance.LocationId;
             ItemTemplates = [];
             GlobalAddonData = globalAddonData;
