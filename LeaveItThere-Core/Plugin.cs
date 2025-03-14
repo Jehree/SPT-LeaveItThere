@@ -7,19 +7,18 @@ using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using LeaveItThere.Patches;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Reflection;
 
 namespace LeaveItThere
 {
-#if FIKA_COMPATIBLE
-    [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.HardDependency)]
-#else
-    [BepInIncompatibility("com.fika.core")]
-#endif
+    [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.6.0")]
     public class Plugin : BaseUnityPlugin
     {
+        public static bool FikaInstalled { get; private set; }
+
         public const string DataToServerURL = "/jehree/pip/data_to_server";
         public const string DataToClientURL = "/jehree/pip/data_to_client";
 
@@ -30,6 +29,7 @@ namespace LeaveItThere
         internal static ItemFilter PlaceableItemFilter { get; private set; }
         private void Awake()
         {
+            FikaInstalled = Chainloader.PluginInfos.ContainsKey("com.fika.core");
             LogSource = Logger;
 
             if (File.Exists(_itemFilterPath))
@@ -46,18 +46,39 @@ namespace LeaveItThere
             Settings.Init(Config);
             LogSource.LogInfo("Ebu is cute :3");
 
-            new EarlyGameStartedPatch().Enable();
+            if (FikaInstalled)
+            {
+                new EarlyGameStartedPatchFika().Enable();
+            }
+            else
+            {
+                new EarlyGameStartedPatch().Enable();
+            }
             new GetAvailableActionsPatch().Enable();
             new GameEndedPatch().Enable();
             new InteractionsChangedHandlerPatch().Enable();
             new LootExperiencePatch().Enable();
 
             ConsoleScreen.Processor.RegisterCommandGroup<ConsoleCommands>();
+
+            TryInitFikaAssembly();
         }
 
         private void OnEnable()
         {
-            FikaInterface.InitOnPluginEnabled();
+            FikaBridge.PluginEnable();
+        }
+
+        void TryInitFikaAssembly()
+        {
+            if (!FikaInstalled) return;
+
+            string assemblyPath = Path.Combine(AssemblyFolderPath, "LeaveItThere-FikaModule.dll");
+            Assembly fikaAssembly = Assembly.LoadFrom(assemblyPath);
+            Type main = fikaAssembly.GetType("LeaveItThere.FikaModule.Main");
+            MethodInfo init = main.GetMethod("Init");
+
+            init.Invoke(main, null);
         }
 
         public static void DebugLog(string message)

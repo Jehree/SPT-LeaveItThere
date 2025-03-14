@@ -99,12 +99,12 @@ namespace LeaveItThere.Addon
         /// </summary>
         public void Register()
         {
-            LITPacketTools.RegisterPacket(this);
+            FikaBridge.RegisterPacket(this);
         }
 
         public void Unregister()
         {
-            LITPacketTools.UnregisterPacket(PacketGUID);
+            FikaBridge.UnregisterPacket(PacketGUID);
         }
 
         internal void SendPacket(Packet packet)
@@ -114,7 +114,7 @@ namespace LeaveItThere.Addon
             packet.Destination = Destination;
 
             OnPacketSent(packet);
-            LITPacketTools.SendPacket(packet);
+            FikaBridge.SendPacket(packet);
         }
 
         /// <summary>
@@ -123,15 +123,14 @@ namespace LeaveItThere.Addon
         /// <param name="data">Data to send</param>
         public void SendData(object data)
         {
-#if FIKA_COMPATIBLE
-            if (FikaInterface.IAmHost() && Destination == EPacketDestination.HostOnly) return;
+            if (!Plugin.FikaInstalled) return;
+            if (FikaBridge.IAmHost() && Destination == EPacketDestination.HostOnly) return;
 
             Packet packet = new()
             {
                 JsonData = JsonConvert.SerializeObject(data),
             };
             SendPacket(packet);
-#endif
         }
     }
 }

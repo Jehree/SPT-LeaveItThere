@@ -1,19 +1,16 @@
-﻿#if FIKA_COMPATIBLE
-using Comfort.Common;
-using ComponentAce.Compression.Libs.zlib;
+﻿using Comfort.Common;
 using EFT.UI;
 using Fika.Core.Networking;
-using LeaveItThere.Fika;
+using LeaveItThere.Addon;
+using LeaveItThere.FikaModule.Packets;
 using LeaveItThere.Helpers;
-using LeaveItThere_Packets;
 using LiteNetLib;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace LeaveItThere.Addon
+namespace LeaveItThere.FikaModule.Common
 {
-    internal static class LITPacketToolsWrapper
+    internal static class GenericPacketTools
     {
         public static Dictionary<string, LITPacketRegistration> Registrations = [];
 
@@ -35,7 +32,7 @@ namespace LeaveItThere.Addon
             }
         }
 
-        public static LITPacketRegistration.Packet GetAbstractedPacket(LITGenericPacket packet)
+        private static LITPacketRegistration.Packet GetAbstractedPacket(LITGenericPacket packet)
         {
             LITPacketRegistration.Packet abstractedPacket = new()
             {
@@ -59,7 +56,7 @@ namespace LeaveItThere.Addon
                 throw new Exception(msg);
             }
 
-            if (FikaWrapper.IAmHost() && abstractedPacket.Destination == EPacketDestination.HostOnly) return;
+            if (Main.IAmHost() && abstractedPacket.Destination == EPacketDestination.HostOnly) return;
 
             LITGenericPacket packet = new()
             {
@@ -69,7 +66,7 @@ namespace LeaveItThere.Addon
                 Data = abstractedPacket.JsonData,
             };
 
-            if (FikaWrapper.IAmHost())
+            if (Main.IAmHost())
             {
                 // if we are the host, we won't get a return packet anyway so we don't care if Destination is Everyone or EveryoneExceptSender
                 Singleton<FikaServer>.Instance.SendDataToAll(ref packet, DeliveryMethod.ReliableOrdered);
@@ -95,7 +92,7 @@ namespace LeaveItThere.Addon
             Registrations[packet.PacketGUID].OnPacketReceived(abstractedPacket);
 
             // if we are not the host, or the Destination is set to HostOnly, we don't need to do any more sending
-            if (!FikaWrapper.IAmHost()) return;
+            if (!Main.IAmHost()) return;
             if (abstractedPacket.Destination == EPacketDestination.HostOnly) return;
 
             FikaServer fikaServer = Singleton<FikaServer>.Instance;
@@ -118,4 +115,3 @@ namespace LeaveItThere.Addon
         }
     }
 }
-#endif

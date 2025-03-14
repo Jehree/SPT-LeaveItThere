@@ -1,10 +1,9 @@
-﻿#if FIKA_COMPATIBLE
-using EFT.InventoryLogic;
+﻿using EFT.InventoryLogic;
 using Fika.Core.Networking;
 using LiteNetLib.Utils;
 using UnityEngine;
 
-namespace LeaveItThere.Packets
+namespace LeaveItThere.FikaModule.Packets
 {
     public struct PlacedItemStateChangedPacket : INetSerializable
     {
@@ -26,8 +25,8 @@ namespace LeaveItThere.Packets
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(ItemId);
-            //writer.Put(Position);
-            //writer.Put(Rotation);
+            writer.Put(Position);
+            writer.Put(Rotation);
             writer.Put(IsPlaced);
             writer.Put(PhysicsEnableRequested);
         }
@@ -49,8 +48,8 @@ namespace LeaveItThere.Packets
         public void Serialize(NetDataWriter writer)
         {
             writer.PutItem(Item);
-            //writer.Put(Position);
-            //writer.Put(Rotation);
+            writer.Put(Position);
+            writer.Put(Rotation);
         }
     }
 
@@ -88,4 +87,3 @@ namespace LeaveItThere.Packets
         }
     }
 }
-#endif

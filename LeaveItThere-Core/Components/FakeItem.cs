@@ -237,14 +237,14 @@ namespace LeaveItThere.Components
             {
                 mover.Disable(true);
                 ErrorPlayerFeedback("Not enough space in inventory to move item!");
-                FikaInterface.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
+                FikaBridge.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
                 return;
             }
             if (Settings.MoveModeCancelsSprinting.Value && LITSession.Instance.Player.Physical.Sprinting)
             {
                 mover.Disable(true);
                 ErrorPlayerFeedback("'MOVE' mode cancelled.");
-                FikaInterface.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
+                FikaBridge.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
                 return;
             }
         }
@@ -256,7 +256,7 @@ namespace LeaveItThere.Components
             if (saved)
             {
                 PlaceAtPosition(gameObject.transform.position, gameObject.transform.rotation);
-                FikaInterface.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
+                FikaBridge.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
             }
             else
             {
@@ -363,7 +363,7 @@ namespace LeaveItThere.Components
                 FakeItem fakeItem = CreateNewFakeItem(_lootItem as ObservedLootItem);
                 fakeItem.PlaceAtLootItem();
                 fakeItem.PlacedPlayerFeedback();
-                FikaInterface.SendPlacedStateChangedPacket(fakeItem, true);
+                FikaBridge.SendPlacedStateChangedPacket(fakeItem, true);
             }
         }
 
@@ -407,7 +407,7 @@ namespace LeaveItThere.Components
 
             public override void OnInteract()
             {
-                FikaInterface.SendPlacedStateChangedPacket(FakeItem, false);
+                FikaBridge.SendPlacedStateChangedPacket(FakeItem, false);
                 FakeItem.Reclaim();
                 FakeItem.ReclaimPlayerFeedback();
             }

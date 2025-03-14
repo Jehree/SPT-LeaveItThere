@@ -42,7 +42,7 @@ namespace LeaveItThere.Patches
             LITSession session = LITSession.Instance;
             lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems as object[], session.GetPlacedItemInstanceIds());
 
-            if (FikaInterface.IAmHost())
+            if (FikaBridge.IAmHost())
             {
                 session.SendPlacedItemDataToServer();
             }

@@ -4,47 +4,34 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}</ProjectGuid>
+    <ProjectGuid>{E9521118-8170-48F1-9C82-6481905B3E78}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LeaveItThere</RootNamespace>
-    <AssemblyName>LeaveItThere</AssemblyName>
+    <RootNamespace>LeaveItThere.FikaModule</RootNamespace>
+    <AssemblyName>LeaveItThere-FikaModule</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;FIKA_COMPATIBLE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\LeaveItThere.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'FikaCompatible|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;FIKA_COMPATIBLE</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\LeaveItThere.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SinglePlayerOnly|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SINGLE_PLAYER_ONLY</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\LeaveItThere.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
@@ -140,35 +127,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Addon\AddonToolsExamples.cs" />
-    <Compile Include="Addon\LITPacketRegistration.cs" />
-    <Compile Include="Common\ConsoleCommands.cs" />
-    <Compile Include="Common\CustomInteraction.cs" />
-    <Compile Include="Common\ItemFilter.cs" />
-    <Compile Include="Common\PlacedItemData.cs" />
-    <Compile Include="Components\LITSession.cs" />
-    <Compile Include="Components\ObjectMover.cs" />
-    <Compile Include="Components\MoveableObject.cs" />
-    <Compile Include="Components\FakeItem.cs" />
-    <Compile Include="Addon\LITFikaTools.cs" />
-    <Compile Include="Fika\FikaBridge.cs" />
-    <Compile Include="Helpers\ConfigurationManagerAttributes.cs" />
-    <Compile Include="Helpers\InteractionHelper.cs" />
-    <Compile Include="Helpers\ItemHelper.cs" />
-    <Compile Include="Addon\LITStaticEvents.cs" />
-    <Compile Include="Helpers\Settings.cs" />
-    <Compile Include="Helpers\LITUtils.cs" />
-    <Compile Include="Patches\GameEndedPatch.cs" />
-    <Compile Include="Patches\EarlyGameStartedPatch.cs" />
-    <Compile Include="Patches\GetAvailableActionsPatch.cs" />
-    <Compile Include="Patches\InteractionsChangedHandlerPatch.cs" />
-    <Compile Include="Patches\LootExperiencePatch.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="Common\FikaMethods.cs" />
+    <Compile Include="Main.cs" />
+    <Compile Include="Packets\GenericPackets.cs" />
+    <Compile Include="Packets\Packets.cs" />
+    <Compile Include="Common\GenericPacketTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LeaveItThere-Core\LeaveItThere.csproj">
+      <Project>{9076ade2-f4ee-4b5d-b9a6-29a054cf0a7e}</Project>
+      <Name>LeaveItThere</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\$(TargetFileName)"
-copy "$(TargetDir)LeaveItThere.xml" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\LeaveItThere.xml"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\..\BepInEx\plugins\LeaveItThere\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
