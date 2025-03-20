@@ -2,7 +2,9 @@
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using EFT.UI;
+using Helpers.CursorHelper;
 using LeaveItThere.Common;
+using LeaveItThere.CustomUI;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using LeaveItThere.Patches;
@@ -10,6 +12,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
+using UnityEngine;
 
 namespace LeaveItThere
 {
@@ -27,6 +30,21 @@ namespace LeaveItThere
         public static string AssemblyFolderPath = Path.GetDirectoryName(_assemblyPath);
         private static string _itemFilterPath = Path.Combine(AssemblyFolderPath, "placeable_item_filter.json");
         internal static ItemFilter PlaceableItemFilter { get; private set; }
+
+
+        public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                MoveModeUI.Instance.ToggleActive();
+            }
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                CursorHelper.ToggleCursorForceUnlocked();
+            }
+        }
+
+
         private void Awake()
         {
             FikaInstalled = Chainloader.PluginInfos.ContainsKey("com.fika.core");
@@ -58,6 +76,7 @@ namespace LeaveItThere
             new GameEndedPatch().Enable();
             new InteractionsChangedHandlerPatch().Enable();
             new LootExperiencePatch().Enable();
+            new CursorHelper.CursorPatch().Enable();
 
             ConsoleScreen.Processor.RegisterCommandGroup<ConsoleCommands>();
 
@@ -67,6 +86,7 @@ namespace LeaveItThere
         private void OnEnable()
         {
             FikaBridge.PluginEnable();
+            BundleThings.LoadBundles();
         }
 
         void TryInitFikaAssembly()

@@ -126,6 +126,9 @@
     <Reference Include="SimpleZlib">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\bsg.componentace.compression.libs.zlib.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addon\AddonToolsExamples.cs" />
@@ -139,8 +142,13 @@
     <Compile Include="Components\MoveableObject.cs" />
     <Compile Include="Components\FakeItem.cs" />
     <Compile Include="Addon\LITFikaTools.cs" />
+    <Compile Include="CustomUI\ButtonDrag.cs" />
+    <Compile Include="CustomUI\MoveModeUI.cs" />
+    <Compile Include="CustomUI\UIColorHelper.cs" />
     <Compile Include="Fika\FikaBridge.cs" />
+    <Compile Include="Helpers\BundleThings.cs" />
     <Compile Include="Helpers\ConfigurationManagerAttributes.cs" />
+    <Compile Include="Helpers\CursorHelper.cs" />
     <Compile Include="Helpers\InteractionHelper.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Addon\LITStaticEvents.cs" />

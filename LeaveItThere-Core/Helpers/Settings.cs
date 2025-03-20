@@ -25,6 +25,13 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<bool> InvertHorizontalRotation;
         public static ConfigEntry<bool> InvertVerticalRotation;
 
+        public static ConfigEntry<Color> PositionTabColor;
+        public static ConfigEntry<Color> RotationTabColor;
+        public static ConfigEntry<Color> PhysicsTabColor;
+        public static ConfigEntry<Color> HighlightColor;
+        public static ConfigEntry<Color> ClickColor;
+
+        public static string ModeModeCategory = "2.1: Move Mode (colors)";
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
         public static ConfigEntry<int> InterchangeAllottedPoints;
@@ -109,6 +116,37 @@ namespace LeaveItThere.Helpers
                 "Invert Vertical Rotation Direction",
                 false,
                 ""
+            );
+
+            PositionTabColor = config.Bind(
+                ModeModeCategory,
+                "1: Position Tab Color",
+                new Color(0.6497419f, 0.8773585f, 0.649954f, 1),
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true } )
+            );
+            RotationTabColor = config.Bind(
+                ModeModeCategory,
+                "2: Rotation Tab Color",
+                new Color(1, 0.5330188f, 0.5330188f, 1),
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            PhysicsTabColor = config.Bind(
+                ModeModeCategory,
+                "3: Physics Tab Color",
+                new Color(1, 0.5330188f, 0.907985f, 1),
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            HighlightColor = config.Bind(
+                ModeModeCategory,
+                "7: Highlight Color",
+                Color.white,
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            ClickColor = config.Bind(
+                ModeModeCategory,
+                "8: Click Color",
+                Color.gray,
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
             );
 
             PlacedItemsHaveCollision = config.Bind(
