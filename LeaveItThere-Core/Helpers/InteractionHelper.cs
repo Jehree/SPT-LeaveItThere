@@ -1,6 +1,12 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
+using EFT.InputSystem;
+using EFT.UI;
 using HarmonyLib;
 using LeaveItThere.Components;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -35,9 +41,16 @@ namespace LeaveItThere.Helpers
         {
             NotificationManagerClass.DisplayMessageNotification(message, EFT.Communications.ENotificationDurationType.Long);
         }
+
         public static void NotificationLongWarning(string message)
         {
             NotificationManagerClass.DisplayWarningNotification(message, EFT.Communications.ENotificationDurationType.Long);
+        }
+
+        public static void ErrorPlayerFeedback(string message)
+        {
+            NotificationLongWarning(message);
+            Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.ErrorMessage);
         }
 
         public static void SetCameraRotationLocked(bool enabled)
@@ -66,6 +79,21 @@ namespace LeaveItThere.Helpers
                     pitchLimit = standingPitchRange;
                 }
                 player.MovementContext.SetRotationLimit(fullYawRange, pitchLimit);
+            }
+        }
+
+        private static IEnumerable<ECommand> _allCommands = Enum.GetValues(typeof(ECommand)).Cast<ECommand>();
+        public static void SetMostInputsIgnored(bool ignored, IEnumerable<ECommand> except = null)
+        {
+            except ??= [];
+
+            if (ignored)
+            {
+                GamePlayerOwner.AddIgnoreInputCommands(_allCommands.Except(except));
+            }
+            else
+            {
+                GamePlayerOwner.RemoveIgnoreInputCommands(_allCommands.Except(except));
             }
         }
     }

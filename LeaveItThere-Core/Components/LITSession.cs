@@ -63,22 +63,6 @@ namespace LeaveItThere.Components
             SpawnAllPlacedItems();
         }
 
-        private void Update()
-        {
-            if (Settings.ToggleImmersivePhysicsHotkey.Value.IsDown())
-            {
-                Settings.ImmersivePhysics.Value = !Settings.ImmersivePhysics.Value;
-                if (Settings.ImmersivePhysics.Value)
-                {
-                    NotificationManagerClass.DisplayMessageNotification("Immersive Physics Enabled!");
-                }
-                else
-                {
-                    NotificationManagerClass.DisplayWarningNotification("Immersive Physics Disabled.");
-                }
-            }
-        }
-
         internal static void CreateNewModSession()
         {
             _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<LITSession>();

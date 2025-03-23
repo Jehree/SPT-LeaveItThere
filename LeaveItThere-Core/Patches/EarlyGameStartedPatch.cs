@@ -1,8 +1,7 @@
-﻿using Comfort.Common;
-using EFT;
+﻿using EFT;
 using HarmonyLib;
 using LeaveItThere.Components;
-using LeaveItThere.Fika;
+using LeaveItThere.CustomUI;
 using SPT.Reflection.Patching;
 using System.Reflection;
 
@@ -19,7 +18,6 @@ namespace LeaveItThere.Patches
         static void PatchPrefix()
         {
             LITSession.CreateNewModSession();
-            ObjectMover.CreateNewObjectMover();
         }
     }
 
@@ -36,7 +34,7 @@ namespace LeaveItThere.Patches
             if (__instance is HideoutGameWorld) return;
 
             LITSession.CreateNewModSession();
-            ObjectMover.CreateNewObjectMover();
+            MoveModeUI.Instance.SetActive(false);
         }
     }
 }

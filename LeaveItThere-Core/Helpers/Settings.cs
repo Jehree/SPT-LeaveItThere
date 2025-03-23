@@ -20,11 +20,22 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<bool> PlacedItemsHaveCollision;
         public static ConfigEntry<int> MinimumSizeItemToGetCollision;
         public static ConfigEntry<bool> ImmersivePhysics;
-        public static ConfigEntry<KeyboardShortcut> ToggleImmersivePhysicsHotkey;
+        public static ConfigEntry<KeyboardShortcut> PrecisionKey;
+        public static ConfigEntry<float> PrecisionMultiplier;
         public static ConfigEntry<float> RotationSpeed;
+        public static ConfigEntry<float> RotationScrollSpeed;
+        public static ConfigEntry<float> RepositionSpeed;
+        public static ConfigEntry<float> RepositionScrollSpeed;
         public static ConfigEntry<bool> InvertHorizontalRotation;
         public static ConfigEntry<bool> InvertVerticalRotation;
 
+        public static ConfigEntry<Color> PositionTabColor;
+        public static ConfigEntry<Color> RotationTabColor;
+        public static ConfigEntry<Color> PhysicsTabColor;
+        public static ConfigEntry<Color> HighlightColor;
+        public static ConfigEntry<Color> ClickColor;
+
+        public static string ModeModeCategory = "2.1: Edit Placement Mode (colors)";
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
         public static ConfigEntry<int> InterchangeAllottedPoints;
@@ -81,34 +92,95 @@ namespace LeaveItThere.Helpers
             );
 
             MoveModeRequiresInventorySpace = config.Bind(
-                "2: Move Mode",
-                "Move Mode Requires Inventory Space",
+                "2: Edit Placement Mode",
+                "Edit Placement Mode Requires Inventory Space",
                 true,
                 "When set to true, you can only use 'MOVE' on placed items when you have the inventory space to pick them up."
             );
             MoveModeCancelsSprinting = config.Bind(
-                "2: Move Mode",
-                "Sprinting Cancels Move Mode",
+                "2: Edit Placement Mode",
+                "Sprinting Cancels Edit Placement Mode",
                 true,
                 "If true, sprinting will cancel 'MOVE' mode."
             );
             RotationSpeed = config.Bind(
-                "2: Move Mode",
-                "Rotation Speed",
-                2f,
-                "Speed items will rotate in rotation mode."
+                "2: Edit Placement Mode",
+                "Rotation Mouse Speed",
+                5f,
+                "Speed items will rotate in rotation mode with mouse movement."
+            );
+            RotationScrollSpeed = config.Bind(
+                "2: Edit Placement Mode",
+                "Rotation Scroll Step Size",
+                100f,
+                "Step size items will rotate in when scrolling mouse wheel."
+            );
+            RepositionSpeed = config.Bind(
+                "2: Edit Placement Mode",
+                "Reposition Mouse Speed",
+                0.2f,
+                "Speed items will move in position mode with mouse movement."
+            );
+            RepositionScrollSpeed = config.Bind(
+                "2: Edit Placement Mode",
+                "Reposition Scroll Step Size",
+                4f,
+                "Step size items will move in when scrolling mouse wheel."
             );
             InvertHorizontalRotation = config.Bind(
-                "2: Move Mode",
+                "2: Edit Placement Mode",
                 "Invert Horizontal Rotation Direction",
                 false,
                 ""
             );
             InvertVerticalRotation = config.Bind(
-                "2: Move Mode",
+                "2: Edit Placement Mode",
                 "Invert Vertical Rotation Direction",
                 false,
                 ""
+            );
+            PrecisionKey = config.Bind(
+                "2: Edit Placement Mode",
+                "Precision Key",
+                new KeyboardShortcut(KeyCode.X),
+                "Hold down to slow down Placement Edit mouse and scroll speed by the Precision Move Multiplier amount."
+            );
+            PrecisionMultiplier = config.Bind(
+                "2: Edit Placement Mode",
+                "Precision Multiplier",
+                0.2f,
+                new ConfigDescription("Mouse and scroll speed in Placement Edit mode will slow down by this amount when Precision Move Key is held", new AcceptableValueRange<float>(0f, 1f))
+            );
+
+            PositionTabColor = config.Bind(
+                ModeModeCategory,
+                "1: Position Tab Color",
+                new Color(0.6497419f, 0.8773585f, 0.649954f, 1),
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            RotationTabColor = config.Bind(
+                ModeModeCategory,
+                "2: Rotation Tab Color",
+                new Color(1, 0.5330188f, 0.5330188f, 1),
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            PhysicsTabColor = config.Bind(
+                ModeModeCategory,
+                "3: Physics Tab Color",
+                new Color(1, 0.5330188f, 0.907985f, 1),
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            HighlightColor = config.Bind(
+                ModeModeCategory,
+                "7: Highlight Color",
+                Color.white,
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            ClickColor = config.Bind(
+                ModeModeCategory,
+                "8: Click Color",
+                Color.gray,
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
             );
 
             PlacedItemsHaveCollision = config.Bind(
@@ -125,15 +197,9 @@ namespace LeaveItThere.Helpers
             );
             ImmersivePhysics = config.Bind(
                 "3: Collision / Physics",
-                "Immersive Physics (no floating items)",
+                "Items Fall After Moved",
                 true,
-                "If you want to be able to make items float wherever you want, set to false."
-            );
-            ToggleImmersivePhysicsHotkey = config.Bind(
-                "3: Collision / Physics",
-                "Hotkey That Toggles Immersive Physics",
-                new KeyboardShortcut(KeyCode.Keypad0),
-                "Hotkey that toggles Immersive Physics setting."
+                "When toggled off, items will float when moved by default. Can be manually changed per-item in the Edit Placement UI pop-up Physics tab."
             );
 
             CustomsAllottedPoints = config.Bind(

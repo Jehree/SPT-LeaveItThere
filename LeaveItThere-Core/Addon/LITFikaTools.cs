@@ -1,9 +1,4 @@
-﻿using EFT.Interactive;
-using EFT.InventoryLogic;
-using LeaveItThere.Fika;
-using LeaveItThere.Helpers;
-using System;
-using UnityEngine;
+﻿using LeaveItThere.Fika;
 
 namespace LeaveItThere.Addon
 {
