@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using Comfort.Common;
+﻿using Comfort.Common;
 using Fika.Core.Coop.Utils;
 using Fika.Core.Networking;
 using LeaveItThere.Fika;

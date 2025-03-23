@@ -1,14 +1,7 @@
-﻿using EFT.UI.Ragfair;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LeaveItThere.CustomUI.MoveModeUI;
-using UnityEngine.UI;
+﻿using LeaveItThere.Helpers;
 using UnityEngine;
-using LeaveItThere.Helpers;
-using EFT;
+using UnityEngine.UI;
+using static LeaveItThere.CustomUI.MoveModeUI;
 
 namespace LeaveItThere.CustomUI
 {

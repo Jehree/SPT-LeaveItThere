@@ -1,5 +1,4 @@
-﻿using Fika.Core.Networking;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace LeaveItThere.FikaModule.Packets
 {

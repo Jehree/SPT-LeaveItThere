@@ -4,13 +4,12 @@ using EFT.InventoryLogic;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
 using Fika.Core.Networking;
-using LeaveItThere.Addon;
 using LeaveItThere.Components;
+using LeaveItThere.FikaModule.Packets;
 using LeaveItThere.Helpers;
 using LiteNetLib;
 using System;
 using UnityEngine;
-using LeaveItThere.FikaModule.Packets;
 
 namespace LeaveItThere.FikaModule.Common
 {
@@ -71,11 +70,11 @@ namespace LeaveItThere.FikaModule.Common
 
             if (packet.PhysicsEnableRequested)
             {
-                fakeItem.gameObject.GetComponent<MoveableObject>().EnablePhysics();
+                fakeItem.gameObject.GetComponent<Moveable>().EnablePhysics(true);
             }
 
-            ObjectMover mover = ObjectMover.Instance;
-            if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
+            ItemMover mover = ItemMover.Instance;
+            if (mover.enabled && mover.Target.gameObject == fakeItem.gameObject)
             {
                 mover.Disable(false);
             }
@@ -86,8 +85,8 @@ namespace LeaveItThere.FikaModule.Common
             FakeItem fakeItem = LITSession.Instance.GetFakeItemOrNull(packet.ItemId);
             if (fakeItem == null) return;
 
-            ObjectMover mover = ObjectMover.Instance;
-            if (mover.Enabled && mover.Target.gameObject == fakeItem.gameObject)
+            ItemMover mover = ItemMover.Instance;
+            if (mover.enabled && mover.Target.gameObject == fakeItem.gameObject)
             {
                 mover.Disable(false);
             }

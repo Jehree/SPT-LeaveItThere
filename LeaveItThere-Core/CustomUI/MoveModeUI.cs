@@ -1,5 +1,4 @@
-﻿using EFT.UI;
-using LeaveItThere.Helpers;
+﻿using LeaveItThere.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +23,77 @@ internal class MoveModeUI : MonoBehaviour
         }
     }
 
+    public enum ERecolorTarget
+    {
+        Base,
+        Highlight,
+        Pressed,
+    }
+
+    public enum ETabType
+    {
+        None = -1,
+        Position,
+        Rotation,
+        Physics
+    }
+
+    public enum ESpaceReference
+    {
+        Player,
+        Item,
+        World
+    }
+
+    public ESpaceReference RepositionReference
+    {
+        get
+        {
+            if (PosTab.MoveRelativeTo.value == 0) return ESpaceReference.Player;
+            if (PosTab.MoveRelativeTo.value == 1) return ESpaceReference.Item;
+            return ESpaceReference.World;
+        }
+    }
+
+    public ESpaceReference RotationReference
+    {
+        get
+        {
+            if (RotTab.RotateRelativeTo.value == 0) return ESpaceReference.Player;
+            if (RotTab.RotateRelativeTo.value == 1) return ESpaceReference.Item;
+            return ESpaceReference.World;
+        }
+    }
+
+    public MenuTab SelectedTab;
+    public ETabType SelectedTabType
+    {
+        get
+        {
+            if (SelectedTab is PositionTab) return ETabType.Position;
+            else if (SelectedTab is RotationTab) return ETabType.Rotation;
+            else if (SelectedTab is PhysicsTab) return ETabType.Physics;
+            return ETabType.None;
+        }
+    }
+
+    public Canvas Canvas;
+
+    public PositionTab PosTab;
+    public RotationTab RotTab;
+    public PhysicsTab PhysTab;
+    public List<MenuTab> AllMenuTabs;
+
+    public RectTransform MenuRect;
+    public Button DragWindowButton;
+    public Button SaveButton;
+    public Button CancelButton;
+
+    public delegate void TabSwitchedHandler(ETabType tabType);
+    public event TabSwitchedHandler TabSwitched;
+
+    public bool IsActive { get => gameObject.activeSelf; }
+
     private MoveModeUI()
     {
         PosTab = new(this);
@@ -42,30 +112,6 @@ internal class MoveModeUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public enum ERecolorTarget
-    {
-        Base,
-        Highlight,
-        Pressed,
-    }
-
-    public Canvas Canvas;
-
-    public PositionTab PosTab;
-    public RotationTab RotTab;
-    public PhysicsTab PhysTab;
-    public MenuTab SelectedTab;
-    public List<MenuTab> AllMenuTabs;
-
-    public RectTransform MenuRect;
-    public Button DragWindowButton;
-    public Button SaveButton;
-    public Button CancelButton;
-
-    public event MenuTab.TabButtonClickedHandler TabSwitched;
-
-    public bool IsActive { get => gameObject.activeSelf; }
-
     private void Awake()
     {
         PosTab.Activate();
@@ -74,12 +120,6 @@ internal class MoveModeUI : MonoBehaviour
         PosTab.TabButtonClicked += OnTabButtonClicked;
         RotTab.TabButtonClicked += OnTabButtonClicked;
         PhysTab.TabButtonClicked += OnTabButtonClicked;
-    }
-
-    private void OnEnable()
-    {
-        gameObject.transform.SetAsLastSibling();
-        Canvas.sortingOrder = 10;
     }
 
     public void OnTabButtonClicked(MenuTab tab)
@@ -99,14 +139,19 @@ internal class MoveModeUI : MonoBehaviour
 
         MenuTab tab = AllMenuTabs.First(t => t.GetType() == tabType);
         tab.Activate();
-        TabSwitched?.Invoke(tab);
+        TabSwitched?.Invoke(SelectedTabType);
 
         UIColorHelper.RefreshColors();
     }
 
     public void ToggleActive()
     {
-        gameObject.SetActive(!IsActive);
+        SetActive(!IsActive);
+    }
+
+    public void SetActive(bool isActive)
+    {
+        gameObject.SetActive(isActive);
     }
 
     public class PhysicsTab : MenuTab
@@ -153,7 +198,7 @@ internal class MoveModeUI : MonoBehaviour
         }
     }
 
-    public class PositionTab : MenuTab 
+    public class PositionTab : MenuTab
     {
         public TMP_Dropdown MoveRelativeTo;
         public Toggle LockX;

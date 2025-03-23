@@ -4,7 +4,6 @@ using BepInEx.Logging;
 using EFT.UI;
 using Helpers.CursorHelper;
 using LeaveItThere.Common;
-using LeaveItThere.CustomUI;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using LeaveItThere.Patches;
@@ -12,12 +11,11 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
-using UnityEngine;
 
 namespace LeaveItThere
 {
     [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "1.6.0")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "2.0.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool FikaInstalled { get; private set; }
@@ -30,20 +28,6 @@ namespace LeaveItThere
         public static string AssemblyFolderPath = Path.GetDirectoryName(_assemblyPath);
         private static string _itemFilterPath = Path.Combine(AssemblyFolderPath, "placeable_item_filter.json");
         internal static ItemFilter PlaceableItemFilter { get; private set; }
-
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                MoveModeUI.Instance.ToggleActive();
-            }
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                CursorHelper.ToggleCursorForceUnlocked();
-            }
-        }
-
 
         private void Awake()
         {

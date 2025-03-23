@@ -1,7 +1,5 @@
-﻿using EFT.UI.Ragfair;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace LeaveItThere.CustomUI
 {

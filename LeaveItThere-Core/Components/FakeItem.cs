@@ -74,9 +74,6 @@ namespace LeaveItThere.Components
         public string TemplateId { get; private set; }
 
         public List<CustomInteraction> Interactions = [];
-        public MoveableObject Moveable { get; private set; }
-        private Vector3 _savedPosition;
-        private Quaternion _savedRotation;
 
         private void Init(ObservedLootItem lootItem)
         {
@@ -84,14 +81,13 @@ namespace LeaveItThere.Components
             ItemId = lootItem.ItemId;
             TemplateId = lootItem.TemplateId;
             AddNavMeshObstacle();
-            Moveable = gameObject.AddComponent<MoveableObject>();
 
             LITSession.Instance.AddFakeItem(this);
             if (LootItem.Item.IsContainer)
             {
                 Interactions.Add(new SearchInteraction(this));
             }
-            Interactions.Add(new EnterMoveModeInteraction(this));
+            Interactions.Add(new ItemMover.EnterMoveModeInteraction(this));
 
             LITStaticEvents.InvokeOnFakeItemInitialized(this);
 
@@ -229,71 +225,6 @@ namespace LeaveItThere.Components
             Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponAssemble);
         }
 
-        private void OnMoveModeEnabledUpdate()
-        {
-            ObjectMover mover = ObjectMover.Instance;
-
-            if (MoveModeDisallowed())
-            {
-                mover.Disable(true);
-                ErrorPlayerFeedback("Not enough space in inventory to move item!");
-                FikaBridge.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
-                return;
-            }
-            if (Settings.MoveModeCancelsSprinting.Value && LITSession.Instance.Player.Physical.Sprinting)
-            {
-                mover.Disable(true);
-                ErrorPlayerFeedback("'MOVE' mode cancelled.");
-                FikaBridge.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
-                return;
-            }
-        }
-
-        private void OnMoveModeDisabled(bool saved)
-        {
-            InteractionHelper.RefreshPrompt();
-
-            if (saved)
-            {
-                PlaceAtPosition(gameObject.transform.position, gameObject.transform.rotation);
-                FikaBridge.SendPlacedStateChangedPacket(this, true, Settings.ImmersivePhysics.Value);
-            }
-            else
-            {
-                ResetPosition();
-            }
-
-            SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
-        }
-
-        public bool MoveModeDisallowed(out string reason)
-        {
-            if (Flags.MoveModeDisabled)
-            {
-                reason = "Disabled";
-                return true;
-            }
-            if (Settings.MoveModeRequiresInventorySpace.Value && !ItemHelper.ItemCanBePickedUp(LootItem.Item))
-            {
-                reason = "No Space";
-                return true;
-            }
-
-            reason = "";
-            return false;
-        }
-
-        public bool MoveModeDisallowed()
-        {
-            return MoveModeDisallowed(out string _);
-        }
-
-        private void ResetPosition()
-        {
-            gameObject.transform.position = _savedPosition;
-            gameObject.transform.rotation = _savedRotation;
-        }
-
         private void SetLocation(Vector3 position, Quaternion rotation)
         {
             gameObject.transform.position = position;
@@ -364,35 +295,6 @@ namespace LeaveItThere.Components
                 fakeItem.PlaceAtLootItem();
                 fakeItem.PlacedPlayerFeedback();
                 FikaBridge.SendPlacedStateChangedPacket(fakeItem, true);
-            }
-        }
-
-        public class EnterMoveModeInteraction(FakeItem fakeItem) : CustomInteraction(fakeItem)
-        {
-            public override string Name
-            {
-                get
-                {
-                    if (FakeItem.MoveModeDisallowed(out string reason))
-                    {
-                        return $"Move: {reason}";
-                    }
-                    else
-                    {
-                        return "Move";
-                    }
-                }
-            }
-
-            public override bool Enabled => !FakeItem.MoveModeDisallowed();
-
-            public override void OnInteract()
-            {
-                ObjectMover mover = ObjectMover.Instance;
-                mover.Enable(FakeItem.gameObject.GetComponent<MoveableObject>(), FakeItem.OnMoveModeDisabled, FakeItem.OnMoveModeEnabledUpdate);
-                FakeItem._savedPosition = FakeItem.gameObject.transform.position;
-                FakeItem._savedRotation = FakeItem.gameObject.transform.rotation;
-                FakeItem.SetPlayerAndBotCollisionEnabled(false);
             }
         }
 
