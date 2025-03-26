@@ -44,6 +44,7 @@ namespace LeaveItThere.CustomUI
             SetTabColor(ui.RotTab, Settings.ClickColor.Value, ERecolorTarget.Pressed);
             SetTabColor(ui.PhysTab, Settings.ClickColor.Value, ERecolorTarget.Pressed);
 
+            ui.Background.color = Settings.BackgroundColor.Value;
         }
 
         public static Color GetButtonColor(MenuTab selectedTab)

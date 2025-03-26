@@ -22,9 +22,17 @@ namespace LeaveItThere.Components
             /// </summary>
             public bool MoveModeDisabled = false;
             /// <summary>
+            /// Reason displayed for Move interaction being disabled in context menu
+            /// </summary>
+            public string MoveModeDisabledReason = "Disabled";
+            /// <summary>
             /// When true, the Reclaim interaction is disabled.
             /// </summary>
             public bool ReclaimInteractionDisabled = false;
+            /// <summary>
+            /// Reason displayed for Reclaim interaction being disabled in context menu
+            /// </summary>
+            public string ReclaimInteractionDisabledReason = "Disabled";
             /// <summary>
             /// Set to true to make this FakeItem ignore size restrictions and always be have player collision / block bot pathing.
             /// </summary>
@@ -301,7 +309,7 @@ namespace LeaveItThere.Components
         public class ReclaimInteraction(FakeItem fakeItem) : CustomInteraction(fakeItem)
         {
             public override string Name => FakeItem.Flags.ReclaimInteractionDisabled
-                                                                    ? "Reclaim: Disabled"
+                                                                    ? $"Reclaim: {FakeItem.Flags.ReclaimInteractionDisabledReason}"
                                                                     : "Reclaim";
             public override string TargetName => FakeItem.LootItem.Name.Localized();
             public override bool Enabled => !FakeItem.Flags.ReclaimInteractionDisabled;

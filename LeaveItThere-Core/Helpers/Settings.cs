@@ -20,6 +20,11 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<bool> PlacedItemsHaveCollision;
         public static ConfigEntry<int> MinimumSizeItemToGetCollision;
         public static ConfigEntry<bool> ImmersivePhysics;
+        public static ConfigEntry<KeyboardShortcut> SaveHotkey;
+        public static ConfigEntry<KeyboardShortcut> CancelHotkey;
+        public static ConfigEntry<KeyboardShortcut> RepositionTabHotkey;
+        public static ConfigEntry<KeyboardShortcut> RotationTabHotkey;
+        public static ConfigEntry<KeyboardShortcut> PhysicsTabHotkey;
         public static ConfigEntry<KeyboardShortcut> PrecisionKey;
         public static ConfigEntry<float> PrecisionMultiplier;
         public static ConfigEntry<float> RotationSpeed;
@@ -34,8 +39,9 @@ namespace LeaveItThere.Helpers
         public static ConfigEntry<Color> PhysicsTabColor;
         public static ConfigEntry<Color> HighlightColor;
         public static ConfigEntry<Color> ClickColor;
+        public static ConfigEntry<Color> BackgroundColor;
 
-        public static string ModeModeCategory = "2.1: Edit Placement Mode (colors)";
+        public static string ModeModeCategory = "2.1: Edit Move Mode (colors)";
         public static ConfigEntry<int> CustomsAllottedPoints;
         public static ConfigEntry<int> FactoryAllottedPoints;
         public static ConfigEntry<int> InterchangeAllottedPoints;
@@ -92,64 +98,94 @@ namespace LeaveItThere.Helpers
             );
 
             MoveModeRequiresInventorySpace = config.Bind(
-                "2: Edit Placement Mode",
-                "Edit Placement Mode Requires Inventory Space",
+                "2: Edit Move Mode",
+                "Edit Move Mode Requires Inventory Space",
                 true,
                 "When set to true, you can only use 'MOVE' on placed items when you have the inventory space to pick them up."
             );
             MoveModeCancelsSprinting = config.Bind(
-                "2: Edit Placement Mode",
-                "Sprinting Cancels Edit Placement Mode",
+                "2: Edit Move Mode",
+                "Sprinting Cancels Edit Move Mode",
                 true,
                 "If true, sprinting will cancel 'MOVE' mode."
             );
             RotationSpeed = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Rotation Mouse Speed",
-                5f,
+                4.5f,
                 "Speed items will rotate in rotation mode with mouse movement."
             );
             RotationScrollSpeed = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Rotation Scroll Step Size",
                 100f,
                 "Step size items will rotate in when scrolling mouse wheel."
             );
             RepositionSpeed = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Reposition Mouse Speed",
-                0.2f,
+                0.07f,
                 "Speed items will move in position mode with mouse movement."
             );
             RepositionScrollSpeed = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Reposition Scroll Step Size",
                 4f,
                 "Step size items will move in when scrolling mouse wheel."
             );
             InvertHorizontalRotation = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Invert Horizontal Rotation Direction",
                 false,
                 ""
             );
             InvertVerticalRotation = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Invert Vertical Rotation Direction",
                 false,
                 ""
             );
             PrecisionKey = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Precision Key",
                 new KeyboardShortcut(KeyCode.X),
-                "Hold down to slow down Placement Edit mouse and scroll speed by the Precision Move Multiplier amount."
+                "Hold down to slow down Move mode mouse and scroll speed by the Precision Move Multiplier amount."
             );
             PrecisionMultiplier = config.Bind(
-                "2: Edit Placement Mode",
+                "2: Edit Move Mode",
                 "Precision Multiplier",
                 0.2f,
-                new ConfigDescription("Mouse and scroll speed in Placement Edit mode will slow down by this amount when Precision Move Key is held", new AcceptableValueRange<float>(0f, 1f))
+                new ConfigDescription("Mouse and scroll speed in Move mode will slow down by this amount when Precision Move Key is held", new AcceptableValueRange<float>(0f, 1f))
+            );
+            RepositionTabHotkey = config.Bind(
+                "2: Edit Move Mode",
+                "Switch To Position Tab",
+                new KeyboardShortcut(KeyCode.Alpha1),
+                ""
+            );
+            RotationTabHotkey = config.Bind(
+                "2: Edit Move Mode",
+                "Switch To Rotation Tab",
+                new KeyboardShortcut(KeyCode.Alpha2),
+                ""
+            );
+            PhysicsTabHotkey = config.Bind(
+                "2: Edit Move Mode",
+                "Switch To Physics Tab",
+                new KeyboardShortcut(KeyCode.Alpha3),
+                ""
+            );
+            SaveHotkey = config.Bind(
+                "2: Edit Move Mode",
+                "Save Placement Edit",
+                new KeyboardShortcut(KeyCode.F),
+                ""
+            );
+            CancelHotkey = config.Bind(
+                "2: Edit Move Mode",
+                "Cancel Placement Edit",
+                new KeyboardShortcut(KeyCode.Escape),
+                ""
             );
 
             PositionTabColor = config.Bind(
@@ -180,6 +216,12 @@ namespace LeaveItThere.Helpers
                 ModeModeCategory,
                 "8: Click Color",
                 Color.gray,
+                new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
+            );
+            BackgroundColor = config.Bind(
+                ModeModeCategory,
+                "8: Background Color",
+                new Color(0.6037736f, 0.5685925f, 0.504094f, 1),
                 new ConfigDescription("", null, new ConfigurationManagerAttributes() { IsAdvanced = true })
             );
 
