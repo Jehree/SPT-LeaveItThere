@@ -218,14 +218,13 @@ namespace LeaveItThere.Components
             if (MoveModeDisallowed(Target, out string reason))
             {
                 Disable(true);
-                InteractionHelper.ErrorPlayerFeedback($"Placement Edit cancelled! Reason: {reason}");
+                InteractionHelper.ErrorPlayerFeedback($"Move Mode cancelled! Reason: {reason}");
                 return;
             }
 
-            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) LMBDown = true;
-            if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject()) LMBDown = false;
-            if (Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject()) RMBDown = true;
-            if (Input.GetMouseButtonUp(1) && !EventSystem.current.IsPointerOverGameObject()) RMBDown = false;
+            MouseInputProcess();
+            UIHotkeyInputProcess(out bool cancelRemainingFrameLogic);
+            if (cancelRemainingFrameLogic) return;
 
             if (CurrentMode == ETabType.Position)
             {
@@ -243,6 +242,56 @@ namespace LeaveItThere.Components
             }
 
             UpdatePlayerLastFrameDeltas();
+        }
+
+        private void MouseInputProcess()
+        {
+            if (EventSystem.current.IsPointerOverGameObject()) return;
+            if (Input.GetMouseButtonDown(0))
+            {
+                LMBDown = true;
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                LMBDown = false;
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                RMBDown = true;
+            }
+            if (Input.GetMouseButtonUp(1))
+            {
+                RMBDown = false;
+            }
+        }
+
+        private void UIHotkeyInputProcess(out bool cancelRemainingFrameLogic)
+        {
+            if (Settings.SaveHotkey.Value.IsDown())
+            {
+                Disable(true);
+                cancelRemainingFrameLogic = true;
+                return;
+            }
+            if (Settings.CancelHotkey.Value.IsDown())
+            {
+                Disable(false);
+                cancelRemainingFrameLogic = true;
+                return;
+            }
+            if (Settings.RepositionTabHotkey.Value.IsDown())
+            {
+                UI.ChangeTabs<PositionTab>();
+            }
+            if (Settings.RotationTabHotkey.Value.IsDown())
+            {
+                UI.ChangeTabs<RotationTab>();
+            }
+            if (Settings.PhysicsTabHotkey.Value.IsDown())
+            {
+                UI.ChangeTabs<PhysicsTab>();
+            }
+            cancelRemainingFrameLogic = false;
         }
 
         private void OnTabSwitched(ETabType tabType)
@@ -294,11 +343,13 @@ namespace LeaveItThere.Components
             {
                 Target.PlaceAtPosition(Target.gameObject.transform.position, Target.gameObject.transform.rotation);
                 FikaBridge.SendPlacedStateChangedPacket(Target, true, WillFloat);
+                InteractionHelper.NotificationLong("Placement edit saved!");
             }
             else
             {
                 _targetTransform.position = _undoPosition;
                 _targetTransform.rotation = _undoRotation;
+                InteractionHelper.NotificationLongWarning("Move Mode cancelled.");
             }
 
             if (movementSaved && !WillFloat)
@@ -331,7 +382,7 @@ namespace LeaveItThere.Components
         {
             if (fakeItem.Flags.MoveModeDisabled)
             {
-                reason = "Disabled";
+                reason = fakeItem.Flags.MoveModeDisabledReason;
                 return true;
             }
             if (Settings.MoveModeRequiresInventorySpace.Value && !ItemHelper.ItemCanBePickedUp(fakeItem.LootItem.Item))
@@ -496,11 +547,11 @@ namespace LeaveItThere.Components
                 {
                     if (MoveModeDisallowed(FakeItem, out string reason))
                     {
-                        return $"Edit Placement: {reason}";
+                        return $"Move: {reason}";
                     }
                     else
                     {
-                        return "Edit Placement";
+                        return "Move";
                     }
                 }
             }

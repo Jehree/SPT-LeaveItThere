@@ -78,6 +78,7 @@ internal class MoveModeUI : MonoBehaviour
     }
 
     public Canvas Canvas;
+    public Image Background;
 
     public PositionTab PosTab;
     public RotationTab RotTab;
@@ -106,6 +107,7 @@ internal class MoveModeUI : MonoBehaviour
         DragWindowButton.gameObject.AddComponent<ButtonDrag>().Init(MenuRect);
 
         Canvas = gameObject.GetComponent<Canvas>();
+        Background = gameObject.transform.Find("TabGroup/bg").gameObject.GetComponent<Image>();
         SaveButton = gameObject.transform.Find("TabGroup/ExitButtons/SaveButton").gameObject.GetComponent<Button>();
         CancelButton = gameObject.transform.Find("TabGroup/ExitButtons/CancelButton").gameObject.GetComponent<Button>();
 
@@ -115,11 +117,15 @@ internal class MoveModeUI : MonoBehaviour
     private void Awake()
     {
         PosTab.Activate();
-        UIColorHelper.RefreshColors();
 
         PosTab.TabButtonClicked += OnTabButtonClicked;
         RotTab.TabButtonClicked += OnTabButtonClicked;
         PhysTab.TabButtonClicked += OnTabButtonClicked;
+    }
+
+    private void OnEnable()
+    {
+        UIColorHelper.RefreshColors();
     }
 
     public void OnTabButtonClicked(MenuTab tab)

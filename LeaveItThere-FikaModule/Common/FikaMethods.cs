@@ -1,6 +1,7 @@
 ﻿using Comfort.Common;
 using EFT.Interactive;
 using EFT.InventoryLogic;
+using Fika.Core.Coop.Components;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
 using Fika.Core.Networking;

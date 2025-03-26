@@ -64,7 +64,7 @@ namespace LeaveItThere
 
             ConsoleScreen.Processor.RegisterCommandGroup<ConsoleCommands>();
 
-            TryInitFikaAssembly();
+            TryInitFikaModuleAssembly();
         }
 
         private void OnEnable()
@@ -73,7 +73,7 @@ namespace LeaveItThere
             BundleThings.LoadBundles();
         }
 
-        void TryInitFikaAssembly()
+        void TryInitFikaModuleAssembly()
         {
             if (!FikaInstalled) return;
 
