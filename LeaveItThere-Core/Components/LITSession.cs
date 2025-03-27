@@ -188,11 +188,11 @@ namespace LeaveItThere.Components
 
         internal void SendPlacedItemDataToServer()
         {
-            PlacedItemDataPack dataPack = new(GlobalAddonData, GetPlacedItemDataList());
+            PlacedItemDataPack dataPack = new(GlobalAddonData, GetPlacedItemDataListToSave());
             LITUtils.ServerRoute(Plugin.DataToServerURL, dataPack);
         }
 
-        private List<PlacedItemData> GetPlacedItemDataList()
+        private List<PlacedItemData> GetPlacedItemDataListToSave()
         {
             List<PlacedItemData> dataList = [];
 
