@@ -3,15 +3,19 @@
   "WorkspaceRootPath": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|c:\\sp tarkov\\spt3.11.x\\dev\\spt-leaveitthere\\leaveitthere-core\\components\\itemmover.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|c:\\sp tarkov\\spt3.11.x\\dev\\spt-leaveitthere\\leaveitthere-core\\components\\litsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\components\\litsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\leaveitthere-core\\components\\itemmover.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\components\\itemmover.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|c:\\sp tarkov\\spt3.11.x\\dev\\spt-leaveitthere\\leaveitthere-core\\components\\fakeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\leaveitthere-core\\components\\fakeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\components\\fakeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|c:\\sp tarkov\\spt3.11.x\\dev\\spt-leaveitthere\\leaveitthere-core\\helpers\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\leaveitthere-core\\helpers\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9076ADE2-F4EE-4B5D-B9A6-29A054CF0A7E}|LeaveItThere-Core\\LeaveItThere.csproj|solutionrelative:leaveitthere-core\\helpers\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -35,19 +39,31 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ItemMover.cs",
-              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\ItemMover.cs",
-              "RelativeDocumentMoniker": "LeaveItThere-Core\\Components\\ItemMover.cs",
-              "ToolTip": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\ItemMover.cs",
-              "RelativeToolTip": "LeaveItThere-Core\\Components\\ItemMover.cs",
-              "ViewState": "AQIAAEMBAAAAAAAAAAAqwGABAAANAAAA",
+              "Title": "LITSession.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\LITSession.cs",
+              "RelativeDocumentMoniker": "LeaveItThere-Core\\Components\\LITSession.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\LITSession.cs",
+              "RelativeToolTip": "LeaveItThere-Core\\Components\\LITSession.cs",
+              "ViewState": "AQIAAKQAAAAAAAAAAAAowMMAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-26T17:40:03.894Z",
+              "WhenOpened": "2025-03-27T15:12:10.759Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "ItemMover.cs",
+              "DocumentMoniker": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\ItemMover.cs",
+              "RelativeDocumentMoniker": "LeaveItThere-Core\\Components\\ItemMover.cs",
+              "ToolTip": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\ItemMover.cs",
+              "RelativeToolTip": "LeaveItThere-Core\\Components\\ItemMover.cs",
+              "ViewState": "AQIAACgBAAAAAAAAAAAqwGABAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T17:40:03.894Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "FakeItem.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Components\\FakeItem.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Components\\FakeItem.cs",
@@ -55,12 +71,11 @@
               "RelativeToolTip": "LeaveItThere-Core\\Components\\FakeItem.cs",
               "ViewState": "AQIAAOAAAAAAAAAAAAAUwPoAAABZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-26T17:31:33.493Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-26T17:31:33.493Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Settings.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Helpers\\Settings.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Helpers\\Settings.cs",
@@ -68,12 +83,11 @@
               "RelativeToolTip": "LeaveItThere-Core\\Helpers\\Settings.cs",
               "ViewState": "AQIAAEUAAAAAAAAAAAAAAHgAAAAVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-25T13:36:46.906Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-25T13:36:46.906Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "FikaMethods.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-FikaModule\\Common\\FikaMethods.cs",
               "RelativeDocumentMoniker": "LeaveItThere-FikaModule\\Common\\FikaMethods.cs",
@@ -85,7 +99,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "GameEndedPatch.cs",
               "DocumentMoniker": "C:\\SP Tarkov\\SPT3.11.X\\Dev\\SPT-LeaveItThere\\LeaveItThere-Core\\Patches\\GameEndedPatch.cs",
               "RelativeDocumentMoniker": "LeaveItThere-Core\\Patches\\GameEndedPatch.cs",

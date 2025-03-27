@@ -188,16 +188,21 @@ namespace LeaveItThere.Components
 
         internal void SendPlacedItemDataToServer()
         {
+            PlacedItemDataPack dataPack = new(GlobalAddonData, GetPlacedItemDataList());
+            LITUtils.ServerRoute(Plugin.DataToServerURL, dataPack);
+        }
+
+        private List<PlacedItemData> GetPlacedItemDataList()
+        {
             List<PlacedItemData> dataList = [];
-            List<string> placedItemInstanceIds = [];
+
             foreach (var kvp in Instance.FakeItems)
             {
                 FakeItem fakeItem = kvp.Value;
                 dataList.Add(new PlacedItemData(fakeItem));
-                placedItemInstanceIds.Add(fakeItem.ItemId);
             }
-            PlacedItemDataPack dataPack = new(GlobalAddonData, dataList);
-            LITUtils.ServerRoute(Plugin.DataToServerURL, dataPack);
+
+            return dataList;
         }
 
         public void SetInteractionsEnabled(bool enabled)
