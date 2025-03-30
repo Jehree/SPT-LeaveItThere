@@ -129,6 +129,9 @@
     <Reference Include="UnityEngine.UIModule">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="spt-custom">
+      <HintPath>..\..\..\BepInEx\plugins\spt\spt-custom.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addon\AddonToolsExamples.cs" />

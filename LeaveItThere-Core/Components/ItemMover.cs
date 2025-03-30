@@ -41,27 +41,15 @@ namespace LeaveItThere.Components
                 if (_target != null)
                 {
                     _targetCachedRotation = _targetTransform.rotation;
+                    TargetMoveable = Target.gameObject.GetOrAddComponent<Moveable>();
+                }
+                else
+                {
+                    TargetMoveable = null;
                 }
             }
         }
-        private Moveable _targetMoveable = null;
-        public Moveable TargetMoveable
-        {
-            get
-            {
-                if (Target == null)
-                {
-                    throw new Exception("Tried to access TargetMoveable while Target was null!");
-                }
-
-                if (_targetMoveable == null)
-                {
-                    _targetMoveable = Target.gameObject.GetOrAddComponent<Moveable>();
-                }
-
-                return _targetMoveable;
-            }
-        }
+        public Moveable TargetMoveable { get; private set; } = null;
         private Transform _targetTransform => Target.gameObject.transform;
         #endregion
 

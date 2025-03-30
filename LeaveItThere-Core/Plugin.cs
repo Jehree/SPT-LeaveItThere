@@ -15,7 +15,7 @@ using System.Reflection;
 namespace LeaveItThere
 {
     [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "2.0.0")]
+    [BepInPlugin("Jehree.LeaveItThere", "LeaveItThere", "2.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool FikaInstalled { get; private set; }
@@ -28,7 +28,7 @@ namespace LeaveItThere
         public static string AssemblyFolderPath = Path.GetDirectoryName(_assemblyPath);
         private static string _itemFilterPath = Path.Combine(AssemblyFolderPath, "placeable_item_filter.json");
         internal static ItemFilter PlaceableItemFilter { get; private set; }
-
+        
         private void Awake()
         {
             FikaInstalled = Chainloader.PluginInfos.ContainsKey("com.fika.core");
