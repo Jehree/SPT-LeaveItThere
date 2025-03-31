@@ -1,3 +1,7 @@
 ### Pre-Merge Checklist:
-- [ ] Addon Tools Docs Updated (if needed)
-- [ ] Version Number Bumped (if needed)
+- Addon Tools Docs Updated:
+    - [ ] Done
+    - [ ] Not Needed
+- Version Number Bumped:
+    - [ ] Done
+    - [ ] Not Needed
