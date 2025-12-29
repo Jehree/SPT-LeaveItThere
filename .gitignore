@@ -1,5 +1,2 @@
 bin/
 obj/
-LeaveItThere-Server/node_modules/
-/*.zip
-/.vs

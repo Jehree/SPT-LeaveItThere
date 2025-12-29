@@ -1,48 +1,19 @@
-﻿using Comfort.Common;
-using Fika.Core.Coop.Utils;
-using Fika.Core.Networking;
-using LeaveItThere.Fika;
+﻿using LeaveItThere.Fika;
 using LeaveItThere.FikaModule.Common;
+using LeaveItThere.FikaModule.Helpers;
 
-namespace LeaveItThere.FikaModule
+namespace LeaveItThere.FikaModule;
+
+internal class Main
 {
-    internal class Main
+    // called by the core dll via reflection
+    public static void Init()
     {
-        // called by the core dll via reflection
-        public static void Init()
-        {
-            PluginAwake();
-            FikaBridge.PluginEnableEmitted += PluginEnable;
+        FikaBridge.PluginEnableEmitted += EventSubscriber.InitOnPluginEnabled;
 
-            FikaBridge.IAmHostEmitted += IAmHost;
-            FikaBridge.GetRaidIdEmitted += GetRaidId;
+        FikaBridge.IAmHostEmitted += FikaTools.IAmServer;
+        FikaBridge.GetRaidIdEmitted += FikaTools.GetRaidId;
 
-            FikaBridge.SendPlacedStateChangedPacketEmitted += FikaMethods.SendPlacedStateChangedPacket;
-            FikaBridge.SendSpawnItemPacketEmitted += FikaMethods.SendSpawnItemPacket;
-
-            FikaBridge.RegisterPacketEmitted += GenericPacketTools.RegisterPacket;
-            FikaBridge.UnregisterPacketEmitted += GenericPacketTools.UnregisterPacket;
-            FikaBridge.SendPacketEmitted += GenericPacketTools.SendPacket;
-        }
-
-        public static void PluginAwake()
-        {
-
-        }
-
-        public static void PluginEnable()
-        {
-            FikaMethods.InitOnPluginEnabled();
-        }
-
-        public static bool IAmHost()
-        {
-            return Singleton<FikaServer>.Instantiated;
-        }
-
-        public static string GetRaidId()
-        {
-            return FikaBackendUtils.GroupId;
-        }
+        FikaBridge.SendPlacedStateChangedPacketEmitted += PlacementPacketHandler.SendPlacedStateChangedPacket;
     }
 }

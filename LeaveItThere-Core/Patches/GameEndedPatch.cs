@@ -1,53 +1,32 @@
 ﻿using EFT;
 using HarmonyLib;
-using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
+using LeaveItThere.Models;
 using SPT.Reflection.Patching;
-using SPT.Reflection.Utils;
-using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 
-namespace LeaveItThere.Patches
+namespace LeaveItThere.Patches;
+
+internal class GameEndedPatch : ModulePatch
 {
-    internal class GameEndedPatch : ModulePatch
+    protected override MethodBase GetTargetMethod()
     {
-        private static Type _targetClassType;
-        private static FieldInfo _exitNameInfo;
+        return AccessTools.Method(typeof(Class308), nameof(Class308.LocalRaidEnded));
+    }
 
-        protected override MethodBase GetTargetMethod()
+    [PatchPrefix]
+    static void PatchPrefix(LocalRaidSettings settings, RaidEndDescriptorClass results, ref FlatItemsDataClass[] lostInsuredItems, Dictionary<string, FlatItemsDataClass[]> transferItems)
+    {
+        lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems, RaidSession.Instance.GetPlacedItemInstanceIds());
+
+        if (FikaBridge.IAmHost())
         {
-            _targetClassType = PatchConstants.EftTypes.Single(targetClass =>
-                !targetClass.IsInterface &&
-                !targetClass.IsNested &&
-                targetClass.GetMethods().Any(method => method.Name == "LocalRaidEnded") &&
-                targetClass.GetMethods().Any(method => method.Name == "LocalRaidStarted")
-            );
-
-            MethodInfo targetMethod = AccessTools.Method(_targetClassType.GetTypeInfo(), "LocalRaidEnded");
-
-            _exitNameInfo = targetMethod.GetParameters()[1].ParameterType.GetField("exitName");
-
-            return targetMethod;
+            LITUtils.ServerRoute(Plugin.DataToServerURL, new ServerDataPack(RaidSession.Instance.FakeItems));
         }
 
-        // LocalRaidSettings settings, GClass1924 results, GClass1301[] lostInsuredItems, Dictionary<string, GClass1301[]> transferItems
-        [PatchPrefix]
-        static void Prefix(LocalRaidSettings settings, object results, ref object lostInsuredItems, object transferItems)
-        {
-            LITStaticEvents.InvokeOnRaidEnd(settings, results, lostInsuredItems, transferItems, _exitNameInfo.GetValue(results) as string);
-
-            LITSession session = LITSession.Instance;
-            lostInsuredItems = ItemHelper.RemoveLostInsuredItemsByIds(lostInsuredItems as object[], session.GetPlacedItemInstanceIds());
-
-            if (FikaBridge.IAmHost())
-            {
-                session.SendPlacedItemDataToServer();
-            }
-
-            session.DestroyAllFakeItems();
-        }
+        RaidSession.Instance.DestroyAllFakeItems();
     }
 }

@@ -1,40 +1,38 @@
 ﻿using EFT;
 using HarmonyLib;
 using LeaveItThere.Components;
-using LeaveItThere.CustomUI;
+using LeaveItThere.Helpers;
 using SPT.Reflection.Patching;
 using System.Reflection;
 
-namespace LeaveItThere.Patches
-{
-    internal class EarlyGameStartedPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsController), nameof(BotsController.SetSettings));
-        }
+namespace LeaveItThere.Patches;
 
-        [PatchPostfix]
-        static void PatchPrefix()
-        {
-            LITSession.CreateNewModSession();
-        }
+internal class EarlyGameStartedPatch : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(BotsController), nameof(BotsController.SetSettings));
     }
 
-    internal class EarlyGameStartedPatchFika : ModulePatch
+    [PatchPostfix]
+    static void PatchPrefix()
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(GameWorld), nameof(GameWorld.RegisterRestrictableZones));
-        }
+        ItemSpawner.SpawnAllPlacedItems();
+    }
+}
 
-        [PatchPostfix]
-        static void PatchPrefix(GameWorld __instance)
-        {
-            if (__instance is HideoutGameWorld) return;
+internal class EarlyGameStartedPatchFika : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(GameWorld), nameof(GameWorld.RegisterRestrictableZones));
+    }
 
-            LITSession.CreateNewModSession();
-            MoveModeUI.Instance.SetActive(false);
-        }
+    [PatchPostfix]
+    static void PatchPrefix(GameWorld __instance)
+    {
+        if (__instance is HideoutGameWorld) return;
+
+        ItemSpawner.SpawnAllPlacedItems();
     }
 }
