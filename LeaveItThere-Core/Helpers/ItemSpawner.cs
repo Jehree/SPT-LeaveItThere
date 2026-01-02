@@ -20,12 +20,10 @@ public static class ItemSpawner
 
     internal static void SpawnAllPlacedItems()
     {
-        ServerDataPack dataPack = LITUtils.ServerRoute(Plugin.DataToClientURL, ServerDataPack.Request);
-
         _itemsSpawned = 0;
-        _itemsToSpawn = dataPack.ItemTemplates.Count;
+        _itemsToSpawn = RaidSession.Instance.ServerDataPack.ItemTemplates.Count;
 
-        foreach (PlacedItemData placedItemData in dataPack.ItemTemplates)
+        foreach (PlacedItemData placedItemData in RaidSession.Instance.ServerDataPack.ItemTemplates)
         {
             if (placedItemData.Item == null) continue; // issue spawning item, error handling done by BytesToItem
 
@@ -41,7 +39,7 @@ public static class ItemSpawner
             ItemHelper.MakeSearchableItemFullySearched(lootItem.Item as SearchableItemItemClass);
         }
 
-        FakeItem fakeItem = FakeItem.CreateNewFakeItem(lootItem as ObservedLootItem);
+        FakeItem fakeItem = FakeItem.CreateNewFakeItem(lootItem as ObservedLootItem, placedItemData.StateSynchronizerDatabase);
         fakeItem.Place(placedItemData.Location, placedItemData.Rotation);
 
         _itemsSpawned++;

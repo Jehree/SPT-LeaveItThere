@@ -2,6 +2,7 @@
 using HarmonyLib;
 using LeaveItThere.Components;
 using LeaveItThere.Helpers;
+using LeaveItThere.Models;
 using SPT.Reflection.Patching;
 using System.Reflection;
 
@@ -17,6 +18,7 @@ internal class EarlyGameStartedPatch : ModulePatch
     [PatchPostfix]
     static void PatchPrefix()
     {
+        RaidSession.Instance.ServerDataPack = LITUtils.ServerRoute(Plugin.DataToClientURL, ServerDataPack.Request);
         ItemSpawner.SpawnAllPlacedItems();
     }
 }
@@ -32,7 +34,8 @@ internal class EarlyGameStartedPatchFika : ModulePatch
     static void PatchPrefix(GameWorld __instance)
     {
         if (__instance is HideoutGameWorld) return;
-
+        RaidSession.Instance.ServerDataPack = LITUtils.ServerRoute(Plugin.DataToClientURL, ServerDataPack.Request);
         ItemSpawner.SpawnAllPlacedItems();
     }
 }
+

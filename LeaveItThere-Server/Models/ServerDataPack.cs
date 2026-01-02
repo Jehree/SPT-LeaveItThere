@@ -6,7 +6,7 @@ public class ServerDataPack : IRequestData
 {
     public required string ProfileId { get; set; }
     public required string MapId { get; set; }
-    public required List<object> ItemTemplates { get; set; }
+    public required object? ItemTemplates { get; set; }
 
     public static ServerDataPack GetEmpty(string profileId, string mapId)
     {
@@ -14,7 +14,7 @@ public class ServerDataPack : IRequestData
         {
             ProfileId = profileId,
             MapId = mapId,
-            ItemTemplates = []
+            ItemTemplates = default
         };
     }
 }

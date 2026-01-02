@@ -12,6 +12,7 @@ namespace LeaveItThere.Models
     {
         public string ProfileId { get; set; }
         public string MapId { get; set; }
+
         public List<PlacedItemData> ItemTemplates { get; set; } = [];
 
         [JsonIgnore]

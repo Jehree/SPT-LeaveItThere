@@ -16,10 +16,13 @@ public class CustomInteractionContainer(FakeItem fakeItem)
     {
         get
         {
-            _actionsReturnClass ??= new()
+            if (_actionsReturnClass == null)
             {
-                Actions = []
-            };
+                _actionsReturnClass = new()
+                {
+                    Actions = []
+                };
+            }
 
             _actionsReturnClass.Actions.Clear();
 
@@ -65,7 +68,10 @@ public abstract class CustomInteraction
     {
         get
         {
-            _actionsTypesClass ??= new();
+            if (_actionsTypesClass == null)
+            {
+                _actionsTypesClass = new();
+            }
 
             _actionsTypesClass.Action = AutoPromptRefresh
                 ? OnInteract + InteractionHelper.RefreshPromptAction

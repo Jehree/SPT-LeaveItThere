@@ -5,8 +5,11 @@ using LeaveItThere.Common;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using LeaveItThere.ModSettings;
+using LeaveItThere.StateSync;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 namespace LeaveItThere.Components;
 
@@ -14,6 +17,7 @@ public class FakeItem : InteractableObject
 {
     public string ItemId { get; private set; }
     public string TemplateId { get; private set; }
+    public PhysicsMoveable Moveable { get; private set; }
 
     private ObservedLootItem _lootItem;
     public ObservedLootItem LootItem
@@ -34,19 +38,35 @@ public class FakeItem : InteractableObject
 
     private NavMeshObstacle _navMeshObstacle;
 
-    internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem)
+    public StateSynchronizerDatabase StateSynchronizerDatabase { get; private set; }
+
+    class TestSynchronizer : StateSynchronizer
     {
-        GameObject gameObject = CreateFakeItemGameObjectFromLootItemObject(lootItem.gameObject);
+        public string ExampleProp = "Some Example Data but changed";
+    }
+
+    class TestInteraction(FakeItem fakeItem) : CustomInteraction
+    {
+        public override string Name => "Test";
+        public override void OnInteract()
+        {
+            Plugin.LogSource.LogError(fakeItem.StateSynchronizerDatabase.GetSynchronizer<TestSynchronizer>().ExampleProp);
+        }
+    }
+
+    internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem, StateSynchronizerDatabase stateSynchronizerDatabase = null)
+    {
+        GameObject gameObject = CreateFakeItemGameObject(lootItem.gameObject);
         FakeItem fakeItem = gameObject.AddComponent<FakeItem>();
-        fakeItem.Init(lootItem);
+
+        PhysicsMoveable moveable = gameObject.AddComponent<PhysicsMoveable>();
+        fakeItem.Init(lootItem, moveable, stateSynchronizerDatabase);
         return fakeItem;
     }
 
-    private static GameObject CreateFakeItemGameObjectFromLootItemObject(GameObject lootItemObject)
+    private static GameObject CreateFakeItemGameObject(GameObject lootItemObject)
     {
-
         GameObject gameObject = Instantiate(lootItemObject);
-
 
         ItemHelper.SetItemColor(Settings.PlacedItemTint.Value, gameObject);
 
@@ -62,18 +82,65 @@ public class FakeItem : InteractableObject
         return gameObject;
     }
 
-    private void Init(ObservedLootItem lootItem)
+    private void Init(ObservedLootItem lootItem, PhysicsMoveable moveable, StateSynchronizerDatabase stateSynchronizerDatabase)
     {
         _lootItem = lootItem;
         ItemId = lootItem.ItemId;
         TemplateId = lootItem.TemplateId;
+        Moveable = moveable;
+        StateSynchronizerDatabase = stateSynchronizerDatabase == null
+            ? new()
+            : stateSynchronizerDatabase;
+
 
         RaidSession.Instance.AddFakeItem(this);
+
 
         AddNavMeshObstacle();
         InitializeInteractions();
 
-        // TODO: add collision functionality
+        SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
+
+        StateSynchronizerDatabase.RegisterSynchronizer<TestSynchronizer>("Test");
+        InteractionContainer.CustomInteractions.Add(new TestInteraction(this));
+    }
+
+    public void SetPlayerAndBotCollisionEnabled(bool enabled)
+    {
+        // if we are disabling the collision, always do it regardless of settings
+        if (enabled)
+        {
+            bool itemIsTooSmall = LootItem.Item.Width * LootItem.Item.Height < Settings.MinimumSizeItemToGetCollision.Value;
+            //if (!Flags.IsPhysicalRegardlessOfSize && itemIsTooSmall) return;
+        }
+
+        _navMeshObstacle.enabled = enabled;
+
+        List<GameObject> descendants = LITUtils.GetAllDescendants(gameObject);
+        foreach (GameObject descendant in descendants)
+        {
+            if (descendant.GetComponent<Collider>() == null) continue;
+            if (descendant.name.Contains("LITKeepLayer")) continue;
+
+            if (enabled)
+            {
+                descendant.layer = GetCollisionEnabledLayerNumber(descendant.name);
+            }
+            else
+            {
+                descendant.layer = LayerMask.NameToLayer("Loot");
+            }
+        }
+    }
+
+    public static int GetCollisionEnabledLayerNumber(string objectName)
+    {
+        if (!objectName.Contains("LITSetLayer")) return LayerMask.NameToLayer("Default");
+
+        int startIndex = objectName.IndexOf("LITSetLayer") + "LITSetLayer".Length;
+        int layerNumber = int.Parse(objectName.Substring(startIndex, 2));
+
+        return layerNumber;
     }
 
     private void AddNavMeshObstacle()
@@ -97,8 +164,7 @@ public class FakeItem : InteractableObject
             InteractionContainer.CustomInteractions.Add(new SearchInteraction(this));
         }
 
-        // TODO: add move mode interaction
-
+        InteractionContainer.CustomInteractions.Add(new ItemMover.EnterMoveModeInteraction(this));
         InteractionContainer.CustomInteractions.Add(new ReclaimInteraction(this));
     }
 
@@ -164,7 +230,7 @@ public class FakeItem : InteractableObject
 
     public class PlaceItemInteraction(LootItem lootItem) : CustomInteraction
     {
-        private LootItem _lootItem = lootItem;
+        private readonly LootItem _lootItem = lootItem;
         public override string Name => "Place Item";
         //public override bool Enabled => LITSession.Instance.PlacementIsAllowed(_lootItem.Item);
 

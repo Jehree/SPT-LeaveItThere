@@ -37,6 +37,14 @@ public static class ItemHelper
         }
     }
 
+    public static bool ItemCanBePickedUp(Item item)
+    {
+        InventoryController playerInventoryController = RaidSession.Instance.Player.InventoryController;
+        InventoryEquipment playerEquipment = playerInventoryController.Inventory.Equipment;
+        var pickedUpResult = InteractionsHandlerClass.QuickFindAppropriatePlace(item, playerInventoryController, playerEquipment.ToEnumerable(), InteractionsHandlerClass.EMoveItemOrder.PickUp, true);
+        return pickedUpResult.Succeeded;
+    }
+
     public static void MakeSearchableItemFullySearched(SearchableItemItemClass searchableItem)
     {
         IPlayerSearchController controller = Singleton<GameWorld>.Instance.MainPlayer.SearchController;

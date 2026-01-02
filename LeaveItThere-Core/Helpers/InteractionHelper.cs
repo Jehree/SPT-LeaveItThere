@@ -3,9 +3,11 @@ using EFT;
 using EFT.InputSystem;
 using EFT.UI;
 using LeaveItThere.Components;
+using SPT.Reflection.Patching;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace LeaveItThere.Helpers;
@@ -75,7 +77,10 @@ public static class InteractionHelper
     private static IEnumerable<ECommand> _allCommands = Enum.GetValues(typeof(ECommand)).Cast<ECommand>();
     public static void SetMostInputsIgnored(bool ignored, IEnumerable<ECommand> except = null)
     {
-        except ??= [];
+        if (except == null)
+        {
+            except = [];
+        }
 
         if (ignored)
         {
@@ -84,6 +89,20 @@ public static class InteractionHelper
         else
         {
             GamePlayerOwner.RemoveIgnoreInputCommands(_allCommands.Except(except));
+        }
+    }
+
+    internal class InteractionsChangedHandlerPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(GamePlayerOwner).GetMethod(nameof(GamePlayerOwner.InteractionsChangedHandler));
+        }
+
+        [PatchPrefix]
+        static bool PatchPrefix()
+        {
+            return RaidSession.Instance.InteractionsAllowed;
         }
     }
 }

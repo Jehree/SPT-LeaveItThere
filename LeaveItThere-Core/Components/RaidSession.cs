@@ -24,7 +24,10 @@ public class RaidSession : MonoBehaviour
                 throw new Exception("Tried to get ModSession when game world was not instantiated!");
             }
 
-            _instance ??= Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<RaidSession>();
+            if (_instance == null)
+            {
+                _instance = Singleton<GameWorld>.Instance.MainPlayer.gameObject.GetOrAddComponent<RaidSession>();
+            }
 
             return _instance;
         }
@@ -33,10 +36,13 @@ public class RaidSession : MonoBehaviour
     public GameWorld GameWorld { get; private set; }
     public Player Player { get; private set; }
     public GamePlayerOwner GamePlayerOwner { get; private set; }
+    internal ServerDataPack ServerDataPack { get; set; }
 
     public Dictionary<string, FakeItem> FakeItems { get; private set; } = [];
 
-    public void Awake()
+    public bool InteractionsAllowed = true;
+
+    internal void Awake()
     {
         GameWorld = Singleton<GameWorld>.Instance;
         Player = GameWorld.MainPlayer;
