@@ -14,6 +14,8 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -111,6 +113,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="set MOD_DIR=$(SolutionDir)\..\..\BepInEx\plugins\LeaveItThere&#xD;&#xA;if not exist &quot;%25MOD_DIR%25&quot; mkdir &quot;%25MOD_DIR%25&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;%25MOD_DIR%25\$(TargetFileName)&quot;&#xD;&#xA;xcopy /E /I /Y &quot;$(SolutionDir)Bundles&quot; &quot;%25MOD_DIR%25\Bundles&quot;" />
+    <Exec Command="set MOD_DIR=$(SolutionDir)\..\..\BepInEx\plugins\LeaveItThere&#xD;&#xA;if not exist &quot;%25MOD_DIR%25&quot; mkdir &quot;%25MOD_DIR%25&quot;&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;%25MOD_DIR%25\$(TargetFileName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)\$(TargetName).xml&quot; &quot;%25MOD_DIR%25\$(TargetName).xml&quot;&#xD;&#xA;xcopy /E /I /Y &quot;$(SolutionDir)Bundles&quot; &quot;%25MOD_DIR%25\Bundles&quot;" />
   </Target>
 </Project>

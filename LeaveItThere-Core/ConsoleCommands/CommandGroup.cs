@@ -12,22 +12,31 @@ namespace LeaveItThere.ConsoleCommands
 {
     public class CommandGroup
     {
-        /*
-        [ConsoleCommand("lit_unplace_all_items_below_cost", "", null, "Un-Place all items on the map below a cost amount. If you run this command in error somehow, ALT F4 to avoid the changes being saved.")]
-        public static void ClearPlacedItemsUnderCost([ConsoleArgument(0, "Cost Amount")] int costAmount, [ConsoleArgument("", "type 'IAMSURE' to confirm")] string iAmSure)
+        [ConsoleCommand("LeaveItThere.reclaim_all", "", null, "Reclaim all items on the map. If you run this command in error somehow, ALT F4 to avoid the changes being saved.")]
+        public static void ReclaimPlacedItemsUnderCost([ConsoleArgument("", "type 'IAMSURE' to confirm")] string iAmSure)
         {
             if (iAmSure != "IAMSURE") return;
 
-            ItemHelper.ForAllItemsUnderCost(
-                costAmount,
-                (FakeItem fakeItem) =>
-                {
-                    FikaBridge.SendPlacedStateChangedPacket(fakeItem, false);
-                    fakeItem.Reclaim();
-                }
-            );
+            foreach (FakeItem fakeItem in RaidSession.Instance.FakeItems.Values)
+            {
+                FikaBridge.SendPlacedStateChangedPacket(fakeItem, false);
+                fakeItem.Reclaim();
+            }
         }
-        */
+
+        [ConsoleCommand("LeaveItThere.reclaim_all_under_cost", "", null, "Reclaim all items on the map below a cost amount. If you run this command in error somehow, ALT F4 to avoid the changes being saved.")]
+        public static void ReclaimPlacedItemsUnderCost([ConsoleArgument(0, "Cost Amount")] int costAmount, [ConsoleArgument("", "type 'IAMSURE' to confirm")] string iAmSure)
+        {
+            if (iAmSure != "IAMSURE") return;
+
+            foreach (FakeItem fakeItem in RaidSession.Instance.FakeItems.Values)
+            {
+                if (LeaveItThereHelper.GetItemCost(fakeItem.LootItem.Item) > costAmount) continue;
+
+                FikaBridge.SendPlacedStateChangedPacket(fakeItem, false);
+                fakeItem.Reclaim();
+            }
+        }
 
         [ConsoleCommand("LeaveItThere.tp_all_items_to_player", "", null, "Teleport all items to the player. If you run this command in error somehow, ALT F4 to avoid the changes being saved.")]
         public static void TPAllItemsUnderCostToPlayer([ConsoleArgument("", "type 'IAMSURE' to confirm")] string iAmSure)
@@ -36,7 +45,7 @@ namespace LeaveItThere.ConsoleCommands
 
             foreach (FakeItem fakeItem in RaidSession.Instance.FakeItems.Values)
             {
-                fakeItem.Place(LITUtils.PlayerFront, RaidSession.Instance.Player.Transform.rotation);
+                fakeItem.SetFakeItemLocation(LeaveItThereHelper.PlayerFront, RaidSession.Instance.Player.Transform.rotation);
                 FikaBridge.SendPlacedStateChangedPacket(fakeItem, true);
             }
         }
@@ -53,7 +62,7 @@ namespace LeaveItThere.ConsoleCommands
             FakeItem fakeItem = RaidSession.Instance.FakeItems.Values.ToList()[itemNum];
 
             ConsoleScreen.Log("Teleporting item!");
-            fakeItem.Place(LITUtils.PlayerFront, RaidSession.Instance.Player.Transform.rotation);
+            fakeItem.SetFakeItemLocation(LeaveItThereHelper.PlayerFront, RaidSession.Instance.Player.Transform.rotation);
             FikaBridge.SendPlacedStateChangedPacket(fakeItem, true);
         }
 
@@ -67,7 +76,7 @@ namespace LeaveItThere.ConsoleCommands
             {
                 Vector3 playerPosition = Singleton<GameWorld>.Instance.MainPlayer.Transform.position;
                 string itemName = string.Format("({0})".Localized(null), fakeItem.LootItem.Name.Localized(null));
-                string direction = LITUtils.GetCardinalDirection(playerPosition, fakeItem.gameObject.transform.position);
+                string direction = LeaveItThereHelper.GetCardinalDirection(playerPosition, fakeItem.gameObject.transform.position);
                 string distance = Vector3.Distance(playerPosition, fakeItem.gameObject.transform.position).ToString();
 
                 ConsoleScreen.Log($"{itemName} (item number: {index}) placed {distance} units away from player ({direction})");

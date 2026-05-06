@@ -9,7 +9,7 @@ internal class FikaTools
     public static FikaServer Server => Singleton<FikaServer>.Instance;
     public static FikaClient Client => Singleton<FikaClient>.Instance;
 
-    public static bool IAmServer()
+    public static bool IAmHost()
     {
         return Singleton<FikaServer>.Instantiated;
     }

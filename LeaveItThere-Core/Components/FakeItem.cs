@@ -1,15 +1,14 @@
 ﻿using Comfort.Common;
 using EFT.Interactive;
 using EFT.UI;
+using LeaveItThere.Addon;
 using LeaveItThere.Common;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using LeaveItThere.ModSettings;
-using LeaveItThere.StateSync;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 namespace LeaveItThere.Components;
 
@@ -35,24 +34,10 @@ public class FakeItem : InteractableObject
     }
 
     public CustomInteractionContainer InteractionContainer { get; private set; }
+    public StateSynchronizerDatabase StateSynchronizerDatabase { get; private set; }
+    public FakeItemAddonFlags AddonFlags { get; private set; }
 
     private NavMeshObstacle _navMeshObstacle;
-
-    public StateSynchronizerDatabase StateSynchronizerDatabase { get; private set; }
-
-    class TestSynchronizer : StateSynchronizer
-    {
-        public string ExampleProp = "Some Example Data but changed";
-    }
-
-    class TestInteraction(FakeItem fakeItem) : CustomInteraction
-    {
-        public override string Name => "Test";
-        public override void OnInteract()
-        {
-            Plugin.LogSource.LogError(fakeItem.StateSynchronizerDatabase.GetSynchronizer<TestSynchronizer>().ExampleProp);
-        }
-    }
 
     internal static FakeItem CreateNewFakeItem(ObservedLootItem lootItem, StateSynchronizerDatabase stateSynchronizerDatabase = null)
     {
@@ -88,38 +73,38 @@ public class FakeItem : InteractableObject
         ItemId = lootItem.ItemId;
         TemplateId = lootItem.TemplateId;
         Moveable = moveable;
-        StateSynchronizerDatabase = stateSynchronizerDatabase == null
-            ? new()
-            : stateSynchronizerDatabase;
-
+        AddonFlags = new();
+        StateSynchronizerDatabase = stateSynchronizerDatabase ?? new();
+        StateSynchronizerDatabase.Init(this);
 
         RaidSession.Instance.AddFakeItem(this);
-
 
         AddNavMeshObstacle();
         InitializeInteractions();
 
+        StaticEvents.InvokeFakeItemInitialized(this);
+
         SetPlayerAndBotCollisionEnabled(Settings.PlacedItemsHaveCollision.Value);
 
-        StateSynchronizerDatabase.RegisterSynchronizer<TestSynchronizer>("Test");
-        InteractionContainer.CustomInteractions.Add(new TestInteraction(this));
+        if (AddonFlags.RemoveRootCollider || gameObject.name.Contains("LITRemoveRootCollider"))
+        {
+            GetComponents<BoxCollider>().ExecuteForEach(col => col.enabled = false);
+        }
     }
 
     public void SetPlayerAndBotCollisionEnabled(bool enabled)
     {
-        // if we are disabling the collision, always do it regardless of settings
-        if (enabled)
-        {
-            bool itemIsTooSmall = LootItem.Item.Width * LootItem.Item.Height < Settings.MinimumSizeItemToGetCollision.Value;
-            //if (!Flags.IsPhysicalRegardlessOfSize && itemIsTooSmall) return;
-        }
+        bool alwaysPhysical = AddonFlags.AlwaysPhysical || gameObject.name.Contains("LITAlwaysPhysical");
+        bool itemIsTooSmall = LootItem.Item.Width * LootItem.Item.Height < Settings.MinimumSizeItemToGetCollision.Value;
+
+        if (enabled && !alwaysPhysical && itemIsTooSmall) return;
 
         _navMeshObstacle.enabled = enabled;
 
-        List<GameObject> descendants = LITUtils.GetAllDescendants(gameObject);
+        List<GameObject> descendants = LeaveItThereHelper.GetAllDescendants(gameObject);
         foreach (GameObject descendant in descendants)
         {
-            if (descendant.GetComponent<Collider>() == null) continue;
+            if (!descendant.TryGetComponent<Collider>(out var _)) continue;
             if (descendant.name.Contains("LITKeepLayer")) continue;
 
             if (enabled)
@@ -170,41 +155,64 @@ public class FakeItem : InteractableObject
 
     public void Reclaim()
     {
+        StaticEvents.InvokeItemReclaimed(this);
+
         SetRealItemLocation(gameObject.transform.position, gameObject.transform.rotation);
         Destroy(gameObject);
+
+        RaidSession.Instance.RefundPoints(LeaveItThereHelper.GetItemCost(LootItem.Item));
     }
 
-    public void Place(Vector3 position, Quaternion rotation)
+    internal void Place(Vector3 position, Quaternion rotation)
     {
-        LootItem.StopPhysics();
         SetFakeItemLocation(position, rotation);
-        LootItem.gameObject.transform.position = new Vector3(0, -99999, 0);
+        SetRealItemLocation(new Vector3(0, -99999, 0));
+
+        RaidSession.Instance.SpendPoints(LeaveItThereHelper.GetItemCost(LootItem.Item));
     }
 
-    public void PlaceAtLootItem()
+    internal void Place()
     {
         Place(LootItem.gameObject.transform.position, LootItem.gameObject.transform.rotation);
     }
 
-    private void SetFakeItemLocation(Vector3 position, Quaternion rotation)
+    public void SetFakeItemLocation(Vector3 position, Quaternion rotation)
     {
+        LootItem.StopPhysics();
         gameObject.transform.position = position;
         gameObject.transform.rotation = rotation;
+
+        StaticEvents.InvokeFakeItemMoved(this);
     }
 
-    private void SetRealItemLocation(Vector3 position, Quaternion rotation)
+    public void SetRealItemLocation(Vector3 position, Quaternion rotation = default)
     {
+        LootItem.StopPhysics();
         LootItem.gameObject.transform.position = position;
-        LootItem.gameObject.transform.rotation = rotation;
+
+        if (rotation != default)
+        {
+            LootItem.gameObject.transform.rotation = rotation;
+        }
     }
 
-    public void PlacedPlayerFeedback()
+    internal void PlacedPlayerFeedback()
     {
+        if (Settings.CostSystemEnabled.Value)
+        {
+            InteractionHelper.NotificationLong($"Placement cost: {LeaveItThereHelper.GetItemCost(LootItem.Item)}, {Settings.AllottedPoints - RaidSession.Instance.PointsSpent} out of {Settings.AllottedPoints} points remaining");
+        }
+
         Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponAssemble);
     }
 
-    public void ReclaimPlayerFeedback()
+    internal void ReclaimPlayerFeedback()
     {
+        if (Settings.CostSystemEnabled.Value)
+        {
+            InteractionHelper.NotificationLong($"Points rufunded: {LeaveItThereHelper.GetItemCost(LootItem.Item)}, {Settings.AllottedPoints - RaidSession.Instance.PointsSpent} out of {Settings.AllottedPoints} points remaining");
+        }
+
         Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuWeaponDisassemble);
     }
 
@@ -232,12 +240,12 @@ public class FakeItem : InteractableObject
     {
         private readonly LootItem _lootItem = lootItem;
         public override string Name => "Place Item";
-        //public override bool Enabled => LITSession.Instance.PlacementIsAllowed(_lootItem.Item);
+        public override bool Enabled => RaidSession.Instance.PlacementIsAllowed(_lootItem.Item);
 
         public override void OnInteract()
         {
             FakeItem fakeItem = CreateNewFakeItem(_lootItem as ObservedLootItem);
-            fakeItem.PlaceAtLootItem();
+            fakeItem.Place();
             fakeItem.PlacedPlayerFeedback();
             FikaBridge.SendPlacedStateChangedPacket(fakeItem, true);
         }
@@ -246,13 +254,14 @@ public class FakeItem : InteractableObject
     public class ReclaimInteraction(FakeItem fakeItem) : CustomInteraction
     {
         public FakeItem FakeItem { get; set; } = fakeItem;
-        public override string Name => "Reclaim";
-        public override bool Enabled => true;
+        public override string Name => FakeItem.AddonFlags.ReclaimInteractionDisabled
+                                            ? $"Reclaim: {FakeItem.AddonFlags.ReclaimInteractionDisabledReason}"
+                                            : "Reclaim";
+        public override bool Enabled => !FakeItem.AddonFlags.ReclaimInteractionDisabled;
         public override bool AutoPromptRefresh => true;
 
         public override void OnInteract()
         {
-            //FikaBridge.SendPlacedStateChangedPacket(FakeItem, false);
             FakeItem.Reclaim();
             FakeItem.ReclaimPlayerFeedback();
             FikaBridge.SendPlacedStateChangedPacket(FakeItem, false);

@@ -1,5 +1,6 @@
 ﻿using EFT;
 using HarmonyLib;
+using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
@@ -24,9 +25,11 @@ internal class GameEndedPatch : ModulePatch
 
         if (FikaBridge.IAmHost())
         {
-            LITUtils.ServerRoute(Plugin.DataToServerURL, new ServerDataPack(RaidSession.Instance.FakeItems));
+            LeaveItThereHelper.ServerRoute(Plugin.DataToServerURL, new ServerDataPack(RaidSession.Instance.FakeItems));
         }
 
         RaidSession.Instance.DestroyAllFakeItems();
+
+        StaticEvents.InvokeGameEnded();
     }
 }

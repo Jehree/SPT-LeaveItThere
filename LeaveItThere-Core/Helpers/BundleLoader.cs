@@ -8,9 +8,9 @@ public static class BundleLoader
 {
     public static AssetBundle LoadBundle(string bundleName, string relativePath = "bundles")
     {
-        string bundlePath = Path.Combine(LITUtils.AssemblyFolderPath, relativePath, bundleName);
+        string bundlePath = Path.Combine(LeaveItThereHelper.AssemblyFolderPath, relativePath, bundleName);
 
-        return AssetBundle.LoadFromFile(bundlePath) 
+        return AssetBundle.LoadFromFile(bundlePath)
             ?? throw new Exception($"Error loading bundle: {bundlePath}");
     }
 

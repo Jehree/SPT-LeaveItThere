@@ -1,6 +1,9 @@
-﻿using Comfort.Common;
+﻿using BepInEx.Bootstrap;
 using EFT;
+using EFT.InventoryLogic;
+using LeaveItThere.Addon;
 using LeaveItThere.Components;
+using LeaveItThere.ModSettings;
 using Newtonsoft.Json;
 using SPT.Common.Http;
 using System.Collections.Generic;
@@ -10,15 +13,28 @@ using UnityEngine;
 
 namespace LeaveItThere.Helpers;
 
-public class LITUtils
+public class LeaveItThereHelper
 {
     public static string AssemblyPath { get; private set; } = Assembly.GetExecutingAssembly().Location;
     public static string AssemblyFolderPath { get; private set; } = Path.GetDirectoryName(AssemblyPath);
 
+    private static bool? _fikaInstalled = null;
+    public static bool FikaInstalled
+    {
+        get
+        {
+            if (_fikaInstalled == null)
+            {
+                _fikaInstalled = Chainloader.PluginInfos.ContainsKey("com.fika.core");
+            }
+
+            return (bool)_fikaInstalled;
+        }
+    }
+
     public static T ServerRoute<T>(string url, T data = default)
     {
         string json = JsonConvert.SerializeObject(data);
-        Plugin.LogSource.LogError(json);
         string req = RequestHandler.PostJson(url, json);
         return JsonConvert.DeserializeObject<T>(req);
     }
@@ -62,7 +78,7 @@ public class LITUtils
         direction.Normalize();
         float angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
         if (angle < 0) angle += 360;
-        
+
         string locId = RaidSession.Instance.GameWorld.LocationId;
         if (locId == "factory4_day" || locId == "factory4_night")
         {
@@ -88,5 +104,33 @@ public class LITUtils
         }
 
         return "this shouldn't ever be reached";
+    }
+
+    public static int GetItemCost(Item item)
+    {
+        if (AddonTools.CostOverrides.TryGetValue(item.TemplateId, out int overriddenCost))
+        {
+            return overriddenCost;
+        }
+
+        int cost = 0;
+
+        if (item is SearchableItemItemClass)
+        {
+            // it happens to be the case that this does NOT include item cases. I'm not fixing it because I think it's cool heh heh
+            foreach (StashGridClass grid in (item as SearchableItemItemClass).Grids)
+            {
+                cost += grid.GridWidth * grid.GridHeight;
+            }
+        }
+        else
+        {
+            XYCellSizeStruct cellSizeStruct = item.CalculateCellSize();
+            cost = cellSizeStruct.X * cellSizeStruct.Y;
+        }
+
+        return cost >= Settings.MinimumPlacementCost.Value
+            ? cost
+            : Settings.MinimumPlacementCost.Value;
     }
 }

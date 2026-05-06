@@ -1,9 +1,8 @@
 ﻿using EFT.InventoryLogic;
+using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Helpers;
-using LeaveItThere.StateSync;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace LeaveItThere.Models;
@@ -27,7 +26,7 @@ public class PlacedItemData
             {
                 _item = ItemHelper.StringToItem(_itemDataBase64);
             }
-            
+
             return _item;
         }
     }
@@ -38,7 +37,7 @@ public class PlacedItemData
         Location = fakeItem.gameObject.transform.position;
         Rotation = fakeItem.gameObject.transform.rotation;
         _itemDataBase64 = ItemHelper.ItemToString(fakeItem.LootItem.Item);
-        fakeItem.StateSynchronizerDatabase.ConvertDatabaseToRaw();
+        fakeItem.StateSynchronizerDatabase.UpdateRawDatabase();
         StateSynchronizerDatabase = fakeItem.StateSynchronizerDatabase;
     }
 }

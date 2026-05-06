@@ -32,7 +32,7 @@ internal class MoveModeUI : MonoBehaviour
             {
                 _prefab = BundleLoader.LoadAsset<GameObject>(AssetBundle, "EditPlacedItemMenu");
             }
-            
+
             return _prefab;
         }
     }
@@ -46,7 +46,7 @@ internal class MoveModeUI : MonoBehaviour
             {
                 _assetBundle = BundleLoader.LoadBundle("editplaceditemmenu.menu");
             }
-            
+
             return _assetBundle;
         }
     }

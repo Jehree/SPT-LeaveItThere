@@ -2,8 +2,6 @@
 using EFT.UI;
 using HarmonyLib;
 using SPT.Reflection.Patching;
-using SPT.Reflection.Utils;
-using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -63,7 +61,7 @@ public static class CursorHelper
         {
             // name is ecursorResult_0 in the InputManager class
             _cursorResultField = typeof(InputManager).GetFields(BindingFlags.NonPublic | BindingFlags.Instance).First(f => f.FieldType == typeof(ECursorResult));
-            
+
             return AccessTools.Method(typeof(InputManager), nameof(InputManager.Update));
         }
 

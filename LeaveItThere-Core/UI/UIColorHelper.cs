@@ -1,9 +1,7 @@
-﻿using LeaveItThere.Helpers;
-using LeaveItThere.ModSettings;
+﻿using LeaveItThere.ModSettings;
 using UnityEngine;
 using UnityEngine.UI;
 using static LeaveItThere.UI.MoveModeUI;
-using static RootMotion.Demos.CharacterThirdPerson;
 
 namespace LeaveItThere.UI;
 

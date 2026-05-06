@@ -2,6 +2,7 @@
 using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
+using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Models;
 using System;
@@ -16,12 +17,17 @@ public static class ItemSpawner
 {
     private static int _itemsSpawned;
     private static int _itemsToSpawn;
-    private static Vector3 _itemSpawnPosition = new(0, -9999, 0);
+    private static Vector3 _itemSpawnPosition = new(0, -99999, 0);
 
     internal static void SpawnAllPlacedItems()
     {
         _itemsSpawned = 0;
         _itemsToSpawn = RaidSession.Instance.ServerDataPack.ItemTemplates.Count;
+
+        if (_itemsToSpawn > 0)
+        {
+            RaidSession.Instance.LootExperienceEnabled = false;
+        }
 
         foreach (PlacedItemData placedItemData in RaidSession.Instance.ServerDataPack.ItemTemplates)
         {
@@ -42,11 +48,13 @@ public static class ItemSpawner
         FakeItem fakeItem = FakeItem.CreateNewFakeItem(lootItem as ObservedLootItem, placedItemData.StateSynchronizerDatabase);
         fakeItem.Place(placedItemData.Location, placedItemData.Rotation);
 
+        StaticEvents.InvokeItemSpawned(fakeItem);
+
         _itemsSpawned++;
         if (_itemsSpawned >= _itemsToSpawn)
         {
-            // reenable loot experience
-            // invoke finished spawning events
+            RaidSession.Instance.LootExperienceEnabled = true;
+            StaticEvents.InvokeAllItemsSpawned();
         }
     }
 
@@ -100,7 +108,7 @@ public static class ItemSpawner
         callback?.Invoke(lootItem, placedItemData);
     }
 
-    private static List<ResourceKey> GetBundleResourceKeys(Item item)
+    public static List<ResourceKey> GetBundleResourceKeys(Item item)
     {
         List<ResourceKey> collection = [];
         IEnumerable<Item> items = item.GetAllItems();

@@ -75,7 +75,7 @@ public class PhysicsMoveable : MonoBehaviour
 
     public void MoveToPlayer()
     {
-        gameObject.transform.position = LITUtils.PlayerFront;
+        gameObject.transform.position = LeaveItThereHelper.PlayerFront;
     }
 
     public void ResetRotation()

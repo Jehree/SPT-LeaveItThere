@@ -2,8 +2,10 @@
 using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
+using LeaveItThere.Addon;
 using LeaveItThere.Helpers;
 using LeaveItThere.Models;
+using LeaveItThere.ModSettings;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,10 +39,24 @@ public class RaidSession : MonoBehaviour
     public Player Player { get; private set; }
     public GamePlayerOwner GamePlayerOwner { get; private set; }
     internal ServerDataPack ServerDataPack { get; set; }
-
+    public StateSynchronizerDatabase StateSynchronizerDatabase { get; internal set; }
     public Dictionary<string, FakeItem> FakeItems { get; private set; } = [];
 
-    public bool InteractionsAllowed = true;
+    internal bool InteractionsAllowed { get; set; } = true;
+    internal bool LootExperienceEnabled { get; set; } = true;
+
+    private int _pointsSpent = 0;
+    public int PointsSpent
+    {
+        get
+        {
+            return _pointsSpent;
+        }
+        private set
+        {
+            _pointsSpent = Mathf.Clamp(value, 0, Settings.AllottedPoints);
+        }
+    }
 
     internal void Awake()
     {
@@ -49,19 +65,33 @@ public class RaidSession : MonoBehaviour
         GamePlayerOwner = Player.GetComponent<GamePlayerOwner>();
     }
 
-    public void AddFakeItem(FakeItem fakeItem)
+    internal void InitOnGameStart()
+    {
+        ServerDataPack = LeaveItThereHelper.ServerRoute(Plugin.DataToClientURL, ServerDataPack.Request);
+        Plugin.LogSource.LogError(ServerDataPack.StateSynchronizerDatabase == null);
+        StateSynchronizerDatabase = ServerDataPack.StateSynchronizerDatabase ?? new();
+        StateSynchronizerDatabase.Init();
+        Plugin.LogSource.LogError(StateSynchronizerDatabase == null);
+    }
+
+    internal void AddFakeItem(FakeItem fakeItem)
     {
         FakeItems[fakeItem.ItemId] = fakeItem;
     }
 
     public FakeItem GetFakeItemOrNull(string itemId)
     {
-        return FakeItems.ContainsKey(itemId)
-            ? FakeItems[itemId]
-            : null;
+        if (FakeItems.TryGetValue(itemId, out FakeItem fakeItem))
+        {
+            return fakeItem;
+        }
+        else
+        {
+            return null;
+        }
     }
 
-    public FakeItem GetOrCreateFakeItem(string itemId)
+    internal FakeItem GetOrCreateFakeItem(string itemId)
     {
         FakeItem fakeItem = GetFakeItemOrNull(itemId);
 
@@ -101,5 +131,27 @@ public class RaidSession : MonoBehaviour
         {
             Destroy(fakeItem.gameObject);
         }
+    }
+
+    public bool PlacementIsAllowed(Item item)
+    {
+        if (Settings.CostSystemEnabled.Value)
+        {
+            return PointsSpent + LeaveItThereHelper.GetItemCost(item) <= Settings.AllottedPoints;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    internal void SpendPoints(int points)
+    {
+        PointsSpent += points;
+    }
+
+    internal void RefundPoints(int points)
+    {
+        PointsSpent -= points;
     }
 }

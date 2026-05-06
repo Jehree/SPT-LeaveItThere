@@ -11,9 +11,14 @@ internal class Main
     {
         FikaBridge.PluginEnableEmitted += EventSubscriber.InitOnPluginEnabled;
 
-        FikaBridge.IAmHostEmitted += FikaTools.IAmServer;
+        FikaBridge.IAmHostEmitted += FikaTools.IAmHost;
         FikaBridge.GetRaidIdEmitted += FikaTools.GetRaidId;
 
         FikaBridge.SendPlacedStateChangedPacketEmitted += PlacementPacketHandler.SendPlacedStateChangedPacket;
+        FikaBridge.SendStateSynchronizerUpdatePacketEmitted += StateSynchronizerPacketHandler.SendPacket;
+
+        FikaBridge.RegisterGenericPacketEmitted += GenericPacketHandler.RegisterPacket;
+        FikaBridge.UnregisterGenericPacketEmitted += GenericPacketHandler.UnregisterPacket;
+        FikaBridge.SendGenericPacketEmitted += GenericPacketHandler.SendPacket;
     }
 }

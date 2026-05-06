@@ -7,7 +7,7 @@ namespace LeaveItThere.FikaModule.Common;
 
 internal class PlacementPacketHandler
 {
-    public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool isPlaced, bool physicsEnableRequested = false)
+    public static void SendPlacedStateChangedPacket(FakeItem fakeItem, bool isPlaced, bool physicsEnableRequested = false, bool moveOnly = false)
     {
         PlacedItemStateChangedPacket packet = new()
         {
@@ -15,10 +15,11 @@ internal class PlacementPacketHandler
             Position = fakeItem.gameObject.transform.position,
             Rotation = fakeItem.gameObject.transform.rotation,
             IsPlaced = isPlaced,
-            PhysicsEnableRequested = physicsEnableRequested
+            PhysicsEnableRequested = physicsEnableRequested,
+            MoveOnly = moveOnly,
         };
 
-        if (FikaTools.IAmServer())
+        if (FikaTools.IAmHost())
         {
             FikaTools.Server.SendData(ref packet, DeliveryMethod.ReliableOrdered);
         }
@@ -40,44 +41,46 @@ internal class PlacementPacketHandler
             ReclaimItemPackedReceived(packet);
         }
 
-        if (FikaTools.IAmServer())
+        if (FikaTools.IAmHost())
         {
             FikaTools.Server.SendData(ref packet, DeliveryMethod.ReliableOrdered);
         }
     }
 
-    public static void PlaceItemPacketReceived(PlacedItemStateChangedPacket packet)
+    private static void PlaceItemPacketReceived(PlacedItemStateChangedPacket packet)
     {
         FakeItem fakeItem = RaidSession.Instance.GetOrCreateFakeItem(packet.ItemId);
 
-        fakeItem.Place(packet.Position, packet.Rotation);
+        if (packet.MoveOnly)
+        {
+            fakeItem.SetFakeItemLocation(packet.Position, packet.Rotation);
+        }
+        else
+        {
+            fakeItem.Place(packet.Position, packet.Rotation);
+        }
 
-        /*
         if (packet.PhysicsEnableRequested)
         {
-            fakeItem.gameObject.GetComponent<Moveable>().EnablePhysics(true);
+            fakeItem.Moveable.EnablePhysics(true);
         }
 
-        ItemMover mover = ItemMover.Instance;
-        if (mover.enabled && mover.Target.gameObject == fakeItem.gameObject)
+        if (ItemMover.Instance.enabled && ItemMover.Instance.Target == fakeItem)
         {
-            mover.Disable(false);
+            ItemMover.Instance.Disable(false);
         }
-        */
     }
 
-    public static void ReclaimItemPackedReceived(PlacedItemStateChangedPacket packet)
+    private static void ReclaimItemPackedReceived(PlacedItemStateChangedPacket packet)
     {
         FakeItem fakeItem = RaidSession.Instance.GetFakeItemOrNull(packet.ItemId);
+
         if (fakeItem == null) return;
 
-        /*
-        ItemMover mover = ItemMover.Instance;
-        if (mover.enabled && mover.Target.gameObject == fakeItem.gameObject)
+        if (ItemMover.Instance.enabled && ItemMover.Instance.Target.gameObject == fakeItem.gameObject)
         {
-            mover.Disable(false);
+            ItemMover.Instance.Disable(false);
         }
-        */
 
         fakeItem.Reclaim();
     }

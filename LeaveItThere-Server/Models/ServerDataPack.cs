@@ -7,6 +7,7 @@ public class ServerDataPack : IRequestData
     public required string ProfileId { get; set; }
     public required string MapId { get; set; }
     public required object? ItemTemplates { get; set; }
+    public required object? StateSynchronizerDatabase { get; set; }
 
     public static ServerDataPack GetEmpty(string profileId, string mapId)
     {
@@ -14,7 +15,8 @@ public class ServerDataPack : IRequestData
         {
             ProfileId = profileId,
             MapId = mapId,
-            ItemTemplates = default
+            ItemTemplates = default,
+            StateSynchronizerDatabase = default,
         };
     }
 }

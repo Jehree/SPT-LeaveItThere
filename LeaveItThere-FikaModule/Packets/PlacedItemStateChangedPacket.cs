@@ -10,6 +10,7 @@ public struct PlacedItemStateChangedPacket : INetSerializable
     public Quaternion Rotation;
     public bool IsPlaced;
     public bool PhysicsEnableRequested;
+    public bool MoveOnly;
 
     public void Deserialize(NetDataReader reader)
     {
@@ -18,6 +19,7 @@ public struct PlacedItemStateChangedPacket : INetSerializable
         Rotation = reader.GetUnmanaged<Quaternion>();
         IsPlaced = reader.GetBool();
         PhysicsEnableRequested = reader.GetBool();
+        MoveOnly = reader.GetBool();
     }
 
     public void Serialize(NetDataWriter writer)
@@ -27,5 +29,6 @@ public struct PlacedItemStateChangedPacket : INetSerializable
         writer.PutUnmanaged(Rotation);
         writer.Put(IsPlaced);
         writer.Put(PhysicsEnableRequested);
+        writer.Put(MoveOnly);
     }
 }

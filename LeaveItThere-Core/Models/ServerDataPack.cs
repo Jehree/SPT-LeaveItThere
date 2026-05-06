@@ -1,6 +1,6 @@
 ﻿using Comfort.Common;
 using EFT;
-using EFT.InventoryLogic;
+using LeaveItThere.Addon;
 using LeaveItThere.Components;
 using LeaveItThere.Fika;
 using Newtonsoft.Json;
@@ -14,6 +14,7 @@ namespace LeaveItThere.Models
         public string MapId { get; set; }
 
         public List<PlacedItemData> ItemTemplates { get; set; } = [];
+        public StateSynchronizerDatabase StateSynchronizerDatabase { get; set; } = null;
 
         [JsonIgnore]
         public static ServerDataPack Request => new()
@@ -35,7 +36,10 @@ namespace LeaveItThere.Models
 
             ItemTemplates = dataList;
             ProfileId = FikaBridge.GetRaidId();
-            MapId = Singleton<GameWorld>.Instance.LocationId;
+            MapId = RaidSession.Instance.GameWorld.LocationId;
+
+            RaidSession.Instance.StateSynchronizerDatabase.UpdateRawDatabase();
+            StateSynchronizerDatabase = RaidSession.Instance.StateSynchronizerDatabase;
         }
     }
 }

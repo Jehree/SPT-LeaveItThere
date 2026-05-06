@@ -10,7 +10,8 @@ internal class EventSubscriber
     public static void OnFikaNetManagerCreated(FikaNetworkManagerCreatedEvent managerCreatedEvent)
     {
         managerCreatedEvent.Manager.RegisterPacket<PlacedItemStateChangedPacket>(PlacementPacketHandler.OnPlacedItemStateChangedPacketReceived);
-        //managerCreatedEvent.Manager.RegisterPacket<LITGenericPacket, NetPeer>(GenericPacketTools.OnGenericPacketReceived);
+        managerCreatedEvent.Manager.RegisterPacket<StateSynchronizerPacket>(StateSynchronizerPacketHandler.OnPacketReceived);
+        managerCreatedEvent.Manager.RegisterPacket<LITGenericPacket, NetPeer>(GenericPacketHandler.OnGenericPacketReceived);
     }
 
     public static void InitOnPluginEnabled()

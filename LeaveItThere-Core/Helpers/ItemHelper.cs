@@ -5,11 +5,7 @@ using EFT.InventoryLogic;
 using EFT.UI;
 using LeaveItThere.Components;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization.Formatters;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace LeaveItThere.Helpers;

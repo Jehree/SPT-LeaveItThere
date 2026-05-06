@@ -5,7 +5,6 @@ using LeaveItThere.Fika;
 using LeaveItThere.Helpers;
 using LeaveItThere.ModSettings;
 using LeaveItThere.UI;
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using static LeaveItThere.UI.MoveModeUI;
@@ -137,7 +136,7 @@ internal class ItemMover : MonoBehaviour
     /// </summary>
     public Vector3 PlayerMovementDelta => RaidSession.Instance.Player.Transform.position - _playerPositionLastFrame;
 
-    private Quaternion CameraRotation => Quaternion.LookRotation(LITUtils.CameraForward);
+    private Quaternion CameraRotation => Quaternion.LookRotation(LeaveItThereHelper.CameraForward);
     #endregion
 
     #region UI Helper Getters
@@ -423,14 +422,13 @@ internal class ItemMover : MonoBehaviour
 
         if (movementSaved)
         {
-            Target.Place(Target.gameObject.transform.position, Target.gameObject.transform.rotation);
-            FikaBridge.SendPlacedStateChangedPacket(Target, true, WillFloat);
+            Target.SetFakeItemLocation(Target.gameObject.transform.position, Target.gameObject.transform.rotation);
+            FikaBridge.SendPlacedStateChangedPacket(Target, true, !WillFloat, true);
             InteractionHelper.NotificationLong("Placement edit saved!");
         }
         else
         {
-            Target.gameObject.transform.position = _undoPosition;
-            Target.gameObject.transform.rotation = _undoRotation;
+            Target.SetFakeItemLocation(_undoPosition, _undoRotation);
             InteractionHelper.NotificationLongWarning("Move Mode cancelled.");
         }
 
@@ -464,13 +462,11 @@ internal class ItemMover : MonoBehaviour
     #region Tests
     public static bool MoveModeDisallowed(FakeItem fakeItem, out string reason)
     {
-        /*
-        if (fakeItem.Flags.MoveModeDisabled)
+        if (fakeItem.AddonFlags.MoveModeDisabled)
         {
-            reason = fakeItem.Flags.MoveModeDisabledReason;
+            reason = fakeItem.AddonFlags.MoveModeDisabledReason;
             return true;
         }
-        */
 
         if (Settings.MoveModeRequiresInventorySpace.Value && !ItemHelper.ItemCanBePickedUp(fakeItem.LootItem.Item))
         {
